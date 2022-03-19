@@ -30,7 +30,7 @@ def update():
 
 @app.route('/test')
 def test():
-   return "succes2!"
+   return "succes3!"
 
 
 if __name__ == '__main__':
