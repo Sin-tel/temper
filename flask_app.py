@@ -18,8 +18,6 @@ def result():
 		options["tenney"] = ("tenney" in args)
 		options["reduce"] = ("reduce" in args)
 
-		
-
 		if "submit_edo" in args:
 			temp = from_edos(args)
 		elif "submit_comma" in args:
