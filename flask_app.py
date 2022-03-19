@@ -19,7 +19,7 @@ def result():
 
 @app.route('/pull')
 def pull():
-   return subprocess.check_output("git pull")
+   return subprocess.check_output("./pull.sh")
 
 if __name__ == '__main__':
    app.run(debug = True)
