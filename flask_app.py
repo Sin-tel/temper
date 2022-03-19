@@ -1,6 +1,6 @@
 import flask as f
 from main import *
-import subprocess
+import git
 
 app = f.Flask(__name__)
 
@@ -17,9 +17,16 @@ def result():
       html_info = info(temp)
       return f.render_template("./result.html",res = html_info)
 
-@app.route('/pull')
-def pull():
-   return subprocess.check_output("/home/sintel/temper/pull.sh")
+@app.route('/update', methods=['POST'])
+def update():
+   if request.method == 'POST':
+      repo = git.Repo('./myproject')
+      origin = repo.remotes.origin
+      repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
+      origin.pull()
+      return '', 200
+   else:
+      return '', 400
 
 @app.route('/test')
 def test():
