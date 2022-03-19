@@ -1,5 +1,6 @@
 import flask as f
 from main import *
+import subprocess
 
 app = f.Flask(__name__)
 
@@ -15,6 +16,10 @@ def result():
       temp = from_edos(args)
       html_info = info(temp)
       return f.render_template("./result.html",res = html_info)
+
+@app.route('/pull')
+def pull():
+   return subprocess.check_output("git pull")
 
 if __name__ == '__main__':
    app.run(debug = True)
