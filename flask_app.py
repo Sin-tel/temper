@@ -22,7 +22,7 @@ def update():
    if f.request.method == 'POST':
       repo = git.Repo('./temper')
       origin = repo.remotes.origin
-      repo.create_head('main', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
+      repo.create_head('main', origin.refs.main).set_tracking_branch(origin.refs.main).checkout()
       origin.pull()
       return '', 200
    else:
