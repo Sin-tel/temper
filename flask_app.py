@@ -21,6 +21,11 @@ def result():
 def pull():
    return subprocess.check_output("./pull.sh")
 
+@app.route('/test')
+def test():
+   return "succes!"
+
+
 if __name__ == '__main__':
    app.run(debug = True)
 
