@@ -20,7 +20,7 @@ def result():
 @app.route('/update', methods=['POST'])
 def update():
    if f.request.method == 'POST':
-      repo = git.Repo('./myproject')
+      repo = git.Repo('./temper')
       origin = repo.remotes.origin
       repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
       origin.pull()
@@ -30,7 +30,7 @@ def update():
 
 @app.route('/test')
 def test():
-   return "succes3!"
+   return "succes4!"
 
 
 if __name__ == '__main__':
