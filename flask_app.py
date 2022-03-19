@@ -19,7 +19,7 @@ def result():
 
 @app.route('/pull')
 def pull():
-   return subprocess.check_output("./pull.sh")
+   return subprocess.check_output("/home/sintel/temper/pull.sh")
 
 @app.route('/test')
 def test():
