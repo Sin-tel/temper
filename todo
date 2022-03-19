@@ -1,1 +1,13 @@
-check  12,31   2.9.5.7  edos
+x always remove contorsion
+x enter comma vectors
+x reduce gens, always positive
+x get preimage gens
+x unweighted/weighted
+
+
+make search
+list more commas, sort by tenney
+adaptive precision?
+error msg
+input validation
+GPV, warts

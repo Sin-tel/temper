@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <link rel="stylesheet" href= "{{ url_for('static', filename = 'basic.css') }}">
-   <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <title>temper</title>
-   <link rel="shortcut icon" type="image/jpg" href="{{ url_for('static', filename = 'icon.png') }}"/>
+	<link rel="stylesheet" href= "{{ url_for('static', filename = 'basic.css') }}">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>temper</title>
+	<link rel="shortcut icon" type="image/jpg" href="{{ url_for('static', filename = 'icon.png') }}"/>
 </head>
 <body>
 <div class="normal">
@@ -13,9 +13,19 @@
 <hr>
 
 <form action = "{{ url_for('result') }}" method = "GET">
-   <p><input type = "text" name = "edos" /> list of edos</p>
-   <p><input type = "text" name = "subgroup" /> prime limit or subgroup</p>
-   <p><input type = "submit" value = "submit" /></p>
+	<p><input type = "text" name = "subgroup" /> prime limit or subgroup</p>
+	<p>Options:<br>
+	<input type="checkbox" name = "reduce" checked> Reduce generators <br>
+	<input type="checkbox" name = "tenney" checked> Tenney weights
+	</p>
+	<hr>
+	<p>List of edos<br>
+		<input type = "text" name = "edos" /></p>
+	<p><input type = "submit" name = "submit_edo" value = "submit"/></p>
+	<hr>
+	<p>List of commas<br>
+		<textarea name = "commas" rows="5"/></textarea> </p>
+	<p><input type = "submit" name = "submit_comma" value = "submit"/></p>
 </form>
 
 </div>

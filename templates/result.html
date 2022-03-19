@@ -24,7 +24,13 @@
    {% for key, value in res.items() %}
       <tr>
          <th> {{ key }} </th>
-         <td> {{ value|safe  }} </td>
+         {% if value is not string and value is iterable%}
+            {% for i in value %}
+               <td> {{ i  }} </td>
+            {% endfor %}
+         {% else %}
+            <td colspan= "{{res['rank']}}" > {{ value|safe  }} </td>
+         {% endif %}
       </tr>
    {% endfor %}
 </table>

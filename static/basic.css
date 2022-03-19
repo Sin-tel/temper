@@ -39,6 +39,7 @@
 
 table {
   width: 100%;
+  table-layout: fixed;
 }
 .hscroll {
   overflow-x: auto;
