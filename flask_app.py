@@ -19,7 +19,7 @@ def result():
 
 @app.route('/update', methods=['POST'])
 def update():
-   if request.method == 'POST':
+   if f.request.method == 'POST':
       repo = git.Repo('./myproject')
       origin = repo.remotes.origin
       repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
