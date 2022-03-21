@@ -38,8 +38,8 @@ Author: Thomas G. Close (tom.g.close@gmail.com)
 # THE SOFTWARE.
 
 from copy import deepcopy
-from fractions import gcd
-from math import ceil
+# from fractions import gcd
+from math import ceil, gcd
 import numpy
 from itertools import chain
 global print_count
@@ -99,8 +99,7 @@ def solve(A, b):
 	if not any(chain(hnf[:r, -1], hnf[r, :-1])) and hnf[r, -1] == 1:
 		nullity = hnf.shape[0] - rank
 		if nullity:
-			basis = numpy.concatenate((P[rank:, :-1],
-									   -P[r, :-1].reshape(1, -1)))
+			basis = numpy.concatenate((P[rank:, :-1], -P[r, :-1].reshape(1, -1)))
 			if verbose_solve:
 				print("Basis:\n")
 				print(basis)
@@ -134,8 +133,7 @@ def lllhermite(G, m1=1, n1=1):
 			print("col1={col1}, col2={col2}".format(col1=col1, col2=col2))
 		if verbose_hnf:
 			print_all(A, B, L, D)
-		u = n1 * (int(D[k - 1]) * int(D[k + 1]) +
-				  int(L[k, k - 1]) * int(L[k, k - 1]))
+		u = n1 * (int(D[k - 1]) * int(D[k + 1]) + int(L[k, k - 1]) * int(L[k, k - 1]))
 		v = m1 * int(D[k]) * int(D[k])
 		if verbose_hnf:
 			print("u={u}, v={v}".format(u=u, v=v))
@@ -182,8 +180,7 @@ def first_nonzero_is_negative(A):
 	if the first nonzero column j of A contains only one nonzero entry, which
 	is negative+ This assumes A is a nonzero matrix with at least two rows+
 	"""
-	nonzero_columns = numpy.nonzero(
-		numpy.sum(A, axis=0, dtype=numpy.int64) != 0)[0]
+	nonzero_columns = numpy.nonzero(numpy.sum(A, axis=0, dtype=numpy.int64) != 0)[0]
 	assert len(nonzero_columns)
 	# Get the first nonzero column
 	nonzero_col = A[:, numpy.min(nonzero_columns)]
@@ -236,10 +233,8 @@ def swap_rows(k, A, B, L, D):
 	L[(k - 1, k), :(k - 1)] = L[(k, k - 1), :(k - 1)]
 	if verbose_hnf:
 		print_all(A, B, L, D)
-	t = (L[(k + 1):, k - 1] * D[k + 1] / D[k] -
-		 L[(k + 1):, k] * L[k, k - 1] / D[k])
-	L[(k + 1):, k - 1] = (L[(k + 1):, k - 1] * L[k, k - 1] +
-						  L[(k + 1):, k] * D[k - 1]) / D[k]
+	t = (L[(k + 1):, k - 1] * D[k + 1] / D[k] - L[(k + 1):, k] * L[k, k - 1] / D[k])
+	L[(k + 1):, k - 1] = (L[(k + 1):, k - 1] * L[k, k - 1] + L[(k + 1):, k] * D[k - 1]) / D[k]
 	L[(k + 1):, k] = t
 	if verbose_hnf:
 		print_all(A, B, L, D)
@@ -299,8 +294,7 @@ def get_solutions(A):
 			print(Tn[i:])
 			print("Td:")
 			print(Td[i:])
-			print("Zn: {}, Zd: {}, num: {}, den: {}".format(
-				Zn, Zd, num, den))
+			print("Zn: {}, Zd: {}, num: {}, den: {}".format(Zn, Zd, num, den))
 		UB[i] = introot(Zn, Zd, num, den)
 		# Calculate x
 		num, den = subr(Un[i], Ud[i], Nn[i], Nd[i])
@@ -331,12 +325,10 @@ def get_solutions(A):
 					for j in range(i, m):
 						# Loops from back of xs
 						num, den = multr(Qn[i - 1, j], Qd[i - 1, j], x[j], 1)
-						Un[i - 1], Ud[i - 1] = addr(Un[i - 1], Ud[i - 1], num,
-													den)
+						Un[i - 1], Ud[i - 1] = addr(Un[i - 1], Ud[i - 1], num, den)
 						if verbose_solve:
 							print(("i: {}, j: {}, Un: {}, Ud: {}, num: {}, "
-								   "den: {}".format(i, j, Un[i - 1], Ud[i - 1],
-													num, den)))
+							       "den: {}".format(i, j, Un[i - 1], Ud[i - 1], num, den)))
 					# now update T
 					num, den = addr(x[i], 1, Un[i], Ud[i])
 					num, den = subr(num, den, Nn[i], Nd[i])
@@ -487,7 +479,7 @@ def ratior(a, b, c, d):
 	g = abs(gcd(r, s))
 	if s < 0:
 		g = -g
-	return r / g, s / g
+	return r // g, s // g
 
 
 def multr(a, b, c, d):
@@ -495,21 +487,21 @@ def multr(a, b, c, d):
 	r = a * c
 	s = b * d
 	g = abs(gcd(r, s))
-	return r / g, s / g
+	return r // g, s // g
 
 
 def subr(a, b, c, d):
 	t = a * d - b * c
 	u = b * d
 	g = abs(gcd(t, u))
-	return t / g, u / g
+	return t // g, u // g
 
 
 def addr(a, b, c, d):
 	t = a * d + b * c
 	u = b * d
 	g = abs(gcd(t, u))
-	return t / g, u / g
+	return t // g, u // g
 
 
 def comparer(a, b, c, d):
@@ -521,8 +513,8 @@ def comparer(a, b, c, d):
 def lcasvector(A, x):
 	"""lcv[j]=X[1]A[1][j]=...+X[m]A[m][j], 1 <= j <= n+"""
 	# global lcv
-#     print x
-#     print A
+	#     print x
+	#     print A
 	n = A.shape[1]
 	lcv = numpy.empty(n, dtype=numpy.int64)
 	for j in range(n):
@@ -542,4 +534,3 @@ def print_all(A, B, L, D):
 	print('D: ')
 	print(numpy.array(D, dtype=numpy.int64))
 	print_count += 1
-

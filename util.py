@@ -4,8 +4,10 @@ import numpy as np
 import re
 from temper import *
 
-def cents(x, prec = 3):
-	return '{1:.{0}f}'.format(prec,1200*x)
+
+def cents(x, prec=3):
+	return '{1:.{0}f}'.format(prec, 1200 * x)
+
 
 def tlist(l):
 	if type(l) is list:
@@ -13,40 +15,46 @@ def tlist(l):
 	else:
 		return [l]
 
+
 def parse_subgroup(s):
-	s = [int(i) for i in re.split("[\\.,; ]+",s)]
+	s = [int(i) for i in re.split("[\\.,; ]+", s)]
 
 	if len(s) == 1:
 		return p_limit(s[0])
 	else:
 		return s
 
+
 def parse_edos(s):
-	s = [int(i) for i in re.split("[\\.,; &]+",s)]
+	s = [int(i) for i in re.split("[\\.,; &]+", s)]
 	return s
+
 
 ratioPattern = '(\d+)[/:](\d+)'
 vectorPattern = '[[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[])>]'
 
-def parse_commas(c,s):
+
+def parse_commas(c, s):
 	commas = []
 	for n, d in re.findall(ratioPattern, c):
 		commas.append(factors((int(n), int(d)), s))
 	for v in re.findall(vectorPattern, c):
 		l = len(s)
-		res = np.zeros((l,1), dtype = np.int64)
+		res = np.zeros((l, 1), dtype=np.int64)
 		v = np.array(list(map(int, v.replace(',', ' ').split())))
-		res[:v.shape[0],0] = v[:l]
+		res[:v.shape[0], 0] = v[:l]
 		commas.append(res)
 
 	return commas
+
 
 def format_matrix(matrix):
 	"""Format a matrix using LaTeX syntax"""
 	body_lines = [" & ".join(map(str, row)) for row in matrix]
 	body = "\\\\\n".join(body_lines)
-	body = "\\begin{bmatrix}" + body + "\\end{bmatrix}" 
-	return "\\( " + body + " \\)" 
+	body = "\\begin{bmatrix}" + body + "\\end{bmatrix}"
+	return "\\( " + body + " \\)"
+
 
 def from_commas(args):
 
@@ -58,20 +66,22 @@ def from_commas(args):
 
 	return (res, subgroup)
 
+
 def from_edos(args):
 	subgroup = parse_subgroup(args["subgroup"])
 	edo_list = parse_edos(args["edos"])
 
 	edos = []
-	for e in tlist(edo_list): 
-		edos.append(patent_map(e,subgroup))
+	for e in tlist(edo_list):
+		edos.append(patent_map(e, subgroup))
 
-	res = hnf(np.vstack(edos), remove_zeros = True)
+	res = hnf(np.vstack(edos), remove_zeros=True)
 
 	# remove contorsion, for now
 	res = defactored_hnf(res)
 
 	return (res, subgroup)
+
 
 def info(temp, options):
 	T = temp[0]
@@ -86,7 +96,7 @@ def info(temp, options):
 
 	Tm = findMaps(T, s)
 
-	res["edos"] = ' & '.join(map(str, list(Tm[:,0])))
+	res["edos"] = ' & '.join(map(str, list(Tm[:, 0])))
 
 	# res["contorsion"] = factor_order(T)
 
@@ -94,20 +104,20 @@ def info(temp, options):
 
 	if options["reduce"]:
 		# eq = log_interval(gens[0], s)
-		o = T[0,0]
+		o = T[0, 0]
 		genoct = np.zeros_like(gens[0])
 		genoct[0] = 1
 		# reduce by octave
-		for i in range(1,T.shape[0]):
+		for i in range(1, T.shape[0]):
 			# make positive first
 			if log_interval(gens[i], s) < 0:
-				T[i,:] = -T[i,:]
+				T[i, :] = -T[i, :]
 				gens[i] = -gens[i]
 
 			print(log_interval(gens[i], s))
 			red = int(np.floor(log_interval(gens[i], s)))
-			gens[i] -= red*genoct
-			T[0,:] += o*red*T[i,:]
+			gens[i] -= red * genoct
+			T[0, :] += o * red * T[i, :]
 
 		print(gens)
 		# gens = preimage(T) # should be the same
@@ -116,7 +126,7 @@ def info(temp, options):
 		# make positive
 		for i in range(T.shape[0]):
 			if log_interval(gens[i], s) < 0:
-				T[i,:] = -T[i,:]
+				T[i, :] = -T[i, :]
 				gens[i] = -gens[i]
 
 	commas = LLL(kernel(T))
@@ -129,9 +139,9 @@ def info(temp, options):
 
 	res["mapping"] = format_matrix(T)
 
-	gens_print = [ratio(g,s) for g in gens]
+	gens_print = [ratio(g, s) for g in gens]
 	# res["preimage"] = ", ".join(map(str,gens_print))
-	res["preimage"] = list(map(str,gens_print))
+	res["preimage"] = list(map(str, gens_print))
 
 	weight = "unweighted"
 	if options["tenney"]:
@@ -139,11 +149,10 @@ def info(temp, options):
 
 	te_tun, te_err = lstsq(temp, weight)
 	cte_tun, cte_err = cte(temp, weight)
-	res["te-tuning"] = list(map(cents,te_tun))
+	res["te-tuning"] = list(map(cents, te_tun))
 
-	res["cte-tuning"] = list(map(cents,cte_tun))
-	res["te-error"]  = ", ".join(map(cents,te_err))
-	res["cte-error"]  = ", ".join(map(cents,cte_err))
+	res["cte-tuning"] = list(map(cents, cte_tun))
+	res["te-error"] = ", ".join(map(cents, te_err))
+	res["cte-error"] = ", ".join(map(cents, cte_err))
 
 	return res
-
