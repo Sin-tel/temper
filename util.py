@@ -17,12 +17,15 @@ def tlist(l):
 
 
 def parse_subgroup(s):
-	s = [int(i) for i in re.split("[\\.,; ]+", s)]
+	s = [Fraction(i) for i in re.split("[\\.,; ]+", s)]
 
 	if len(s) == 1:
 		return p_limit(s[0])
 	else:
-		return s
+		s_basis, expanded = get_subgroup_basis(s)
+		s = get_subgroup(s_basis, expanded)
+		# s = expanded
+		return s_basis, expanded
 
 
 def parse_edos(s):
@@ -58,34 +61,70 @@ def format_matrix(matrix):
 
 def from_commas(args):
 
-	subgroup = parse_subgroup(args["subgroup"])
+	basis, s_expanded = parse_subgroup(args["subgroup"])
 
-	commas = parse_commas(args["commas"], subgroup)
+	commas = parse_commas(args["commas"], s_expanded)
 
-	res = hnf(cokernel(np.hstack(commas)))
+	M_expanded = hnf(cokernel(np.hstack(commas)))
 
-	return (res, subgroup)
+	# print(M_expanded)
+	# print(basis)
+	R = basis @ basis.T
+	Rdet = np.linalg.det(R)
+	Rinv = (np.linalg.inv(R)*np.linalg.det(R))
+	# print(Rinv)
+	Rinv = (np.round(Rinv).astype(np.int64))
+	# print(Rinv)
+
+	commas_2 = []
+	for c in commas:
+		# print(c)
+		sol = (Rinv @ basis @ c) / Rdet 
+
+		assert np.allclose(sol, np.round(sol)), "Comma not in subgroup"
+
+		sol = np.round(sol).astype(np.int64)
+		# print(sol)
+		commas_2.append(sol)
+		# print(Rinv @ basis @ c)
+		# sol = diophantine.solve(basis.T, c.flatten())
+		# print(sol)
+
+	M = hnf(cokernel(np.hstack(commas_2)))
+
+	return (M, basis, M_expanded, s_expanded)
 
 
 def from_edos(args):
-	subgroup = parse_subgroup(args["subgroup"])
+	basis, s_expanded = parse_subgroup(args["subgroup"])
 	edo_list = parse_edos(args["edos"])
 
 	edos = []
 	for e in tlist(edo_list):
-		edos.append(patent_map(e, subgroup))
+		edos.append(patent_map(e, get_subgroup(basis, s_expanded)))
 
-	res = hnf(np.vstack(edos), remove_zeros=True)
+	M = hnf(np.vstack(edos), remove_zeros=True)
 
-	# remove contorsion, for now
-	res = defactored_hnf(res)
+	# remove contorsion
+	M = defactored_hnf(M)
 
-	return (res, subgroup)
+	# find expansion from subgroup
+	M_expanded = cokernel(basis.T @ kernel(M))
+
+	return (M, basis, M_expanded, s_expanded)
 
 
 def info(temp, options):
 	T = temp[0]
-	s = temp[1]
+	basis = temp[1]
+	T_expanded = temp[2]
+	s_expanded = temp[3]
+
+
+	s = get_subgroup(basis, s_expanded)
+
+	# find expansion from subgroup
+	T_expanded = cokernel(basis.T @ kernel(T))
 
 	res = dict()
 
@@ -114,13 +153,12 @@ def info(temp, options):
 				T[i, :] = -T[i, :]
 				gens[i] = -gens[i]
 
-			print(log_interval(gens[i], s))
 			red = int(np.floor(log_interval(gens[i], s)))
 			gens[i] -= red * genoct
 			T[0, :] += o * red * T[i, :]
 
-		print(gens)
-		# gens = preimage(T) # should be the same
+		# should be the same
+		# gens = preimage(T) 
 
 	else:
 		# make positive
@@ -140,19 +178,45 @@ def info(temp, options):
 	res["mapping"] = format_matrix(T)
 
 	gens_print = [ratio(g, s) for g in gens]
-	# res["preimage"] = ", ".join(map(str,gens_print))
+	# print(gens_print)
+
 	res["preimage"] = list(map(str, gens_print))
 
 	weight = "unweighted"
 	if options["tenney"]:
 		weight = "tenney"
 
-	te_tun, te_err = lstsq(temp, weight)
-	cte_tun, cte_err = cte(temp, weight)
-	res["te-tuning"] = list(map(cents, te_tun))
+	g_matrix = np.vstack(gens).T
 
-	res["cte-tuning"] = list(map(cents, cte_tun))
+	te_tun, te_err = lstsq((T_expanded,s_expanded), weight)
+	cte_tun, cte_err = cte((T_expanded,s_expanded), weight)
+
+	te_tun  = ( te_tun.T @ T_expanded @ basis.T) @ g_matrix
+	cte_tun = (cte_tun.T @ T_expanded @ basis.T) @ g_matrix
+
+
+	res["te-tuning"] = list(map(cents, te_tun.flatten()))
+
+	res["cte-tuning"] = list(map(cents, cte_tun.flatten()))
 	res["te-error"] = ", ".join(map(cents, te_err))
 	res["cte-error"] = ", ".join(map(cents, cte_err))
 
 	return res
+
+
+#########################################
+if __name__ == '__main__':
+	args = dict()
+	# args["subgroup"] = "2.3.5.7"
+	args["subgroup"] = "2.5.9/7"
+	# args["edos"] = "19,22"
+	args["commas"] = "225/224"
+
+	options = dict()
+
+	options["tenney"] = True
+	options["reduce"] = True
+
+	# temp = from_edos(args)
+	temp = from_commas(args)
+	html_info = info(temp, options)

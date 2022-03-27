@@ -5,7 +5,7 @@ from fractions import Fraction
 import numpy as np
 import diophantine
 from math import gcd
-
+from primes import primes
 # PHI = (1 + 5 ** 0.5) / 2
 
 
@@ -72,22 +72,50 @@ def canonical(M):
 		# mapping
 		return defactored_hnf(M)
 
+# expansion for fractional subgroup
+def prime_expansion(subgroup):
+	assert (type(subgroup) is list), "Subgroup must be a list."
+	assert all(isinstance(x, Fraction) for x in subgroup)
 
-def prime_factors(n, subgroup):
-	factors = np.zeros((len(subgroup), 1), dtype=np.int64)
+	s = set()
 
-	for i, p in enumerate(subgroup):
+	for p in subgroup:
+		s = s.union(prime_factors(p))
+
+	return sorted(list(s))
+
+
+def prime_factors(frac):
+	assert type(frac) is Fraction
+
+	s = set()
+
+	n,d = frac.as_integer_ratio()
+
+	for p in primes:
+		# print(p,n,d)
 		while n % p == 0:
+			# print(p)
 			n //= p
-			factors[i, 0] += 1
+			s.add(p)
+		while d % p == 0:
+			d //= p
+			s.add(p)
+		if n == 1 and d == 1:
+			break
 
-	assert n == 1, "Decomposition not in subgroup."
+	assert n == 1, "Prime decomposition failed."
+	assert d == 1, "Prime decomposition failed."
 
-	return factors
+	return s
 
 
 def factors(fr, subgroup):
 	assert (type(subgroup) is list), "Subgroup must be a list."
+	assert all(isinstance(x, int) for x in subgroup)
+
+	factors = np.zeros((len(subgroup), 1), dtype=np.int64)
+
 	if type(fr) is tuple:
 		p = fr[0]
 		q = fr[1]
@@ -96,10 +124,21 @@ def factors(fr, subgroup):
 		p = frac.numerator
 		q = frac.denominator
 
-	assert (p >= 0)
+	assert (p > 0)
 	assert (q > 0)
 
-	return prime_factors(p, subgroup) - prime_factors(q, subgroup)
+	for i, f in enumerate(subgroup):
+		while p % f == 0:
+			p //= f
+			factors[i, 0] += 1
+		while q % f == 0:
+			q //= f
+			factors[i, 0] -= 1
+
+	# print(p,q, flush = True)
+	assert p == 1 and q == 1, "Decomposition not in subgroup."
+
+	return factors
 
 
 def make_positive(v, subgroup):
@@ -108,17 +147,22 @@ def make_positive(v, subgroup):
 	else:
 		return v
 
+def log_subgroup(subgroup):
+	return np.log2(np.array(subgroup).astype(np.double))
 
 def log_interval(v, subgroup):
 	vn = v.flatten().tolist()
+	logs = log_subgroup(subgroup)
 	r = 0
 	for i, n in enumerate(vn):
-		r += n * np.log2(subgroup[i])
+		r += n * logs[i]
 
 	return r
 
 
 def ratio(v, subgroup):
+	# assert all(isinstance(x, Fraction) for x in subgroup)
+
 	v = v.flatten().tolist()
 	p = 1
 	q = 1
@@ -132,27 +176,17 @@ def ratio(v, subgroup):
 
 
 def patent_map(t, subgroup):
-	factors = np.zeros((1, len(subgroup)), dtype=np.int64)
-
-	M = np.zeros((1, len(subgroup)), dtype=np.int64)
-
-	for i, n in enumerate(subgroup):
-		M[0, i] = round(t * np.log2(n))
-
-	return M
+	logs = log_subgroup(subgroup)
+	# floor(x+0.5) rounds more predictably (downwards on .5)
+	M = np.floor(t * logs + 0.5).astype(np.int64)
+	return np.atleast_2d(M)
 
 
 def p_limit(limit):
-	limitn = limit + 1
-	primes = dict()
-	for i in range(2, limitn):
-		primes[i] = True
+	assert limit > 1
+	assert limit < 7920
 
-	for i in primes:
-		factors = range(i, limitn, i)
-		for f in factors[1:]:
-			primes[f] = False
-	return [i for i in primes if primes[i] == True]
+	return [i for i in primes if i <= limit]
 
 
 def findMaps(T, subgroup):
@@ -174,6 +208,7 @@ def findMaps(T, subgroup):
 		tors = np.gcd.reduce(M.flatten().tolist())
 
 		if not red.any() and tors == 1:
+			# print(M)
 			# check if new edo map is not redundant
 			newmap = hnf(np.vstack([Tp, M]))
 			red2 = newmap[c, :]
@@ -187,7 +222,6 @@ def findMaps(T, subgroup):
 				else:
 					Tp = np.vstack([Tp, M])
 
-				# print(Tp)
 				c = c + 1
 				if c >= r:
 					break
@@ -210,14 +244,15 @@ def preimage(M):
 
 
 def lstsq(temp, weight="tenney"):
+
 	M = temp[0]
 	s = temp[1]
 
-	print(M)
+	M = np.atleast_2d(M)
 
-	j = np.log2(np.array(s))
+	j = log_subgroup(s)
 
-	W = np.diag(1. / j)
+	W = np.diag(1/j)
 	if weight == 'unweighted':
 		W = np.eye(len(s))
 
@@ -228,16 +263,17 @@ def lstsq(temp, weight="tenney"):
 	tun = (sol.T @ M)
 	err = tun - j
 
-	return sol.flatten(), err.flatten()
+	return sol, err.flatten()
 
 
 def cte(temp, weight="tenney"):
 	M = temp[0]
 	s = temp[1]
+	M = np.atleast_2d(M)
+	
+	j = log_subgroup(s)
 
-	j = np.log2(np.array(s))
-
-	W = np.diag(1. / j)
+	W = np.diag(1/j)
 	if weight == 'unweighted':
 		W = np.eye(len(s))
 
@@ -264,6 +300,45 @@ def cte(temp, weight="tenney"):
 	return sol.flatten(), err.flatten()
 
 
+# patent map iterator
+class Pmaps:
+	def __init__(self, bounds, subgroup):
+		self.stop = bounds[1]
+		self.logS = log_subgroup(subgroup)
+		assert np.all(self.logS >= 1)
+
+		start = bounds[0]
+
+		self.cmap = patent_map(start, subgroup)
+
+		self.first = True
+
+	def __iter__(self):
+		return self
+
+	def __next__(self):
+		if not self.first:
+			incr = np.argmin(self.ubounds)
+			self.cmap[0, incr] += 1
+
+		self.first = False
+
+		self.lbounds = (self.cmap - 0.5) / self.logS
+		self.ubounds = (self.cmap + 0.5) / self.logS
+
+		lb = np.max(self.lbounds)
+		ub = np.min(self.ubounds)
+
+		# stop when new lower bound hits end of interval
+		if lb >= self.stop:
+			raise StopIteration
+
+		ind = (lb + ub) / 2.0
+		assert np.all(self.cmap == np.round(ind * self.logS).astype(np.int64))
+
+		return self.cmap, (lb, ub)
+
+
 # def normsq(v,W = None):
 #     if W is None:
 #         return np.sum(v*v)
@@ -278,3 +353,59 @@ def cte(temp, weight="tenney"):
 #         return np.sum(a*b)
 #     else:
 #         return np.sum(a*W*b)
+
+def get_subgroup_basis(subgroup):
+	expanded = prime_expansion(subgroup)
+	s_basis = []
+	for k in subgroup:
+		s_basis.append(factors(k,expanded))
+	s_basis = np.hstack(s_basis).T
+	
+	# new_subgroup = subgroup
+
+	# if redundant, normalize
+	if np.linalg.det(s_basis @ s_basis.T) < 0.5:
+		s_basis = hnf(s_basis, remove_zeros = True)
+		# new_subgroup = []
+		# for b in s_basis:
+			# new_subgroup.append(ratio(b,expanded))
+
+	return s_basis, expanded
+
+def get_subgroup(s_basis, expanded):
+	s = []
+	for b in s_basis:
+		s.append(ratio(b,expanded))
+	return s
+
+if __name__ == '__main__':
+	subgroup = [Fraction("2"),Fraction("5/4"),Fraction("9")]
+
+	s_basis, expanded = get_subgroup_basis(subgroup)
+
+	subgroup = get_subgroup(s_basis, expanded)
+
+	rational = False
+	for r in subgroup:
+		p,q = r.as_integer_ratio()
+		if q > 1:
+			rational = True
+
+	if not rational:
+		subgroup = list(map(int, subgroup))
+
+
+	# normalization test.. unsuited because it doesnt keep equave
+	# s_basis = hnf(s_basis, remove_zeros = True)
+	# s_basis = LLL(s_basis)
+	# # make positive
+	# for i in range(s_basis.shape[0]):
+	# 	if log_interval(s_basis[i], expanded) < 0:
+	# 		s_basis[i, :] = -s_basis[i, :]
+	# new_subgroup = []
+	# for b in s_basis:
+	# 	new_subgroup.append(ratio(b,expanded))
+
+	print(expanded)
+	print(s_basis)
+	print(subgroup)

@@ -4,12 +4,58 @@ x reduce gens, always positive
 x get preimage gens
 x unweighted/weighted
 
+rational subgroups
+check tuning for subgroup weights? ie difference between basis change or just plain TE weights
+
+radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
+
+speed up findmaps, just check kernel?
+
+use yield in pmap iterator
+
+help page
+find optimal edo tunings
+enter intervals to optimize
+make results page look nicer
+list more commas, sort by tenney/wilson
+adaptive precision
+
+check if subgroup is valid (no 2.3.9 etc)
 
 make search
-list more commas, sort by tenney
-adaptive precision?
+
+check LLL reduction fp
+  https://github.com/higumachan/olll/blob/master/olll_numpy.py
+  implement custom weights on dot product
+
+complexity, ~ gram matrix, = lattice volume
+  check invariant wrt basis
+
+when subgroup empty, infer from commas
+
+reduce gens by commas
+find more commas, sort by TE/wilson
+
+naming scheme proposal
+
+parser for ~ notation
+  ie 9/8^2 ~ 5/4
+
+custom weights
+
 error msg
 input validation
-GPV, warts
-
 write tests
+
+different bases:
+  pergen form, mingen form, [period, generator, commas]
+
+add xen-calc link to all ratios
+  https://www.yacavone.net/xen-calc/?q=60/49
+
+generate lattice
+ - rank 2 -> easy
+ - rank 3 -> uhhh, modulo octaves?
+
+add scale workshop links,
+need some way to figure out MOS and ?? for higher rank

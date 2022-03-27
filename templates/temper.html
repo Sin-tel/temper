@@ -13,7 +13,8 @@
 <hr>
 
 <form action = "{{ url_for('result') }}" method = "GET">
-	<p><input type = "text" name = "subgroup" /> prime limit or subgroup</p>
+	<p>Prime limit or subgroup<br>
+		<input type = "text" name = "subgroup" /></p>
 	<p>Options:<br>
 	<input type="checkbox" name = "reduce" checked> Reduce generators <br>
 	<input type="checkbox" name = "tenney" checked> Tenney weights

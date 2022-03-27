@@ -29,6 +29,8 @@ def result():
 
 		html_info = info(temp, options)
 
+		# print(f.url_for("result", **args))
+
 		print("", flush=True)
 		return f.render_template("./result.html", res=html_info)
 
@@ -52,5 +54,5 @@ def test():
 	return "succes!\n v0.1.9"
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':	
 	app.run(debug=True)
