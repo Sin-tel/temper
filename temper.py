@@ -72,6 +72,7 @@ def canonical(M):
 		# mapping
 		return defactored_hnf(M)
 
+
 # expansion for fractional subgroup
 def prime_expansion(subgroup):
 	assert (type(subgroup) is list), "Subgroup must be a list."
@@ -90,12 +91,10 @@ def prime_factors(frac):
 
 	s = set()
 
-	n,d = frac.as_integer_ratio()
+	n, d = frac.as_integer_ratio()
 
 	for p in primes:
-		# print(p,n,d)
 		while n % p == 0:
-			# print(p)
 			n //= p
 			s.add(p)
 		while d % p == 0:
@@ -147,8 +146,10 @@ def make_positive(v, subgroup):
 	else:
 		return v
 
+
 def log_subgroup(subgroup):
 	return np.log2(np.array(subgroup).astype(np.double))
+
 
 def log_interval(v, subgroup):
 	vn = v.flatten().tolist()
@@ -252,7 +253,7 @@ def lstsq(temp, weight="tenney"):
 
 	j = log_subgroup(s)
 
-	W = np.diag(1/j)
+	W = np.diag(1 / j)
 	if weight == 'unweighted':
 		W = np.eye(len(s))
 
@@ -270,10 +271,10 @@ def cte(temp, weight="tenney"):
 	M = temp[0]
 	s = temp[1]
 	M = np.atleast_2d(M)
-	
+
 	j = log_subgroup(s)
 
-	W = np.diag(1/j)
+	W = np.diag(1 / j)
 	if weight == 'unweighted':
 		W = np.eye(len(s))
 
@@ -354,32 +355,35 @@ class Pmaps:
 #     else:
 #         return np.sum(a*W*b)
 
+
 def get_subgroup_basis(subgroup):
 	expanded = prime_expansion(subgroup)
 	s_basis = []
 	for k in subgroup:
-		s_basis.append(factors(k,expanded))
+		s_basis.append(factors(k, expanded))
 	s_basis = np.hstack(s_basis).T
-	
+
 	# new_subgroup = subgroup
 
 	# if redundant, normalize
 	if np.linalg.det(s_basis @ s_basis.T) < 0.5:
-		s_basis = hnf(s_basis, remove_zeros = True)
+		s_basis = hnf(s_basis, remove_zeros=True)
 		# new_subgroup = []
 		# for b in s_basis:
-			# new_subgroup.append(ratio(b,expanded))
+		# new_subgroup.append(ratio(b,expanded))
 
 	return s_basis, expanded
+
 
 def get_subgroup(s_basis, expanded):
 	s = []
 	for b in s_basis:
-		s.append(ratio(b,expanded))
+		s.append(ratio(b, expanded))
 	return s
 
+
 if __name__ == '__main__':
-	subgroup = [Fraction("2"),Fraction("5/4"),Fraction("9")]
+	subgroup = [Fraction("2"), Fraction("5/4"), Fraction("9")]
 
 	s_basis, expanded = get_subgroup_basis(subgroup)
 
@@ -387,13 +391,12 @@ if __name__ == '__main__':
 
 	rational = False
 	for r in subgroup:
-		p,q = r.as_integer_ratio()
+		p, q = r.as_integer_ratio()
 		if q > 1:
 			rational = True
 
 	if not rational:
 		subgroup = list(map(int, subgroup))
-
 
 	# normalization test.. unsuited because it doesnt keep equave
 	# s_basis = hnf(s_basis, remove_zeros = True)

@@ -67,30 +67,24 @@ def from_commas(args):
 
 	M_expanded = hnf(cokernel(np.hstack(commas)))
 
-	# print(M_expanded)
-	# print(basis)
+	# find commad expressed in subgroup basis
+	# this is algorithm not exact!
 	R = basis @ basis.T
 	Rdet = np.linalg.det(R)
-	Rinv = (np.linalg.inv(R)*np.linalg.det(R))
-	# print(Rinv)
+	Rinv = (np.linalg.inv(R) * np.linalg.det(R))
 	Rinv = (np.round(Rinv).astype(np.int64))
-	# print(Rinv)
 
 	commas_2 = []
 	for c in commas:
-		# print(c)
-		sol = (Rinv @ basis @ c) / Rdet 
+		sol = (Rinv @ basis @ c) / Rdet
 
 		assert np.allclose(sol, np.round(sol)), "Comma not in subgroup"
-
 		sol = np.round(sol).astype(np.int64)
-		# print(sol)
 		commas_2.append(sol)
-		# print(Rinv @ basis @ c)
-		# sol = diophantine.solve(basis.T, c.flatten())
-		# print(sol)
 
 	M = hnf(cokernel(np.hstack(commas_2)))
+
+	assert np.allclose(M_expanded @ basis.T @ np.hstack(commas_2), 0)
 
 	return (M, basis, M_expanded, s_expanded)
 
@@ -109,7 +103,7 @@ def from_edos(args):
 	M = defactored_hnf(M)
 
 	# find expansion from subgroup
-	M_expanded = cokernel(basis.T @ kernel(M))
+	M_expanded = hnf(cokernel(basis.T @ kernel(M)))
 
 	return (M, basis, M_expanded, s_expanded)
 
@@ -120,11 +114,7 @@ def info(temp, options):
 	T_expanded = temp[2]
 	s_expanded = temp[3]
 
-
 	s = get_subgroup(basis, s_expanded)
-
-	# find expansion from subgroup
-	T_expanded = cokernel(basis.T @ kernel(T))
 
 	res = dict()
 
@@ -136,8 +126,6 @@ def info(temp, options):
 	Tm = findMaps(T, s)
 
 	res["edos"] = ' & '.join(map(str, list(Tm[:, 0])))
-
-	# res["contorsion"] = factor_order(T)
 
 	gens = preimage(T)
 
@@ -158,7 +146,7 @@ def info(temp, options):
 			T[0, :] += o * red * T[i, :]
 
 		# should be the same
-		# gens = preimage(T) 
+		# gens = preimage(T)
 
 	else:
 		# make positive
@@ -188,12 +176,11 @@ def info(temp, options):
 
 	g_matrix = np.vstack(gens).T
 
-	te_tun, te_err = lstsq((T_expanded,s_expanded), weight)
-	cte_tun, cte_err = cte((T_expanded,s_expanded), weight)
+	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
+	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
-	te_tun  = ( te_tun.T @ T_expanded @ basis.T) @ g_matrix
+	te_tun = (te_tun.T @ T_expanded @ basis.T) @ g_matrix
 	cte_tun = (cte_tun.T @ T_expanded @ basis.T) @ g_matrix
-
 
 	res["te-tuning"] = list(map(cents, te_tun.flatten()))
 

@@ -3,13 +3,15 @@ x enter comma vectors
 x reduce gens, always positive
 x get preimage gens
 x unweighted/weighted
+x rational subgroups
+x check if subgroup is valid (no 2.3.9 etc)
 
-rational subgroups
-check tuning for subgroup weights? ie difference between basis change or just plain TE weights
+check solver for exact diophantine
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 
 speed up findmaps, just check kernel?
+vector pattern FutureWarning
 
 use yield in pmap iterator
 
@@ -18,9 +20,9 @@ find optimal edo tunings
 enter intervals to optimize
 make results page look nicer
 list more commas, sort by tenney/wilson
-adaptive precision
+adaptive precision of outputs
+simplyify subgroup
 
-check if subgroup is valid (no 2.3.9 etc)
 
 make search
 
