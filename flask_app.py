@@ -51,7 +51,7 @@ def update():
 
 @app.route('/test')
 def test():
-	return "succes!\n v0.1.9"
+	return "succes!\n v0.1.10"
 
 
 if __name__ == '__main__':	
