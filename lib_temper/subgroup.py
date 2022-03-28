@@ -5,7 +5,7 @@ from fractions import Fraction
 
 from .primes import primes
 from .interval import *
-
+from . import temper
 
 # prime limit
 def p_limit(limit):
@@ -27,7 +27,7 @@ def get_subgroup_basis(subgroup):
 
 	# if redundant, normalize
 	if np.linalg.det(s_basis.T @ s_basis) < 0.5:
-		s_basis = hnf(s_basis.T, remove_zeros=True).T
+		s_basis = temper.hnf(s_basis.T, remove_zeros=True).T
 		# new_subgroup = []
 		# for b in s_basis:
 		# new_subgroup.append(ratio(b,expanded))
