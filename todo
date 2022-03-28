@@ -5,13 +5,18 @@ x get preimage gens
 x unweighted/weighted
 x rational subgroups
 x check if subgroup is valid (no 2.3.9 etc)
+x vector pattern FutureWarning
 
 check solver for exact diophantine
+ -> adapt solver for multi-row solve
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 
 speed up findmaps, just check kernel?
-vector pattern FutureWarning
+ - search over all supporting pmaps
+ - sort by badness
+ - loop over all n choose k until finding map of full rank
+
 
 use yield in pmap iterator
 

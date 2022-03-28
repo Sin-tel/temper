@@ -2,25 +2,18 @@
 
 import numpy as np
 import re
-from temper import *
+from lib_temper import *
 
 
 def cents(x, prec=3):
 	return '{1:.{0}f}'.format(prec, 1200 * x)
 
-
-def tlist(l):
-	if type(l) is list:
-		return l
-	else:
-		return [l]
-
-
 def parse_subgroup(s):
 	s = [Fraction(i) for i in re.split("[\\.,; ]+", s)]
 
 	if len(s) == 1:
-		return p_limit(s[0])
+		expanded = p_limit(s[0])
+		return np.eye(len(expanded), dtype = np.int64), expanded
 	else:
 		s_basis, expanded = get_subgroup_basis(s)
 		s = get_subgroup(s_basis, expanded)
@@ -34,7 +27,7 @@ def parse_edos(s):
 
 
 ratioPattern = '(\d+)[/:](\d+)'
-vectorPattern = '[[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[])>]'
+vectorPattern = '[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]'
 
 
 def parse_commas(c, s):
@@ -69,14 +62,14 @@ def from_commas(args):
 
 	# find commad expressed in subgroup basis
 	# this is algorithm not exact!
-	R = basis @ basis.T
+	R = basis.T @ basis
 	Rdet = np.linalg.det(R)
 	Rinv = (np.linalg.inv(R) * np.linalg.det(R))
 	Rinv = (np.round(Rinv).astype(np.int64))
 
 	commas_2 = []
 	for c in commas:
-		sol = (Rinv @ basis @ c) / Rdet
+		sol = (Rinv @ basis.T @ c) / Rdet
 
 		assert np.allclose(sol, np.round(sol)), "Comma not in subgroup"
 		sol = np.round(sol).astype(np.int64)
@@ -84,7 +77,9 @@ def from_commas(args):
 
 	M = hnf(cokernel(np.hstack(commas_2)))
 
-	assert np.allclose(M_expanded @ basis.T @ np.hstack(commas_2), 0)
+	print(M_expanded @ basis @ np.hstack(commas_2), flush = True)
+
+	assert np.allclose(M_expanded @ basis @ np.hstack(commas_2), 0)
 
 	return (M, basis, M_expanded, s_expanded)
 
@@ -94,7 +89,7 @@ def from_edos(args):
 	edo_list = parse_edos(args["edos"])
 
 	edos = []
-	for e in tlist(edo_list):
+	for e in edo_list:
 		edos.append(patent_map(e, get_subgroup(basis, s_expanded)))
 
 	M = hnf(np.vstack(edos), remove_zeros=True)
@@ -103,7 +98,7 @@ def from_edos(args):
 	M = defactored_hnf(M)
 
 	# find expansion from subgroup
-	M_expanded = hnf(cokernel(basis.T @ kernel(M)))
+	M_expanded = hnf(cokernel(basis @ kernel(M)))
 
 	return (M, basis, M_expanded, s_expanded)
 
@@ -179,8 +174,10 @@ def info(temp, options):
 	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
 	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
-	te_tun = (te_tun.T @ T_expanded @ basis.T) @ g_matrix
-	cte_tun = (cte_tun.T @ T_expanded @ basis.T) @ g_matrix
+	print(basis)
+
+	te_tun = (te_tun.T @ T_expanded @ basis) @ g_matrix
+	cte_tun = (cte_tun.T @ T_expanded @ basis) @ g_matrix
 
 	res["te-tuning"] = list(map(cents, te_tun.flatten()))
 
