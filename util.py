@@ -8,12 +8,13 @@ from lib_temper import *
 def cents(x, prec=3):
 	return '{1:.{0}f}'.format(prec, 1200 * x)
 
+
 def parse_subgroup(s):
 	s = [Fraction(i) for i in re.split("[\\.,; ]+", s)]
 
 	if len(s) == 1:
 		expanded = p_limit(s[0])
-		return np.eye(len(expanded), dtype = np.int64), expanded
+		return np.eye(len(expanded), dtype=np.int64), expanded
 	else:
 		s_basis, expanded = get_subgroup_basis(s)
 		s = get_subgroup(s_basis, expanded)
@@ -99,7 +100,7 @@ def info(temp, options):
 	## we can find the map as:
 	# T_expanded @ basis (removing zero rows)
 	# so it is possibly redundant
-	# however, it might be defactored! 
+	# however, it might be defactored!
 	## example: 2.9.5.7/6 + 13&31
 	# print(T)
 	# print(T_expanded @ basis, flush = True)
@@ -118,26 +119,40 @@ def info(temp, options):
 
 	res["subgroup"] = ".".join(map(str, s))
 
-	Tm = findMaps(T, s)
+	commas = LLL(kernel(T))
 
-	res["edos"] = ' & '.join(map(str, list(Tm[:, 0])))
+	comma_str = []
+	for c in commas.T:
+		comma_str.append(str(ratio(make_positive(c, s), s)))
+
+	res["commas"] = ", ".join(comma_str)
+
+	Tm, edolist = findMaps2(T, s)
+	print("", flush=True)
+	res["edos"] = ', '.join(map(str, edolist))
+
+	res["edomapping"] = format_matrix(Tm)
+
+	# Tm, edolist = findMaps(T, s)
+	# res["edos"] = ' & '.join(map(str, list(Tm[:, 0])))
+	# res["edomapping"] = format_matrix(Tm)
 
 	gens = preimage(T)
 
 	if options["reduce"]:
 		# eq = log_interval(gens[0], s)
 		o = T[0, 0]
-		genoct = np.zeros_like(gens[:,0])
+		genoct = np.zeros_like(gens[:, 0])
 		genoct[0] = 1
 		# reduce by octave
 		for i in range(1, T.shape[0]):
 			# make positive first
-			if log_interval(gens[:,i], s) < 0:
+			if log_interval(gens[:, i], s) < 0:
 				T[i, :] = -T[i, :]
-				gens[:,i] = -gens[:,i]
+				gens[:, i] = -gens[:, i]
 
-			red = int(np.floor(log_interval(gens[:,i], s)))
-			gens[:,i] -= red * genoct
+			red = int(np.floor(log_interval(gens[:, i], s)))
+			gens[:, i] -= red * genoct
 			T[0, :] += o * red * T[i, :]
 
 		# should be the same
@@ -146,17 +161,9 @@ def info(temp, options):
 	else:
 		# make positive
 		for i in range(T.shape[0]):
-			if log_interval(gens[:,i], s) < 0:
+			if log_interval(gens[:, i], s) < 0:
 				T[i, :] = -T[i, :]
-				gens[:,i] = -gens[:,i]
-
-	commas = LLL(kernel(T))
-
-	comma_str = []
-	for c in commas.T:
-		comma_str.append(str(ratio(make_positive(c, s), s)))
-
-	res["commas"] = ", ".join(comma_str)
+				gens[:, i] = -gens[:, i]
 
 	res["mapping"] = format_matrix(T)
 
@@ -171,7 +178,7 @@ def info(temp, options):
 	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
 	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
-	te_tun  = ( te_tun.T @ T_expanded @ basis) @ gens
+	te_tun = (te_tun.T @ T_expanded @ basis) @ gens
 	cte_tun = (cte_tun.T @ T_expanded @ basis) @ gens
 
 	res["TE-tuning"] = list(map(cents, te_tun.flatten()))

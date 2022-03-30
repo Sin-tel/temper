@@ -5,12 +5,12 @@ from fractions import Fraction
 # import numpy as np
 # from math import gcd
 # from primes import primes
-
+from itertools import combinations
 from . import diophantine
 
 from .subgroup import *
 from .optimize import *
-
+from .combo import comboBySum
 
 def hnf(M, remove_zeros=False, transformation=False):
 	assert (M.ndim == 2)
@@ -67,9 +67,33 @@ def defactored_hnf(M):
 	return hnf(D)
 
 
+# exact integer determinant using Bareiss algorithm
+# modified slightly from:
+## https://stackoverflow.com/questions/66192894/precise-determinant-of-integer-nxn-matrix
+def integer_det(M):
+	M = np.copy(M) # make a copy to keep original M unmodified
+
+	N, sign, prev = len(M), 1, 1
+	for i in range(N-1):
+		if M[i,i] == 0: # swap with another row having nonzero i's elem
+			swapto = next( (j for j in range(i+1,N) if M[j,i] != 0), None )
+			if swapto is None:
+				print("stoppe")
+				return 0 # all M[*][i] are zero => zero determinant
+			## swap rows
+			M[[i,swapto]] = M[[swapto,i]]
+			sign *= -1
+		for j in range(i+1,N):
+			for k in range(i+1,N):
+				assert ( M[j,k] * M[i,i] - M[j,i] * M[i,k] ) % prev == 0
+				M[j,k] = ( M[j,k] * M[i,i] - M[j,i] * M[i,k] ) // prev
+		prev = M[i,i]
+	return sign * M[-1,-1]
+
+
 def factor_order(M):
 	r, d = M.shape
-	return np.round(np.linalg.det(hnf(M.T)[:r].T)).astype(np.int64)
+	return integer_det(hnf(M.T)[:r].T)
 
 
 def canonical(M):
@@ -89,7 +113,7 @@ def solve_diophantine(A, B):
 	B = np.atleast_2d(B)
 	assert A.shape[0] == B.shape[0]
 	aug = np.block([[A.T, np.zeros((A.shape[1], B.shape[1]), dtype=np.int64)],
-	                [B.T, np.eye(B.shape[1], dtype=np.int64)]])
+					[B.T, np.eye(B.shape[1], dtype=np.int64)]])
 
 	r, d = A.shape
 
@@ -136,6 +160,46 @@ def patent_map(t, subgroup):
 	M = np.floor(t * logs + 0.5).astype(np.int64)
 	return np.atleast_2d(M)
 
+def findMaps2(T, subgroup):
+	assert (T.ndim == 2)
+	r, d = T.shape
+	T = hnf(T)
+	c = kernel(T)
+	search_range = (4.5,99.5)
+
+	m_list = []
+
+	for m1,b1 in Pmaps(search_range, subgroup):
+		if np.all(m1 @ c == 0):
+			# print(m1)
+			# tun = np.sum((m1/logs)**2)/np.sum(m1/logs)  # optimal TE tuning for edo
+			# e = np.sqrt(np.average((m1/logs - tun)**2))  # relative error
+			badness = temp_measures((m1, subgroup))[0]
+			# print(badness)
+			m_list.append((np.copy(m1),badness))
+
+	m_list.sort(key = lambda l: l[1])
+	# print(m_list)
+	
+
+	r_list = m_list[:10]
+
+	r_list = [m[0][0][0] for m in r_list]
+	print(r_list)
+
+	for combo in comboBySum(r,0,len(m_list)):
+		print("=====")
+		print()
+
+		m_new = np.vstack([m_list[i][0] for i in combo])
+		m_hnf = hnf(m_new)
+
+		print(m_hnf)
+		if (np.all(m_hnf == T)):
+			return m_new, r_list
+
+
+
 
 def findMaps(T, subgroup):
 	assert (T.ndim == 2)
@@ -144,9 +208,11 @@ def findMaps(T, subgroup):
 	c = 0
 	Tp = np.zeros((1, d), dtype=np.int64)
 
+	elist = []
+
 	f_order = factor_order(T)
 
-	for i in np.arange(5, 500, 1):
+	for i in np.arange(5, 31, 0.1):
 		M = (patent_map(i, subgroup))
 
 		# check if edo map supports given M
@@ -169,11 +235,12 @@ def findMaps(T, subgroup):
 					Tp = M
 				else:
 					Tp = np.vstack([Tp, M])
+					elist.append(i)
 
 				c = c + 1
 				if c >= r:
 					break
-	return Tp
+	return Tp, elist
 
 
 # patent map iterator
@@ -181,7 +248,7 @@ class Pmaps:
 	def __init__(self, bounds, subgroup):
 		self.stop = bounds[1]
 		self.logS = log_subgroup(subgroup)
-		assert np.all(self.logS >= 1)
+		# assert np.all(self.logS >= 1)
 
 		start = bounds[0]
 

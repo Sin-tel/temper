@@ -45,7 +45,7 @@ for d in range(2,10):
 			l = np.vstack(l)
 			# print(hnf(l))
 
-			if np.linalg.det(l @ l.T) >= 0.5:
+			if integer_det(l @ l.T) != 0:
 
 				e = temp_error((l,S))
 				c = temp_complexity((l,S))
