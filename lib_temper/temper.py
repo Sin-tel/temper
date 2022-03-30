@@ -12,6 +12,7 @@ from .subgroup import *
 from .optimize import *
 from .combo import comboBySum
 
+
 def hnf(M, remove_zeros=False, transformation=False):
 	assert (M.ndim == 2)
 
@@ -71,24 +72,23 @@ def defactored_hnf(M):
 # modified slightly from:
 ## https://stackoverflow.com/questions/66192894/precise-determinant-of-integer-nxn-matrix
 def integer_det(M):
-	M = np.copy(M) # make a copy to keep original M unmodified
+	M = np.copy(M)  # make a copy to keep original M unmodified
 
 	N, sign, prev = len(M), 1, 1
-	for i in range(N-1):
-		if M[i,i] == 0: # swap with another row having nonzero i's elem
-			swapto = next( (j for j in range(i+1,N) if M[j,i] != 0), None )
+	for i in range(N - 1):
+		if M[i, i] == 0:  # swap with another row having nonzero i's elem
+			swapto = next((j for j in range(i + 1, N) if M[j, i] != 0), None)
 			if swapto is None:
-				print("stoppe")
-				return 0 # all M[*][i] are zero => zero determinant
+				return 0  # all M[*][i] are zero => zero determinant
 			## swap rows
-			M[[i,swapto]] = M[[swapto,i]]
+			M[[i, swapto]] = M[[swapto, i]]
 			sign *= -1
-		for j in range(i+1,N):
-			for k in range(i+1,N):
-				assert ( M[j,k] * M[i,i] - M[j,i] * M[i,k] ) % prev == 0
-				M[j,k] = ( M[j,k] * M[i,i] - M[j,i] * M[i,k] ) // prev
-		prev = M[i,i]
-	return sign * M[-1,-1]
+		for j in range(i + 1, N):
+			for k in range(i + 1, N):
+				assert (M[j, k] * M[i, i] - M[j, i] * M[i, k]) % prev == 0
+				M[j, k] = (M[j, k] * M[i, i] - M[j, i] * M[i, k]) // prev
+		prev = M[i, i]
+	return sign * M[-1, -1]
 
 
 def factor_order(M):
@@ -113,7 +113,7 @@ def solve_diophantine(A, B):
 	B = np.atleast_2d(B)
 	assert A.shape[0] == B.shape[0]
 	aug = np.block([[A.T, np.zeros((A.shape[1], B.shape[1]), dtype=np.int64)],
-					[B.T, np.eye(B.shape[1], dtype=np.int64)]])
+	                [B.T, np.eye(B.shape[1], dtype=np.int64)]])
 
 	r, d = A.shape
 
@@ -160,87 +160,57 @@ def patent_map(t, subgroup):
 	M = np.floor(t * logs + 0.5).astype(np.int64)
 	return np.atleast_2d(M)
 
-def findMaps2(T, subgroup):
-	assert (T.ndim == 2)
-	r, d = T.shape
-	T = hnf(T)
-	c = kernel(T)
-	search_range = (4.5,99.5)
-
-	m_list = []
-
-	for m1,b1 in Pmaps(search_range, subgroup):
-		if np.all(m1 @ c == 0):
-			# print(m1)
-			# tun = np.sum((m1/logs)**2)/np.sum(m1/logs)  # optimal TE tuning for edo
-			# e = np.sqrt(np.average((m1/logs - tun)**2))  # relative error
-			badness = temp_measures((m1, subgroup))[0]
-			# print(badness)
-			m_list.append((np.copy(m1),badness))
-
-	m_list.sort(key = lambda l: l[1])
-	# print(m_list)
-	
-
-	r_list = m_list[:10]
-
-	r_list = [m[0][0][0] for m in r_list]
-	print(r_list)
-
-	for combo in comboBySum(r,0,len(m_list)):
-		print("=====")
-		print()
-
-		m_new = np.vstack([m_list[i][0] for i in combo])
-		m_hnf = hnf(m_new)
-
-		print(m_hnf)
-		if (np.all(m_hnf == T)):
-			return m_new, r_list
-
-
-
 
 def findMaps(T, subgroup):
 	assert (T.ndim == 2)
 	r, d = T.shape
+	T = hnf(T)
+	c = kernel(T)
+	search_range = (4.5, 665.5)
 
-	c = 0
-	Tp = np.zeros((1, d), dtype=np.int64)
+	m_list = []
 
-	elist = []
+	count = 0
+	count2 = 0
+	for m1, b1 in Pmaps(search_range, subgroup):
+		count2 += 1
+		if count2 > 8000:
+			break
+		if np.all(m1 @ c == 0):
+			badness = temp_measures((m1, subgroup))[0]
+			m_list.append((np.copy(m1), badness))
 
-	f_order = factor_order(T)
+			count += 1
+			if count > r + 20:
+				break
 
-	for i in np.arange(5, 31, 0.1):
-		M = (patent_map(i, subgroup))
+	# print("LIST")
+	# print(m_list, flush=True)
+	print("list count: ", len(m_list))
+	print("nr checked: ", count2)
 
-		# check if edo map supports given M
-		red = hnf(np.vstack([T, M]))[r, :]
+	m_list.sort(key=lambda l: l[1])
 
-		# check if edo map has gcd = 1
-		tors = np.gcd.reduce(M.flatten().tolist())
+	r_list = m_list[:10]
+	r_list = [m[0][0][0] for m in r_list]
 
-		if not red.any() and tors == 1:
-			# print(M)
-			# check if new edo map is not redundant
-			newmap = hnf(np.vstack([Tp, M]))
-			red2 = newmap[c, :]
+	count = 0
+	for combo in comboBySum(r, 0, len(m_list) - 1):
+		# print(combo, flush=True)
+		m_new = np.vstack([m_list[i][0] for i in combo])
+		m_hnf = hnf(m_new)
 
-			# check if contorsion matches input
-			order = factor_order(newmap)
+		# print(m_hnf)
+		count += 1
 
-			if (red2.any() and order == f_order) or c == 0:
-				if c == 0:
-					Tp = M
-				else:
-					Tp = np.vstack([Tp, M])
-					elist.append(i)
+		if (np.all(m_hnf == T)):
+			print("number of combos checked: " + str(count))
+			return m_new, r_list
 
-				c = c + 1
-				if c >= r:
-					break
-	return Tp, elist
+		if count > 500:
+			break
+	print("FAIL. number of combos checked: " + str(count))
+	return None, r_list
 
 
 # patent map iterator
@@ -328,6 +298,7 @@ def temp_measures(temp):
 	error = temp_error(temp)
 
 	badness = error * (complexity**(d / (d - r)))
+	# badness = error * complexity
 
 	return badness, complexity, error
 

@@ -127,15 +127,16 @@ def info(temp, options):
 
 	res["commas"] = ", ".join(comma_str)
 
-	Tm, edolist = findMaps2(T, s)
+	Tm, edolist = findMaps(T, s)
+	print(Tm)
 	print("", flush=True)
-	res["edos"] = ', '.join(map(str, edolist))
+	if len(edolist) > 0:
+		res["edos"] = ', '.join(map(str, edolist))
+	else:
+		res["edos"] = "?"
 
-	res["edomapping"] = format_matrix(Tm)
-
-	# Tm, edolist = findMaps(T, s)
-	# res["edos"] = ' & '.join(map(str, list(Tm[:, 0])))
-	# res["edomapping"] = format_matrix(Tm)
+	if Tm is not None:
+		res["edomapping"] = format_matrix(Tm)
 
 	gens = preimage(T)
 
@@ -186,6 +187,11 @@ def info(temp, options):
 	res["CTE-tuning"] = list(map(cents, cte_tun.flatten()))
 	res["TE-errors"] = ", ".join(map(cents, te_err))
 	res["CTE-errors"] = ", ".join(map(cents, cte_err))
+
+	# badness, complexity, error = temp_measures((T_expanded, s_expanded))
+	# res["badness"] = '{:.3e}'.format(badness)
+	# res["complexity"] = '{1:.{0}f}'.format(3, complexity)
+	# res["error"] = '{1:.{0}f}'.format(3, 1200*error)
 
 	return res
 

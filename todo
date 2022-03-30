@@ -9,6 +9,10 @@ x vector pattern FutureWarning
 x check solver for exact diophantine
 x adapt solver for multi-row solve
 x simplify subgroup
+x speed up findmaps
+x exact integer determinant
+x complexity, error, badness
+x check complexity invariant wrt basis
 
 add tests for solver
 
@@ -16,16 +20,8 @@ plot complexity vs error for random temperaments
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 
-speed up findmaps, just check kernel?
- - search over all supporting pmaps
- - sort by badness
- - loop over all n choose k until finding map of full rank
-
 fast rank test?
-exact integer determinant
 cholesky weights?
-
-test 2.6.20 meantone with regular TE weights
 
 use yield in pmap iterator
 
@@ -42,9 +38,6 @@ make search
 check LLL reduction fp
   https://github.com/higumachan/olll/blob/master/olll_numpy.py
   implement custom weights on dot product
-
-complexity, ~ gram matrix, = lattice volume
-  check invariant wrt basis
 
 when subgroup empty, infer from commas
 
