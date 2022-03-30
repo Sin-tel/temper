@@ -31,8 +31,6 @@ enter intervals to optimize
 make results page look nicer
 list more commas, sort by tenney/wilson
 adaptive precision of outputs
-
-
 make search
 
 check LLL reduction fp
@@ -63,7 +61,7 @@ add xen-calc link to all ratios
 
 generate lattice
  - rank 2 -> easy
- - rank 3 -> uhhh, modulo octaves?
+ - rank 3 -> ...
 
 add scale workshop links,
 need some way to figure out MOS and ?? for higher rank

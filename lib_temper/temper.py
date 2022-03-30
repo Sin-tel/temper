@@ -168,21 +168,26 @@ def findMaps(T, subgroup):
 	c = kernel(T)
 	search_range = (4.5, 665.5)
 
+	octave_div = T[0,0]
+	print("octave mult:", octave_div)
+
 	m_list = []
 
 	count = 0
 	count2 = 0
 	for m1, b1 in Pmaps(search_range, subgroup):
-		count2 += 1
-		if count2 > 8000:
-			break
-		if np.all(m1 @ c == 0):
-			badness = temp_measures((m1, subgroup))[0]
-			m_list.append((np.copy(m1), badness))
-
-			count += 1
-			if count > r + 20:
+		# print(m1[0,0])
+		if m1[0,0] % octave_div == 0: # skip non multiples of the octave division
+			count2 += 1
+			if count2 > 8000:
 				break
+			if np.all(m1 @ c == 0):
+				badness = temp_measures((m1, subgroup))[0]
+				m_list.append((np.copy(m1), badness))
+
+				count += 1
+				if count > r + 20:
+					break
 
 	# print("LIST")
 	# print(m_list, flush=True)
@@ -290,6 +295,7 @@ def temp_complexity(temp):
 
 
 # logflat badness
+epsilon = 0.15
 def temp_measures(temp):
 	M, S = temp
 	r, d = M.shape
@@ -299,6 +305,11 @@ def temp_measures(temp):
 
 	badness = error * (complexity**(d / (d - r)))
 	# badness = error * complexity
+	# badness = (error**(1.0-epsilon)) * (complexity**(1.0+epsilon))
+	# badness = error * (complexity**(1.0+epsilon))
+
+	# badness = error * (1 + 0.01*complexity)*complexity
+
 
 	return badness, complexity, error
 

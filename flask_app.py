@@ -52,7 +52,7 @@ def update():
 
 @app.route('/test')
 def test():
-	return "succes!\n v0.1.12"
+	return "succes!\n v0.1.13"
 
 @app.errorhandler(500)
 def internal_error(exception):
