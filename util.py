@@ -62,30 +62,11 @@ def from_commas(args):
 
 	M_expanded = hnf(cokernel(commas))
 
-	# find comma expressed in subgroup basis
-	# this is algorithm not exact! ~should replace with some HNF calculation
-	# R = basis.T @ basis
-	# Rdet = np.linalg.det(R)
-	# Rinv = (np.linalg.inv(R) * np.linalg.det(R))
-	# Rinv = (np.round(Rinv).astype(np.int64))
-
-	# commas_2 = []
-	# for c in commas:
-	# 	sol = (Rinv @ basis.T @ c) / Rdet
-
-	# 	assert np.allclose(sol, np.round(sol)), "Comma not in subgroup"
-	# 	sol = np.round(sol).astype(np.int64)
-	# 	commas_2.append(sol)
-
 	commas_2 = solve_diophantine(basis, commas)
-
-	print(commas_2, flush = True)
 
 	M = hnf(cokernel(commas_2))
 
-	# print(M_expanded @ basis @ np.hstack(commas_2), flush = True)
-
-	assert np.allclose(M_expanded @ basis @ commas_2, 0)
+	assert np.allclose(M_expanded @ basis @ commas_2, 0), "comma not in basis"
 
 	return (M, basis, M_expanded, s_expanded)
 
@@ -103,7 +84,7 @@ def from_edos(args):
 	# remove contorsion
 	M = defactored_hnf(M)
 
-	# find expansion from subgroup
+	# find expansion with the same kernel
 	M_expanded = hnf(cokernel(basis @ kernel(M)))
 
 	return (M, basis, M_expanded, s_expanded)
@@ -120,8 +101,6 @@ def info(temp, options):
 	# so it is possibly redundant
 	# however, it might be defactored! 
 	## example: 2.9.5.7/6 + 13&31
-
-
 	# print(T)
 	# print(T_expanded @ basis, flush = True)
 	# print(basis, flush = True)
@@ -144,10 +123,6 @@ def info(temp, options):
 	res["edos"] = ' & '.join(map(str, list(Tm[:, 0])))
 
 	gens = preimage(T)
-
-	print("GENS")
-	print(gens, flush = True)
-	print(gens[:,0], flush = True)
 
 	if options["reduce"]:
 		# eq = log_interval(gens[0], s)
@@ -193,19 +168,17 @@ def info(temp, options):
 	if options["tenney"]:
 		weight = "tenney"
 
-	# g_matrix = np.hstack(gens)
-
 	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
 	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
-	te_tun = (te_tun.T @ T_expanded @ basis) @ gens
+	te_tun  = ( te_tun.T @ T_expanded @ basis) @ gens
 	cte_tun = (cte_tun.T @ T_expanded @ basis) @ gens
 
-	res["te-tuning"] = list(map(cents, te_tun.flatten()))
+	res["TE-tuning"] = list(map(cents, te_tun.flatten()))
 
-	res["cte-tuning"] = list(map(cents, cte_tun.flatten()))
-	res["te-error"] = ", ".join(map(cents, te_err))
-	res["cte-error"] = ", ".join(map(cents, cte_err))
+	res["CTE-tuning"] = list(map(cents, cte_tun.flatten()))
+	res["TE-errors"] = ", ".join(map(cents, te_err))
+	res["CTE-errors"] = ", ".join(map(cents, cte_err))
 
 	return res
 

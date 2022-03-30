@@ -26,9 +26,9 @@ for d in range(2,10):
 	j = np.log2(np.array(S))
 	W = np.diag(1. / j)
 
-	# for r in range(2,3):
+	for r in range(1,2):
 	# for r in range(2,d):
-	for r in range(1,d):
+	# for r in range(1,d):
 		print((d,r))
 
 		# print(math.comb(d,r))
@@ -55,7 +55,7 @@ for d in range(2,10):
 				ctot += c
 				btot += b
 
-		# print((etot/iters))
+		# print(1200*(etot/iters))
 		# print(ctot/iters)
 		print(btot/iters)
 

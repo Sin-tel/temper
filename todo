@@ -8,8 +8,11 @@ x check if subgroup is valid (no 2.3.9 etc)
 x vector pattern FutureWarning
 x check solver for exact diophantine
 x adapt solver for multi-row solve
+x simplify subgroup
 
-do more tests for solver...
+add tests for solver
+
+plot complexity vs error for random temperaments
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 
@@ -17,6 +20,10 @@ speed up findmaps, just check kernel?
  - search over all supporting pmaps
  - sort by badness
  - loop over all n choose k until finding map of full rank
+
+fast rank test?
+exact integer determinant
+cholesky weights?
 
 test 2.6.20 meantone with regular TE weights
 
@@ -28,7 +35,6 @@ enter intervals to optimize
 make results page look nicer
 list more commas, sort by tenney/wilson
 adaptive precision of outputs
-simplyify subgroup
 
 
 make search
