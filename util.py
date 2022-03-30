@@ -58,28 +58,34 @@ def from_commas(args):
 
 	commas = parse_commas(args["commas"], s_expanded)
 
-	M_expanded = hnf(cokernel(np.hstack(commas)))
+	commas = np.hstack(commas)
 
-	# find commad expressed in subgroup basis
-	# this is algorithm not exact!
-	R = basis.T @ basis
-	Rdet = np.linalg.det(R)
-	Rinv = (np.linalg.inv(R) * np.linalg.det(R))
-	Rinv = (np.round(Rinv).astype(np.int64))
+	M_expanded = hnf(cokernel(commas))
 
-	commas_2 = []
-	for c in commas:
-		sol = (Rinv @ basis.T @ c) / Rdet
+	# find comma expressed in subgroup basis
+	# this is algorithm not exact! ~should replace with some HNF calculation
+	# R = basis.T @ basis
+	# Rdet = np.linalg.det(R)
+	# Rinv = (np.linalg.inv(R) * np.linalg.det(R))
+	# Rinv = (np.round(Rinv).astype(np.int64))
 
-		assert np.allclose(sol, np.round(sol)), "Comma not in subgroup"
-		sol = np.round(sol).astype(np.int64)
-		commas_2.append(sol)
+	# commas_2 = []
+	# for c in commas:
+	# 	sol = (Rinv @ basis.T @ c) / Rdet
 
-	M = hnf(cokernel(np.hstack(commas_2)))
+	# 	assert np.allclose(sol, np.round(sol)), "Comma not in subgroup"
+	# 	sol = np.round(sol).astype(np.int64)
+	# 	commas_2.append(sol)
 
-	print(M_expanded @ basis @ np.hstack(commas_2), flush = True)
+	commas_2 = solve_diophantine(basis, commas)
 
-	assert np.allclose(M_expanded @ basis @ np.hstack(commas_2), 0)
+	print(commas_2, flush = True)
+
+	M = hnf(cokernel(commas_2))
+
+	# print(M_expanded @ basis @ np.hstack(commas_2), flush = True)
+
+	assert np.allclose(M_expanded @ basis @ commas_2, 0)
 
 	return (M, basis, M_expanded, s_expanded)
 
@@ -109,6 +115,21 @@ def info(temp, options):
 	T_expanded = temp[2]
 	s_expanded = temp[3]
 
+	## we can find the map as:
+	# T_expanded @ basis (removing zero rows)
+	# so it is possibly redundant
+	# however, it might be defactored! 
+	## example: 2.9.5.7/6 + 13&31
+
+
+	# print(T)
+	# print(T_expanded @ basis, flush = True)
+	# print(basis, flush = True)
+	# print(defactored_hnf(basis), flush = True)
+	# print(T_expanded)
+	# print("=========")
+	# T = hnf(T_expanded @ basis, remove_zeros = True)
+
 	s = get_subgroup(basis, s_expanded)
 
 	res = dict()
@@ -124,20 +145,24 @@ def info(temp, options):
 
 	gens = preimage(T)
 
+	print("GENS")
+	print(gens, flush = True)
+	print(gens[:,0], flush = True)
+
 	if options["reduce"]:
 		# eq = log_interval(gens[0], s)
 		o = T[0, 0]
-		genoct = np.zeros_like(gens[0])
+		genoct = np.zeros_like(gens[:,0])
 		genoct[0] = 1
 		# reduce by octave
 		for i in range(1, T.shape[0]):
 			# make positive first
-			if log_interval(gens[i], s) < 0:
+			if log_interval(gens[:,i], s) < 0:
 				T[i, :] = -T[i, :]
-				gens[i] = -gens[i]
+				gens[:,i] = -gens[:,i]
 
-			red = int(np.floor(log_interval(gens[i], s)))
-			gens[i] -= red * genoct
+			red = int(np.floor(log_interval(gens[:,i], s)))
+			gens[:,i] -= red * genoct
 			T[0, :] += o * red * T[i, :]
 
 		# should be the same
@@ -146,9 +171,9 @@ def info(temp, options):
 	else:
 		# make positive
 		for i in range(T.shape[0]):
-			if log_interval(gens[i], s) < 0:
+			if log_interval(gens[:,i], s) < 0:
 				T[i, :] = -T[i, :]
-				gens[i] = -gens[i]
+				gens[:,i] = -gens[:,i]
 
 	commas = LLL(kernel(T))
 
@@ -160,8 +185,7 @@ def info(temp, options):
 
 	res["mapping"] = format_matrix(T)
 
-	gens_print = [ratio(g, s) for g in gens]
-	# print(gens_print)
+	gens_print = [ratio(g, s) for g in gens.T]
 
 	res["preimage"] = list(map(str, gens_print))
 
@@ -169,15 +193,13 @@ def info(temp, options):
 	if options["tenney"]:
 		weight = "tenney"
 
-	g_matrix = np.vstack(gens).T
+	# g_matrix = np.hstack(gens)
 
 	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
 	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
-	print(basis)
-
-	te_tun = (te_tun.T @ T_expanded @ basis) @ g_matrix
-	cte_tun = (cte_tun.T @ T_expanded @ basis) @ g_matrix
+	te_tun = (te_tun.T @ T_expanded @ basis) @ gens
+	cte_tun = (cte_tun.T @ T_expanded @ basis) @ gens
 
 	res["te-tuning"] = list(map(cents, te_tun.flatten()))
 

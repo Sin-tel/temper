@@ -23,14 +23,18 @@ def get_subgroup_basis(subgroup):
 		s_basis.append(factors(k, expanded))
 	s_basis = np.hstack(s_basis)
 
-	# new_subgroup = subgroup
+
+	s_basis_new = temper.hnf(s_basis.T, remove_zeros=True).T
+
 
 	# if redundant, normalize
-	if np.linalg.det(s_basis.T @ s_basis) < 0.5:
-		s_basis = temper.hnf(s_basis.T, remove_zeros=True).T
-		# new_subgroup = []
-		# for b in s_basis:
-		# new_subgroup.append(ratio(b,expanded))
+	if s_basis_new.shape[1] < s_basis.shape[1]:
+		s_basis = s_basis_new
+
+	# if diagonal, normalize
+	if np.all(s_basis_new == np.diag(np.diagonal(s_basis_new))):
+		s_basis = s_basis_new
+
 
 	return s_basis, expanded
 

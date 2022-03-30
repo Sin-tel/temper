@@ -12,16 +12,24 @@ from .subgroup import *
 from .optimize import *
 
 
-def hnf(M, remove_zeros=False):
+def hnf(M, remove_zeros=False, transformation=False):
 	assert (M.ndim == 2)
 
-	res = np.array(diophantine.lllhermite(M.astype(np.int64))[0]).astype(np.int64)
+	solution = diophantine.lllhermite(M.astype(np.int64))
+
+	res = np.array(solution[0]).astype(np.int64)
+
+	unimod = np.array(solution[1]).astype(np.int64)
+
 
 	if remove_zeros:
 		idx = np.argwhere(np.all(res[:] == 0, axis=1))
 		res = np.delete(res, idx, axis=0)
 
-	return res
+	if transformation:
+		return res, unimod
+	else:
+		return res
 
 
 def kernel(M):
@@ -76,23 +84,80 @@ def canonical(M):
 		return defactored_hnf(M)
 
 
+# Solve AX = B in the integers
+# for the method used, see https://github.com/tclose/Diophantine/blob/master/algorithm.pdf
+def solve_diophantine(A,B):
+	B = np.atleast_2d(B)
+	print(A)
+	print(B, flush = True)
+	assert A.shape[0] == B.shape[0]
+	aug = np.block([[A.T, np.zeros((A.shape[1],B.shape[1]),dtype = np.int64)],
+	                [B.T, np.eye(B.shape[1],dtype = np.int64)]])
+
+	r, d = A.shape
+
+	nullity = d-r
+
+	print("nullity:", nullity)
+	print(aug)
+
+	if nullity <= 0:
+		nullity = 0
+	
+
+	print(B.shape)
+
+	H, U = hnf(aug, transformation=True)
+
+	p2 = U.shape[0] - nullity
+	p1 = p2-B.shape[1]
+
+	
+
+
+	#TODO assert H is diag?
+	print(H)
+	print(U)
+
+	print("===")
+
+	sol = -U[p1:p2,:A.shape[1]]
+
+	print(p1,p2)
+	print(-sol)
+
+	print("======")
+	return sol.T
+
 def preimage(M):
 	gens = []
 
 	r, d = M.shape
 
-	for i in range(r):
-		tv = np.zeros(r, dtype=np.int64)
-		tv[i] = 1
-		sol = diophantine.solve(M, tv)
-		g = sol[0]
-		gens.append(g)
+	# for i in range(r):
+	# 	tv = np.zeros((r,1), dtype=np.int64)
+	# 	tv[i,0] = 1
+	# 	print("=========================")
+	# 	print(tv, flush = True)
+	# 	# sol = diophantine.solve(M, tv)
+	# 	# g = sol[0]
+	# 	g = solve_diophantine(M, tv)
+	# 	gens.append(g)
+	# gens = np.hstack(gens)
+	# print(gens)
+
+	rank = M.shape[0]
+
+	gens = solve_diophantine(M, np.eye(rank, dtype = np.int64))
 
 	return gens
 
 
 def patent_map(t, subgroup):
 	logs = log_subgroup(subgroup)
+
+	t = t / logs[0] # equave
+
 	# floor(x+0.5) rounds more predictably (downwards on .5)
 	M = np.floor(t * logs + 0.5).astype(np.int64)
 	return np.atleast_2d(M)
