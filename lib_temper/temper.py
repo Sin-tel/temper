@@ -166,12 +166,15 @@ def findMaps(T, subgroup):
 	r, d = T.shape
 	T = hnf(T)
 	c = kernel(T)
-	search_range = (4.5, 665.5)
 
 	octave_div = T[0,0]
 	print("octave mult:", octave_div)
+	search_range = (4.5, 665.5)
 
 	m_list = []
+
+	if r == 1:
+		return None, [octave_div]
 
 	count = 0
 	count2 = 0
@@ -182,12 +185,13 @@ def findMaps(T, subgroup):
 			if count2 > 8000:
 				break
 			if np.all(m1 @ c == 0):
-				badness = temp_measures((m1, subgroup))[0]
-				m_list.append((np.copy(m1), badness))
+				if np.gcd.reduce(m1.flatten().tolist()) == 1:
+					badness = temp_measures((m1, subgroup))[0]
+					m_list.append((np.copy(m1), badness))
 
-				count += 1
-				if count > r + 20:
-					break
+					count += 1
+					if count > r + 10:
+						break
 
 	# print("LIST")
 	# print(m_list, flush=True)
