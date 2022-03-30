@@ -112,7 +112,7 @@ def solve_diophantine(A, B):
 	# Probably the easiest way to guarantee this routine works correctly.
 	assert np.all(A @ sol == B)
 
-	return sol.T
+	return sol
 
 
 def preimage(M):
