@@ -1,5 +1,6 @@
 import flask as f
 from util import *
+import traceback
 import git
 
 app = f.Flask(__name__)
@@ -51,8 +52,14 @@ def update():
 
 @app.route('/test')
 def test():
-	return "succes!\n v0.1.11"
+	return "succes!\n v0.1.12"
+
+@app.errorhandler(500)
+def internal_error(exception):
+    print("500 error caught")
+    return "<pre>" + traceback.format_exc() + "</pre>"
 
 
 if __name__ == '__main__':	
 	app.run(debug=True)
+	# app.run()
