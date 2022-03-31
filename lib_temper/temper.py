@@ -161,10 +161,10 @@ def patent_map(t, subgroup):
 	return np.atleast_2d(M)
 
 
-def findMaps(T, subgroup):
+def find_edos(T, subgroup):
 	assert (T.ndim == 2)
 	r, d = T.shape
-	T = hnf(T)
+	# T = hnf(T)
 	c = kernel(T)
 
 	octave_div = T[0,0]
@@ -174,8 +174,9 @@ def findMaps(T, subgroup):
 	m_list = []
 
 	if r == 1:
-		return None, [octave_div]
+		return
 
+	seen = set()
 	count = 0
 	count2 = 0
 	for m1, b1 in Pmaps(search_range, subgroup):
@@ -184,24 +185,43 @@ def findMaps(T, subgroup):
 			count2 += 1
 			if count2 > 8000:
 				break
+			# if it tempers out all commas
 			if np.all(m1 @ c == 0):
+				# if it is not contorted
 				if np.gcd.reduce(m1.flatten().tolist()) == 1:
 					badness = temp_measures((m1, subgroup))[0]
 					m_list.append((np.copy(m1), badness))
 
-					count += 1
-					if count > r + 10:
-						break
+					# only count distinct octave divisions
+					if m1[0][0] not in seen:
+						seen.add(m1[0][0])
+						count += 1
+						if count > r + 10:  # rank + 10 should be enough
+							break
 
-	# print("LIST")
-	# print(m_list, flush=True)
+
 	print("list count: ", len(m_list))
 	print("nr checked: ", count2)
 
+	# sort by badness
 	m_list.sort(key=lambda l: l[1])
 
-	r_list = m_list[:10]
-	r_list = [m[0][0][0] for m in r_list]
+	# filter so each edo only shows up once (first on the list)
+	r_list = []
+	seen = set()
+	for m in m_list:
+		if m[0][0][0] not in seen:
+			r_list.append(m)
+			seen.add(m[0][0][0])
+
+	return r_list
+
+
+
+def find_join(T, subgroup, m_list):
+	assert (T.ndim == 2)
+	r, d = T.shape
+	# T = hnf(T)
 
 	count = 0
 	for combo in comboBySum(r, 0, len(m_list) - 1):
@@ -214,13 +234,11 @@ def findMaps(T, subgroup):
 
 		if (np.all(m_hnf == T)):
 			print("number of combos checked: " + str(count))
-			return m_new, r_list
+			return [m[0] for m in m_new]
 
 		if count > 500:
 			break
-	print("FAIL. number of combos checked: " + str(count))
-	return None, r_list
-
+	print("FAILED. number of combos checked: " + str(count))
 
 # patent map iterator
 class Pmaps:

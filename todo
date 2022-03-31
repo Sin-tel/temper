@@ -16,7 +16,11 @@ x check complexity invariant wrt basis
 
 find optimal maps for edo input
 
+dont do combination search on edo input
+
 correct kernel
+
+monospace formatting instead of latex
 
 check LLL reduction fp
   https://github.com/higumachan/olll/blob/master/olll_numpy.py
@@ -25,6 +29,7 @@ check LLL reduction fp
 reduce gens by commas
 sort commas by Wilson
 find additional commas
+
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 

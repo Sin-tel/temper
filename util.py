@@ -127,16 +127,20 @@ def info(temp, options):
 
 	res["commas"] = ", ".join(comma_str)
 
-	Tm, edolist = findMaps(T, s)
-	print(Tm)
-	print("", flush=True)
-	if len(edolist) > 0:
-		res["edos"] = ', '.join(map(str, edolist))
-	else:
-		res["edos"] = "?"
+	edolist = find_edos(T, s)
+	print(edolist, flush = True)
+	if edolist is not None and len(edolist) > 1:
+		joins = find_join(T, s, edolist)
 
-	if Tm is not None:
-		res["edomapping"] = format_matrix(Tm)
+		show_list = [m[0][0][0] for m in edolist]
+
+		res["edos"] = ', '.join(map(str, show_list))
+
+		if joins is not None:
+			res["edo joins"] = ' & '.join(map(str, joins))
+
+
+		# res["edomapping"] = format_matrix(Tm)
 
 	gens = preimage(T)
 
