@@ -1,8 +1,8 @@
 # collection of functions for dealing with regular temperaments
 
-import olll
+from . import olll
 from fractions import Fraction
-# import numpy as np
+import numpy as np
 # from math import gcd
 # from primes import primes
 from itertools import combinations
@@ -48,8 +48,16 @@ def cokernel(M):
 	return kernel(M.T).T
 
 
-def LLL(M):
-	return np.array(olll.reduction(M.T.tolist(), delta=0.99), dtype=np.int64).T
+def LLL(M, W):
+	res = olll.reduction(np.copy(M).T, delta=0.99, W=W).T
+	# res2 = np.array(olll2.reduction(np.copy(M).T, delta=0.99), dtype=np.int64).T
+
+	# sort 'em
+	# actually, this might be redundant.
+	c_list = list(res.T)
+	c_list.sort(key = lambda c: np.dot(c, W @ c))
+
+	return np.array(c_list).T
 
 
 def antitranspose(M):
@@ -150,6 +158,36 @@ def preimage(M):
 
 	return gens
 
+# simplify Intervals wrt Comma basis (should be in reduced LLL) wrt Weight matrix
+def simplify(I,C,W):
+	It = I.T
+	Ct = C.T
+
+	for i in range(len(It)):
+		v = It[i]
+		p_best = np.dot(v, W @ v)
+
+		cont = True
+		while cont:
+			print(v, np.dot(v, W @ v))
+			cont = False
+			for c in Ct:
+				new = v - c
+				p_new = np.dot(new, W @ new)
+				if p_new < p_best:
+					v = new
+					p_best = p_new
+					cont = True
+				else:
+					new = v + c
+					p_new = np.dot(new, W @ new)
+					if p_new < p_best:
+						v = new
+						p_best = p_new
+						cont = True
+		It[i] = v
+
+	return It.T
 
 def patent_map(t, subgroup):
 	logs = log_subgroup(subgroup)
@@ -168,7 +206,7 @@ def find_edos(T, subgroup):
 	c = kernel(T)
 
 	octave_div = T[0,0]
-	print("octave mult:", octave_div)
+	# print("octave mult:", octave_div)
 	search_range = (4.5, 665.5)
 
 	m_list = []

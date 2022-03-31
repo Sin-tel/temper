@@ -13,28 +13,21 @@ x speed up findmaps
 x exact integer determinant
 x complexity, error, badness
 x check complexity invariant wrt basis
+x correct kernel
+x implement custom weights on dot product
+x check LLL reduction fp
+x sort commas by Wilson
+x reduce gens by commas
 
 find optimal maps for edo input
 
-dont do combination search on edo input
+switch for monospace formatting instead of latex
 
-correct kernel
-
-monospace formatting instead of latex
-
-check LLL reduction fp
-  https://github.com/higumachan/olll/blob/master/olll_numpy.py
-  implement custom weights on dot product
-
-reduce gens by commas
-sort commas by Wilson
 find additional commas
-
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 
 fast rank test?
-cholesky weights?
 
 add tests for solver
 use yield in pmap iterator

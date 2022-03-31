@@ -119,7 +119,10 @@ def info(temp, options):
 
 	res["subgroup"] = ".".join(map(str, s))
 
-	commas = LLL(kernel(T))
+	W_wilson = np.diag(s).astype(np.double) ## sqrt??
+	G_wilson = W_wilson @ W_wilson.T
+
+	commas = LLL(kernel(T), G_wilson)
 
 	comma_str = []
 	for c in commas.T:
@@ -128,7 +131,7 @@ def info(temp, options):
 	res["commas"] = ", ".join(comma_str)
 
 	edolist = find_edos(T, s)
-	print(edolist, flush = True)
+	# print(edolist, flush = True)
 	if edolist is not None and len(edolist) > 1:
 		joins = find_join(T, s, edolist)
 
@@ -139,8 +142,6 @@ def info(temp, options):
 		if joins is not None:
 			res["edo joins"] = ' & '.join(map(str, joins))
 
-
-		# res["edomapping"] = format_matrix(Tm)
 
 	gens = preimage(T)
 
@@ -170,6 +171,9 @@ def info(temp, options):
 				T[i, :] = -T[i, :]
 				gens[:, i] = -gens[:, i]
 
+	
+	gens = simplify(gens, commas, G_wilson)
+
 	res["mapping"] = format_matrix(T)
 
 	gens_print = [ratio(g, s) for g in gens.T]
@@ -183,14 +187,17 @@ def info(temp, options):
 	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
 	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
-	te_tun = (te_tun.T @ T_expanded @ basis) @ gens
-	cte_tun = (cte_tun.T @ T_expanded @ basis) @ gens
+	te_tun2 = (te_tun.T @ T_expanded @ basis) @ gens
+	cte_tun2 = (cte_tun.T @ T_expanded @ basis) @ gens
 
-	res["TE-tuning"] = list(map(cents, te_tun.flatten()))
+	res["TE-tuning"] = list(map(cents, te_tun2.flatten()))
 
-	res["CTE-tuning"] = list(map(cents, cte_tun.flatten()))
+	res["CTE-tuning"] = list(map(cents, cte_tun2.flatten()))
 	res["TE-errors"] = ", ".join(map(cents, te_err))
 	res["CTE-errors"] = ", ".join(map(cents, cte_err))
+
+	# print((cte_tun.T @ T_expanded @ basis))
+	# res["CTE map"] = " ".join(map(cents, (cte_tun.T @ T_expanded @ basis)))
 
 	# badness, complexity, error = temp_measures((T_expanded, s_expanded))
 	# res["badness"] = '{:.3e}'.format(badness)
