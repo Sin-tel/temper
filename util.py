@@ -61,11 +61,18 @@ def from_commas(args):
 
 	commas = np.hstack(commas)
 
-	M_expanded = hnf(cokernel(commas))
+	commas = hnf(commas.T, remove_zeros = True).T # fix redundant commas
+
+	M_expanded = cokernel(commas)
+
+	print(commas)
+	print(M_expanded, flush = True)
+	assert M_expanded[0][0] != 0, "Can't temper out the octave."
+
 
 	commas_2 = solve_diophantine(basis, commas)
 
-	M = hnf(cokernel(commas_2))
+	M = cokernel(commas_2)
 
 	assert np.allclose(M_expanded @ basis @ commas_2, 0), "comma not in basis"
 

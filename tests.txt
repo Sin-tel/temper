@@ -6,4 +6,6 @@ http://127.0.0.1:5000/result?subgroup=2.5.9%2F7&reduce=on&tenney=on&edos=12&comm
 http://127.0.0.1:5000/result?subgroup=2.5%2F3.7%2F3.11%2F3&reduce=on&tenney=on&edos=&commas=3025%2F3024%0D%0A3125%2F3087&submit_comma=submit
 http://127.0.0.1:5000/result?subgroup=3.5.7&reduce=on&tenney=on&edos=8%2C13&submit_edo=submit&commas=
 
+bugs:
 http://127.0.0.1:5000/result?subgroup=19&reduce=on&tenney=on&edos=7+%26+381&commas=51%2F50%0D%0A57%2F56%0D%0A66%2F65%0D%0A81%2F80%0D%0A225%2F224%0D%0A190%2F189&submit_comma=submit
+http://127.0.0.1:5000/result?subgroup=2.3.19%2F20&reduce=on&tenney=on&edos=12%2C29&submit_edo=submit&commas=
