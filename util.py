@@ -119,8 +119,6 @@ def info(temp, options):
 
 	res["subgroup"] = ".".join(map(str, s))
 
-	print(s)
-
 	s_w = []
 	for fr in s:
 		fr = fr.as_integer_ratio()
@@ -143,7 +141,14 @@ def info(temp, options):
 	if edolist is not None and len(edolist) >= 1:
 		joins = find_join(T, s, edolist)
 
-		show_list = [m[0][0][0] for m in edolist]
+
+		show_list = []
+		for m in edolist:
+			mstr = str(m[0][0][0])
+			if m[2]:
+				mstr = mstr + "'"
+			show_list.append(mstr)
+		# show_list = [m[0][0][0] for m in edolist]
 
 		res["edos"] = ', '.join(map(str, show_list))
 

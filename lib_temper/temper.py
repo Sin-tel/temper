@@ -283,7 +283,9 @@ def find_edos(T, subgroup):
 				# if it is not contorted
 				if np.gcd.reduce(m1.flatten().tolist()) == 1:
 					badness = temp_measures((m1, subgroup))[0]
-					m_list.append((np.copy(m1), badness))
+
+					patent = (np.floor(b1[0]) == np.floor(b1[1]))
+					m_list.append((np.copy(m1), badness, patent))
 
 					# only count distinct octave divisions
 					if m1[0][0] not in seen:

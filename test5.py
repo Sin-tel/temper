@@ -14,3 +14,12 @@ print(H)
 print(U)
 
 print(preimage(T))
+
+subgroup = p_limit(31)
+
+m3 = patent_map(22.8,subgroup)
+m4 = np.array([[23, 36, 53, 64, 79, 84, 93, 97, 103, 111, 113]], dtype = np.int64)
+
+print(np.average(m4 / log_subgroup(subgroup)))
+print(m3)
+print(m4)

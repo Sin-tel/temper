@@ -29,6 +29,9 @@ radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, 
 
 fast rank test?
 
+make search better
+ - only patent edo
+
 add tests for solver
 use yield in pmap iterator
 
