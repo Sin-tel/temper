@@ -119,7 +119,14 @@ def info(temp, options):
 
 	res["subgroup"] = ".".join(map(str, s))
 
-	W_wilson = np.diag(s).astype(np.double) ## sqrt??
+	print(s)
+
+	s_w = []
+	for fr in s:
+		fr = fr.as_integer_ratio()
+		s_w.append(fr[0]*fr[1])
+	W_wilson = np.diag(s_w).astype(np.double) 
+
 	G_wilson = W_wilson @ W_wilson.T
 
 	commas = LLL(kernel(T), G_wilson)
