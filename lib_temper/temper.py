@@ -198,6 +198,61 @@ def patent_map(t, subgroup):
 	M = np.floor(t * logs + 0.5).astype(np.int64)
 	return np.atleast_2d(M)
 
+def find_edos_patent(T, subgroup):
+	assert (T.ndim == 2)
+	r, d = T.shape
+	# T = hnf(T)
+	c = kernel(T)
+
+	octave_div = T[0,0]
+	# print("octave mult:", octave_div)
+	# search_range = (4.5, 665.5)
+
+	m_list = []
+
+	if r == 1:
+		return
+
+	seen = set()
+	count = 0
+	count2 = 0
+	for k in range(666):
+		m1 = patent_map(k,subgroup)
+		# print(m1[0,0])
+		if m1[0,0] % octave_div == 0: # skip non multiples of the octave division
+			count2 += 1
+			if count2 > 8000:
+				break
+			# if it tempers out all commas
+			if np.all(m1 @ c == 0):
+				# if it is not contorted
+				if np.gcd.reduce(m1.flatten().tolist()) == 1:
+					badness = temp_measures((m1, subgroup))[0]
+					m_list.append((np.copy(m1), badness))
+
+					# only count distinct octave divisions
+					if m1[0][0] not in seen:
+						seen.add(m1[0][0])
+						count += 1
+						if count > r + 10:  # rank + 10 should be enough
+							break
+
+
+	print("list count: ", len(m_list))
+	print("nr checked: ", count2)
+
+	# sort by badness
+	m_list.sort(key=lambda l: l[1])
+
+	# filter so each edo only shows up once (first on the list)
+	r_list = []
+	seen = set()
+	for m in m_list:
+		if m[0][0][0] not in seen:
+			r_list.append(m)
+			seen.add(m[0][0][0])
+
+	return r_list
 
 def find_edos(T, subgroup):
 	assert (T.ndim == 2)
@@ -234,7 +289,7 @@ def find_edos(T, subgroup):
 					if m1[0][0] not in seen:
 						seen.add(m1[0][0])
 						count += 1
-						if count > r + 10:  # rank + 10 should be enough
+						if count > r + 25:  # rank + 10 should be enough
 							break
 
 
@@ -252,7 +307,8 @@ def find_edos(T, subgroup):
 			r_list.append(m)
 			seen.add(m[0][0][0])
 
-	return r_list
+	# return r_list
+	return r_list[:(r+12)]
 
 
 

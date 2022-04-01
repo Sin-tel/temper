@@ -131,8 +131,9 @@ def info(temp, options):
 	res["commas"] = ", ".join(comma_str)
 
 	edolist = find_edos(T, s)
-	# print(edolist, flush = True)
-	if edolist is not None and len(edolist) > 1:
+	# edolist = find_edos_patent(T,s)
+
+	if edolist is not None and len(edolist) >= 1:
 		joins = find_join(T, s, edolist)
 
 		show_list = [m[0][0][0] for m in edolist]
@@ -140,7 +141,7 @@ def info(temp, options):
 		res["edos"] = ', '.join(map(str, show_list))
 
 		if joins is not None:
-			res["edo joins"] = ' & '.join(map(str, joins))
+			res["edo join"] = ' & '.join(map(str, joins))
 
 
 	gens = preimage(T)

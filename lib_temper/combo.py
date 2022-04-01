@@ -1,5 +1,5 @@
 # generate all combinations (n choose p) ordered by sum of indices
-
+# https://stackoverflow.com/a/68999050
 
 # generate offsets in increasing order (>=)
 # to produce a total value
