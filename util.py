@@ -232,8 +232,6 @@ def info(temp, options):
 			target_tun, target_err = cte((T_expanded, s_expanded), weight, V = targets)
 
 		target_tun2 = (target_tun.T @ T_expanded @ basis) @ gens
-		print(T_expanded)
-		print(T)
 
 	te_tun2 = (te_tun.T @ T_expanded @ basis) @ gens
 	cte_tun2 = (cte_tun.T @ T_expanded @ basis) @ gens
@@ -241,7 +239,10 @@ def info(temp, options):
 	res["TE tuning"] = list(map(cents, te_tun2.flatten()))
 	res["CTE tuning"] = list(map(cents, cte_tun2.flatten()))
 	if showtarget:
-		res["target tuning"] = list(map(cents, target_tun2.flatten()))
+		target_str = []
+		for c in targets.T:
+			target_str.append(str(ratio(c, s_expanded)))
+		res["target tuning (" + ", ".join(target_str) + ")"] = list(map(cents, target_tun2.flatten()))
 
 	res["TE errors"] = ", ".join(map(cents, te_err))
 	res["CTE errors"] = ", ".join(map(cents, cte_err))
