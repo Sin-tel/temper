@@ -200,6 +200,8 @@ def info(temp, options):
 	if options["tenney"]:
 		weight = "tenney"
 
+	j2 = log_subgroup(s)
+
 	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
 	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
@@ -209,17 +211,6 @@ def info(temp, options):
 	if showtarget:
 		targets = np.hstack(targets)
 		n_targets = targets.shape[1]
-		print(targets)
-		print(n_targets)
-
-		
-		# if n_targets == T_expanded.shape[0]:
-		# 	print("aa")
-		# 	j = log_subgroup(s)
-		# 	W = np.diag(1. / j)
-		# 	target_tun = j @ targets @ np.linalg.inv(T_expanded @ targets)
-		# 	print(target_tun)
-		# 	target_err = [0]
 
 		# use least squares if theres more targets than constraints 
 		# (or equal, which will just solve the system)
@@ -233,8 +224,17 @@ def info(temp, options):
 
 		target_tun2 = (target_tun.T @ T_expanded @ basis) @ gens
 
+		target_err2 = target_tun2 @ T - j2
+
 	te_tun2 = (te_tun.T @ T_expanded @ basis) @ gens
 	cte_tun2 = (cte_tun.T @ T_expanded @ basis) @ gens
+
+	print(te_tun.T @ T_expanded)
+	print((te_tun.T @ T_expanded @ basis) @ gens @ T)
+
+	
+	te_err2  =  te_tun2 @ T - j2
+	cte_err2 = cte_tun2 @ T - j2
 
 	res["TE tuning"] = list(map(cents, te_tun2.flatten()))
 	res["CTE tuning"] = list(map(cents, cte_tun2.flatten()))
@@ -244,10 +244,10 @@ def info(temp, options):
 			target_str.append(str(ratio(c, s_expanded)))
 		res["target tuning (" + ", ".join(target_str) + ")"] = list(map(cents, target_tun2.flatten()))
 
-	res["TE errors"] = ", ".join(map(cents, te_err))
-	res["CTE errors"] = ", ".join(map(cents, cte_err))
+	res["TE errors"] = ", ".join(map(cents, te_err2.flatten()))
+	res["CTE errors"] = ", ".join(map(cents, cte_err2.flatten()))
 	if showtarget:
-		res["target errors"] = ", ".join(map(cents, target_err))
+		res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
 
 	# print((cte_tun.T @ T_expanded @ basis))
 	# res["CTE map"] = " ".join(map(cents, (cte_tun.T @ T_expanded @ basis)))
