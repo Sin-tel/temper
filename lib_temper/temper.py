@@ -142,7 +142,7 @@ def solve_diophantine(A, B):
 
 	# Check that the solution actually works.
 	# Probably the easiest way to guarantee this routine works correctly.
-	assert np.all(A @ sol == B)
+	assert np.all(A @ sol == B), "Could not solve system"
 
 	return sol
 
@@ -169,7 +169,7 @@ def simplify(I,C,W):
 
 		cont = True
 		while cont:
-			print(v, np.dot(v, W @ v))
+			# print(v, np.dot(v, W @ v))
 			cont = False
 			for c in Ct:
 				new = v - c

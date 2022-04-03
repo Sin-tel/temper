@@ -61,14 +61,11 @@ def from_commas(args):
 
 	commas = np.hstack(commas)
 
-	commas = hnf(commas.T, remove_zeros = True).T # fix redundant commas
+	commas = hnf(commas.T, remove_zeros=True).T  # fix redundant commas
 
 	M_expanded = cokernel(commas)
 
-	print(commas)
-	print(M_expanded, flush = True)
 	assert M_expanded[0][0] != 0, "Can't temper out the octave."
-
 
 	commas_2 = solve_diophantine(basis, commas)
 
@@ -104,19 +101,6 @@ def info(temp, options):
 	T_expanded = temp[2]
 	s_expanded = temp[3]
 
-	## we can find the map as:
-	# T_expanded @ basis (removing zero rows)
-	# so it is possibly redundant
-	# however, it might be defactored!
-	## example: 2.9.5.7/6 + 13&31
-	# print(T)
-	# print(T_expanded @ basis, flush = True)
-	# print(basis, flush = True)
-	# print(defactored_hnf(basis), flush = True)
-	# print(T_expanded)
-	# print("=========")
-	# T = hnf(T_expanded @ basis, remove_zeros = True)
-
 	s = get_subgroup(basis, s_expanded)
 
 	res = dict()
@@ -129,25 +113,37 @@ def info(temp, options):
 	s_w = []
 	for fr in s:
 		fr = fr.as_integer_ratio()
-		s_w.append(fr[0]*fr[1])
-	W_wilson = np.diag(s_w).astype(np.double) 
+		s_w.append(fr[0] * fr[1])
+	W_wilson = np.diag(s_w).astype(np.double)
 
 	G_wilson = W_wilson @ W_wilson.T
 
 	commas = LLL(kernel(T), G_wilson)
 
+	for i in range(len(commas.T)):
+		commas[:,i] = make_positive(commas[:,i], s)
+
+	# G_wilson_dual = np.linalg.inv(G_wilson)
+
+	c_length = []
+	for c_column in commas:
+		c_length.append(max([len(str(x))+1 for x in list(c_column)]))
+
 	comma_str = []
 	for c in commas.T:
-		comma_str.append(str(ratio(make_positive(c, s), s)))
+		## format spaces
+		vec = "".join(["{1: {0}d}".format(c_length[i],c[i]) for i in range(len(c))])
+		vec = vec.replace(" ", "&nbsp;")
+		vec = '<span style="font-family: var(--mono)">[' + vec  + "]<sup>T</sup></span>&nbsp; "
+		comma_str.append(vec + str(ratio(c, s)))
 
-	res["commas"] = ", ".join(comma_str)
+	res["comma basis"] = "<br>".join(comma_str)
 
 	edolist = find_edos(T, s)
 	# edolist = find_edos_patent(T,s)
 
 	if edolist is not None and len(edolist) >= 1:
 		joins = find_join(T, s, edolist)
-
 
 		show_list = []
 		for m in edolist:
@@ -162,6 +158,8 @@ def info(temp, options):
 		if joins is not None:
 			res["edo join"] = ' & '.join(map(str, joins))
 
+
+	# T = LLL(T.T, G_wilson_dual).T
 
 	gens = preimage(T)
 
@@ -181,9 +179,6 @@ def info(temp, options):
 			gens[:, i] -= red * genoct
 			T[0, :] += o * red * T[i, :]
 
-		# should be the same
-		# gens = preimage(T)
-
 	else:
 		# make positive
 		for i in range(T.shape[0]):
@@ -191,7 +186,8 @@ def info(temp, options):
 				T[i, :] = -T[i, :]
 				gens[:, i] = -gens[:, i]
 
-	
+
+
 	gens = simplify(gens, commas, G_wilson)
 
 	res["mapping"] = format_matrix(T)
@@ -207,14 +203,50 @@ def info(temp, options):
 	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
 	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
+	targets = parse_commas(options["target"], s_expanded)
+
+	showtarget = len(targets) > 0
+	if showtarget:
+		targets = np.hstack(targets)
+		n_targets = targets.shape[1]
+		print(targets)
+		print(n_targets)
+
+		
+		# if n_targets == T_expanded.shape[0]:
+		# 	print("aa")
+		# 	j = log_subgroup(s)
+		# 	W = np.diag(1. / j)
+		# 	target_tun = j @ targets @ np.linalg.inv(T_expanded @ targets)
+		# 	print(target_tun)
+		# 	target_err = [0]
+
+		# use least squares if theres more targets than constraints 
+		# (or equal, which will just solve the system)
+		# for soem reason it only works unweighted, need to investigate
+		if n_targets >= T_expanded.shape[0]:
+			target_tun, target_err = lstsq((T_expanded, s_expanded), weight = "unweighted", V = targets)
+		
+		# otherwise, use constraints with reguular weights
+		else:
+			target_tun, target_err = cte((T_expanded, s_expanded), weight, V = targets)
+
+		target_tun2 = (target_tun.T @ T_expanded @ basis) @ gens
+		print(T_expanded)
+		print(T)
+
 	te_tun2 = (te_tun.T @ T_expanded @ basis) @ gens
 	cte_tun2 = (cte_tun.T @ T_expanded @ basis) @ gens
 
-	res["TE-tuning"] = list(map(cents, te_tun2.flatten()))
+	res["TE tuning"] = list(map(cents, te_tun2.flatten()))
+	res["CTE tuning"] = list(map(cents, cte_tun2.flatten()))
+	if showtarget:
+		res["target tuning"] = list(map(cents, target_tun2.flatten()))
 
-	res["CTE-tuning"] = list(map(cents, cte_tun2.flatten()))
-	res["TE-errors"] = ", ".join(map(cents, te_err))
-	res["CTE-errors"] = ", ".join(map(cents, cte_err))
+	res["TE errors"] = ", ".join(map(cents, te_err))
+	res["CTE errors"] = ", ".join(map(cents, cte_err))
+	if showtarget:
+		res["target errors"] = ", ".join(map(cents, target_err))
 
 	# print((cte_tun.T @ T_expanded @ basis))
 	# res["CTE map"] = " ".join(map(cents, (cte_tun.T @ T_expanded @ basis)))

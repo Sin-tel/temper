@@ -101,7 +101,8 @@ a {color: var(--c1);  text-decoration:none}
 
 a:hover {color: var(--c1); text-decoration: underline}
 
-pre {font: 1em/1.6 var(--mono); background: var(--c2); padding: 1em; overflow: auto}
+/*pre {font: 1em/1.6 var(--mono); background: var(--c2); padding: 1em; overflow: auto}*/
+pre {font: 1em/1.6 var(--mono); overflow: auto}
 
 code {font: 1em/1.6 var(--mono);}
 

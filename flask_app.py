@@ -16,10 +16,11 @@ def result():
 	if f.request.method == 'GET':
 		args = f.request.args
 
-		options = dict()
+		# options = dict()
+		args = args.to_dict()
 
-		options["tenney"] = ("tenney" in args)
-		options["reduce"] = ("reduce" in args)
+		args["tenney"] = ("tenney" in args)
+		args["reduce"] = ("reduce" in args)
 
 		if "submit_edo" in args:
 			temp = from_edos(args)
@@ -28,7 +29,7 @@ def result():
 		else:
 			return "error"
 
-		html_info = info(temp, options)
+		html_info = info(temp, args)
 
 		# print(f.url_for("result", **args))
 
