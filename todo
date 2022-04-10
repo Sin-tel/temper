@@ -27,13 +27,17 @@ find additional commas
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 
+radio selector for norm
+
 fast rank test?
 
 make search better
- - only patent edo
+ - only patent edos first?
 
 add tests for solver
 use yield in pmap iterator
+
+septimal meantone w just 5/4 and 7/4 is impossible because the intervals are collinear => deal w this properly
 
 help page
 enter intervals to optimize

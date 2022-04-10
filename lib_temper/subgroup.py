@@ -28,12 +28,12 @@ def get_subgroup_basis(subgroup):
 
 
 	# if redundant, normalize
-	if s_basis_new.shape[1] < s_basis.shape[1]:
-		s_basis = s_basis_new
+	# if s_basis_new.shape[1] < s_basis.shape[1]:
+	# 	s_basis = s_basis_new
 
-	# if diagonal, normalize
-	if np.all(s_basis_new == np.diag(np.diagonal(s_basis_new))):
-		s_basis = s_basis_new
+	# # if diagonal, normalize
+	# if np.all(s_basis_new == np.diag(np.diagonal(s_basis_new))):
+	# 	s_basis = s_basis_new
 
 
 	return s_basis, expanded

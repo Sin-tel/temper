@@ -17,8 +17,7 @@ def parse_subgroup(s):
 		return np.eye(len(expanded), dtype=np.int64), expanded
 	else:
 		s_basis, expanded = get_subgroup_basis(s)
-		s = get_subgroup(s_basis, expanded)
-		# s = expanded
+		# s = get_subgroup(s_basis, expanded)
 		return s_basis, expanded
 
 
@@ -34,6 +33,7 @@ vectorPattern = '[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]'
 def parse_commas(c, s):
 	commas = []
 	for n, d in re.findall(ratioPattern, c):
+		print(n,d, flush = True)
 		commas.append(factors((int(n), int(d)), s))
 	for v in re.findall(vectorPattern, c):
 		l = len(s)
@@ -205,9 +205,11 @@ def info(temp, options):
 	te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
 	cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
 
-	targets = parse_commas(options["target"], s_expanded)
+	showtarget = False
+	if "target" in options:
+		targets = parse_commas(options["target"], s_expanded)
+		showtarget = len(targets) > 0
 
-	showtarget = len(targets) > 0
 	if showtarget:
 		targets = np.hstack(targets)
 		n_targets = targets.shape[1]

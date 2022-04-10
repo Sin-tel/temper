@@ -51,6 +51,39 @@ def factors(fr, subgroup):
 	return factors
 
 
+def factors_unchecked(fr, subgroup):
+	assert (type(subgroup) is list), "Subgroup must be a list."
+	assert all(isinstance(x, int) for x in subgroup)
+
+	factors = np.zeros((len(subgroup), 1), dtype=np.int64)
+
+	if type(fr) is tuple:
+		p = fr[0]
+		q = fr[1]
+	else:
+		frac = Fraction(fr)
+		p = frac.numerator
+		q = frac.denominator
+
+	assert (p > 0)
+	assert (q > 0)
+
+	for i, f in enumerate(subgroup):
+		while p % f == 0:
+			p //= f
+			factors[i, 0] += 1
+		while q % f == 0:
+			q //= f
+			factors[i, 0] -= 1
+
+	# print(p,q, flush = True)
+	# assert p == 1 and q == 1, "Decomposition not in subgroup."
+	if p != 1 or q != 1:
+		return None
+
+	return factors
+
+
 # make a prime vector positive
 def make_positive(v, subgroup):
 	if log_interval(v, subgroup) < 0:
