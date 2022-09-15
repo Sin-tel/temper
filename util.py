@@ -216,7 +216,7 @@ def info(temp, options):
 
 		# use least squares if theres more targets than constraints 
 		# (or equal, which will just solve the system)
-		# for soem reason it only works unweighted, need to investigate
+		# for some reason it only works unweighted, need to investigate
 		if n_targets >= T_expanded.shape[0]:
 			target_tun, target_err = lstsq((T_expanded, s_expanded), weight = "unweighted", V = targets)
 		
@@ -238,18 +238,21 @@ def info(temp, options):
 	te_err2  =  te_tun2 @ T - j2
 	cte_err2 = cte_tun2 @ T - j2
 
-	res["TE tuning"] = list(map(cents, te_tun2.flatten()))
-	res["CTE tuning"] = list(map(cents, cte_tun2.flatten()))
+	res["optimal tuning"] = list(map(cents, te_tun2.flatten()))
+	res["pure octaves tuning"] = list(map(cents, cte_tun2.flatten()))
 	if showtarget:
 		target_str = []
 		for c in targets.T:
 			target_str.append(str(ratio(c, s_expanded)))
 		res["target tuning (" + ", ".join(target_str) + ")"] = list(map(cents, target_tun2.flatten()))
 
-	res["TE errors"] = ", ".join(map(cents, te_err2.flatten()))
-	res["CTE errors"] = ", ".join(map(cents, cte_err2.flatten()))
-	if showtarget:
-		res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
+	# res["TE errors"] = ", ".join(map(cents, te_err2.flatten()))
+	# res["CTE errors"] = ", ".join(map(cents, cte_err2.flatten()))
+	# if showtarget:
+	# 	res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
+
+
+
 
 	# print((cte_tun.T @ T_expanded @ basis))
 	# res["CTE map"] = " ".join(map(cents, (cte_tun.T @ T_expanded @ basis)))

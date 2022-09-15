@@ -33,10 +33,12 @@ def reduction(basis: np.ndarray, delta: float, W) -> Sequence[Sequence[int]]:
 
 	k = 1
 	while k < n:
+		# print(basis)
 		for j in range(k - 1, -1, -1):
 			mu_kj = mu(k, j)
 			if abs(mu_kj) > 0.5:
 				basis[k] = basis[k] - basis[j] * round(mu_kj)
+				# print(basis[k])
 				ortho = gramschmidt(basis, W)
 
 		if innerprod(ortho[k], ortho[k],

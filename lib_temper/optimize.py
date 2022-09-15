@@ -86,7 +86,7 @@ def metric_wilson(s):
 
 	return G
 
-# weil norm
+# weil-euclidean metric
 def metric_weil(s):
 	n = len(s)
 	j = log_subgroup(s)
@@ -95,7 +95,17 @@ def metric_weil(s):
 	Gd = Bw2.T @ Bw2
 	G = np.linalg.inv(Gd)
 	G = G / G[0,0]
+	return G
 
+# tenney-weil / cangwu / generalized weil
+def metric_kweil(k,s):
+	n = len(s)
+	j = log_subgroup(s)
+	Bw = np.block([[np.eye(n)],[k*np.ones((1,n))]])
+	Bw2 = Bw @ np.diag(j.flatten())
+	Gd = Bw2.T @ Bw2
+	G = np.linalg.inv(Gd)
+	G = G / G[0,0]
 	return G
 
 # farey series (integer limit) norm

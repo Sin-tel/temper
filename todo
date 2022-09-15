@@ -19,6 +19,8 @@ x check LLL reduction fp
 x sort commas by Wilson
 x reduce gens by commas
 
+abstract scale search (mv3 etc)
+
 find optimal maps for edo input
 
 switch for monospace formatting instead of latex
@@ -29,7 +31,25 @@ radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, 
 
 radio selector for norm
 
-fast rank test?
+fast rank test? 
+
+better edo search
+ - only search subspace where comma is tempered (ie image of temp in HNF w octaves stretched)
+ - somehow get normal edo maps (?)
+ - find join 
+    * take best 2 (they wont be linearly dep anyway)
+    * iterate further until we find one thats linearly indep (check fast via det(V*V^T))
+    * iterate until rank r is reached
+
+temp search
+ - find good approximations first? (low badness)
+ - easier for edos
+ - find edo pairs that have a large angle wrt eachother
+ - find good commas instead?
+
+complexity under weil norm ~edo without normalization
+
+automatically find target tuning by finding vectors that are small under the error functional of least squares
 
 make search better
  - only patent edos first?
