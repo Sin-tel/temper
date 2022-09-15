@@ -263,7 +263,7 @@ def find_edos(T, subgroup):
 
 	octave_div = T[0,0]
 	# print("octave mult:", octave_div)
-	search_range = (4.5, 665.5)
+	search_range = (4.5, 1999.5)
 
 	m_list = []
 
