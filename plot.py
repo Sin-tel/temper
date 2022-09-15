@@ -18,7 +18,7 @@ def innerprod(a, b, W):
 
 
 # number of points in each dimension
-nx, ny, nz = (5, 5, 5)
+nx, ny, nz = (4, 4, 1)
 
 # create points
 xv = np.arange(-nx, nx+1)
@@ -36,14 +36,13 @@ s = [2,3,5]
 
 n = len(s)
 
-Gd1 = np.linalg.inv(metric_farey(7,s))
+Gd1 = np.linalg.inv(metric_farey(20,s))
 Gd2 = np.linalg.inv(metric_tenney(s))
 Gd3 = np.linalg.inv(metric_weil(s))
-Gd4 = np.linalg.inv(metric_kweil(5,s))
+Gd4 = np.linalg.inv(metric_wilson(s))
 Gd5 = np.eye(n)
 
-
-Gd = Gd4
+Gd = Gd3
 G = np.linalg.inv(Gd)
 
 
@@ -51,46 +50,8 @@ L = np.linalg.cholesky(Gd)
 
 basis = L.T
 
-# aabaaab
-# abbabab
-
-# LLsLLLs
-# LssLsLs
-# LmsLmLs
-
-# LLsLLLs
-# sLsLsLs
-# mLsLmLs
-
-# LLsLLLs
-# ssLsLsL
-# MMsMLMs
-
-# LLsLLsL
-# LsLLsLs
-# LMsLMsM
-
-# MV3a
-# C  D  E- F  G  A- B- C
-# MV3b
-# C  D- E- F  G  A- B- C
-
-# D  E  F+ G+ A  B  C+ D
-
-
-# Lb = np.eye(len(s), dtype = np.int64)
-# Lb = LLL(Lb, Gd)
-# print(Lb)
-
-## comma
-prat = factors("250/243",s)
-
-# porcupine  250/243
-# meantone   81/80
-# schisma    32805/32768
-# diaschisma 2048/2025
-# magic      3125/3072
-# wurschmidt 393216/390625
+## extra vector to draw in blue
+prat = factors("81/80",s)
 
 M = cokernel(prat)
 
@@ -112,53 +73,13 @@ Gm = Bm.T @ Bm
 print(Gm)
 
 
-Gm = np.linalg.inv(M @ G @ M.T)
-print(Gm)
+print(np.linalg.inv(M @ G @ M.T))
 
-gens = np.eye(2, dtype = np.int64)
-
-print(np.dot(gens.T[0], Gm @ gens.T[0]))
-print(np.dot(gens.T[1], Gm @ gens.T[1]))
-print(np.dot(gens.T[1], Gm @ gens.T[0]))
-normdot = np.dot(gens.T[1], Gm @ gens.T[0])
-normdot = normdot / np.sqrt(np.dot(gens.T[0], Gm @ gens.T[0]) * np.dot(gens.T[1], Gm @ gens.T[1]))
-# print(normdot)
-print("angle: ", np.degrees(np.arccos(normdot)))
-gens = LLL(gens, Gm)
-
-# should be 1
-print(integer_det(gens))
-
-# M = 
-
-print(gens)
-print(gens.T[0])
-
-print(np.dot(gens.T[0], Gm @ gens.T[0]))
-print(np.dot(gens.T[1], Gm @ gens.T[1]))
-print(np.dot(gens.T[1], Gm @ gens.T[0]))
-normdot = np.dot(gens.T[1], Gm @ gens.T[0])
-normdot = normdot / np.sqrt(np.dot(gens.T[0], Gm @ gens.T[0]) * np.dot(gens.T[1], Gm @ gens.T[1]))
-# print(normdot)
-print("angle: ", np.degrees(np.arccos(normdot)))
-
-# get inverse
-H, U = hnf(gens, transformation = True)
-print(gens)
-print(H)
-print(U @ gens)
-print(M)
-print(U @ M)
-g = preimage(U @ M)
-print(g)
-print(ratio(g.T[0],s))
-print(ratio(g.T[1],s))
-
-# exit()
-nb = proj @ g
-# exit()
 pts2 = proj @ pts
+# print(pts2)
+# print(pts)
 
+print(M @ prat)
 
 
 # transform the points
@@ -183,8 +104,6 @@ o2 = np.zeros_like(bx2)
 bx2 = np.vstack([o2,bx2]).T
 by2 = np.vstack([o2,by2]).T
 bz2 = np.vstack([o2,bz2]).T
-
-# cx = 
 
 # Creating figure
 fig = plt.figure(figsize = (10, 7))

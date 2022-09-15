@@ -49,16 +49,16 @@ def cokernel(M):
 	return kernel(M.T).T
 
 
-def LLL(M, W, delta = 0.99):
-	res = olll.reduction(np.copy(M).T, delta=delta, W=W).T
+def LLL(M, W):
+	res = olll.reduction(np.copy(M).T, delta=0.99, W=W).T
 	# res2 = np.array(olll2.reduction(np.copy(M).T, delta=0.99), dtype=np.int64).T
 
 	# sort 'em
 	# actually, this might be redundant.
-	# c_list = list(res.T)
-	# c_list.sort(key = lambda c: np.dot(c, W @ c))
-	# return np.array(c_list).T
-	return res
+	c_list = list(res.T)
+	c_list.sort(key = lambda c: np.dot(c, W @ c))
+
+	return np.array(c_list).T
 
 
 def antitranspose(M):
@@ -376,42 +376,33 @@ class Pmaps:
 		return self.cmap, (lb, ub)
 
 
-def temp_relerror(temp, G):
+def temp_error(temp):
 	M, S = temp
 	r, d = M.shape
 
-	j = np.atleast_2d(log_subgroup(S))
+	j = log_subgroup(S)
+	W = np.diag(1. / j)
 
-	# js = np.sqrt(np.asscalar(j @ G @ j.T))
-
-	V = np.block([[M],[j]])
-
-
-	err = np.sqrt(np.linalg.det(V @ G @ V.T))
-
-	# sol, e = lstsq(temp, weight="tenney")
-	# err2 = np.sqrt(np.average(e**2))
-	# print(np.sqrt((d-r)/((r+1)*d))*err2)
+	sol, e = lstsq(temp, weight="tenney")
 
 	# Breed
-	# err2 = np.sqrt(np.average((e @ W)**2))
-
+	err = np.sqrt(np.average((e @ W)**2))
 
 	# Smith
-	# err2 = np.sqrt(np.sum((e @ W)**2) * (r + 1) / (d-r) )
+	# err = np.sqrt(np.sum((e @ W)**2) * (r + 1) / (d-r) )
 
 	return err
 
 
-def temp_complexity(temp, G):
+def temp_complexity(temp):
 	M, S = temp
 	r, d = M.shape
 
-
-	compl = np.sqrt(np.linalg.det((M @ G @ M.T)))
+	j = log_subgroup(S)
+	W = np.diag(1. / j)
 
 	# simple
-	# compl = np.sqrt(np.linalg.det((M @ G @ M.T)) / d)
+	compl = np.sqrt(np.linalg.det((M @ W) @ (M @ W).T) / d)
 
 	# Breed
 	# compl  = np.sqrt (np.linalg.det ((M @ W) @ (M @ W).T / d))
@@ -423,21 +414,21 @@ def temp_complexity(temp, G):
 
 
 # logflat badness
-epsilon = 0.00
-def temp_measures(temp, G):
+epsilon = 0.15
+def temp_measures(temp):
 	M, S = temp
 	r, d = M.shape
 
-	complexity = temp_complexity(temp, G)
+	complexity = temp_complexity(temp)
+	error = temp_error(temp)
 
-	relerror = temp_relerror(temp, G)
-	error = relerror / complexity
+	badness = error * (complexity**(d / (d - r)))
+	# badness = error * complexity
+	# badness = (error**(1.0-epsilon)) * (complexity**(1.0+epsilon))
+	# badness = error * (complexity**(1.0+epsilon))
 
-	badness = error * (complexity**(epsilon + (d / (d - r))))
+	# badness = error * (1 + 0.01*complexity)*complexity
 
-	# c2 = (complexity**(epsilon + (d / (d - r))))
-
-	# print(relerror, complexity**(- r / (d - r)))
 
 	return badness, complexity, error
 

@@ -1,7 +1,7 @@
 from util import *
 import numpy as np
 import math
-# from farey import farey
+from farey import farey
 
 ### http://x31eq.com/composite.pdf
 
@@ -54,10 +54,8 @@ U2 = G2 - (j_i @ j_i.T - G2) / n
 
 
 # print(G - G2)
-print(U2)
+print(G)
 print(U)
-# print(G2)
-# exit()
 
 Gd_u = np.linalg.inv(U)
 
@@ -73,21 +71,12 @@ G3 = np.linalg.inv(Gd3)
 Gd3 = np.linalg.inv(G3 / G3[0,0])
 print("===================")
 
-# print(Gd)
+print(Gd)
 
 print(Gd_u)
 print(Gd3)
-# print(Gd2)
-G5 = metric_weil(s)
-Gd5 = np.linalg.inv(G5)
+print(Gd2)
 
-print(Gd5)
-
-print(G5)
-
-
-
-exit()
 
 def norm(v, g):
 	return np.sqrt(v.T @ g @ v)
