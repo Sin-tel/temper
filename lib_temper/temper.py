@@ -285,14 +285,21 @@ def find_edos(T, subgroup):
 				if np.gcd.reduce(m1.flatten().tolist()) == 1:
 					badness = temp_measures((m1, subgroup))[0]
 
-					patent = (np.floor(b1[0]) == np.floor(b1[1]))
-					m_list.append((np.copy(m1), badness, patent))
+					# Check the bounds of the GPV map.
+					# The map is 'patent' if the interval includes the integer value.
+					# If they are e.g. [16.9, 17.1] then it is patent.
+					# In this case the floor() will be different (16 != 17).
+					# If it is not patent, they will be something like [17.1, 17.2].
+					# In this case, the floor() will be the same.
+					not_patent = (np.floor(b1[0]) == np.floor(b1[1]))
+
+					m_list.append((np.copy(m1), badness, not_patent))
 
 					# only count distinct octave divisions
 					if m1[0][0] not in seen:
 						seen.add(m1[0][0])
 						count += 1
-						if count > r + 25:  # rank + 10 should be enough
+						if count > r + 25:  # rank + 25 should be enough
 							break
 
 
@@ -310,7 +317,7 @@ def find_edos(T, subgroup):
 			r_list.append(m)
 			seen.add(m[0][0][0])
 
-	# return r_list
+	# return top 12+rank edos
 	return r_list[:(r+12)]
 
 
