@@ -1,4 +1,4 @@
-## generator optimization & metric
+# generator optimization and metrics
 
 import numpy as np
 

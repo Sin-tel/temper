@@ -1,4 +1,4 @@
-## interval arithmetic
+# interval arithmetic
 
 import numpy as np
 from fractions import Fraction

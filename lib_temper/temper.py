@@ -14,6 +14,7 @@ from .optimize import *
 from .combo import comboBySum
 
 
+# Find the hermite normal form of M
 def hnf(M, remove_zeros=False, transformation=False):
     assert M.ndim == 2
 
@@ -33,6 +34,10 @@ def hnf(M, remove_zeros=False, transformation=False):
         return res
 
 
+# Find the left kernel (nullspace) of M.
+# Adjoin an identity block matrix and solve for HNF.
+# This is equivalent to the highschool maths method,
+# but using HNF instead of Gaussian elimination.
 def kernel(M):
     assert M.ndim == 2
     r, d = M.shape
@@ -44,16 +49,20 @@ def kernel(M):
     return K
 
 
+# Find the right kernel (nullspace) of M
 def cokernel(M):
     assert M.ndim == 2
     return kernel(M.T).T
 
 
+# LLL reduction
+# Tries to find the smallest basis vectors in some lattice
+# M: Map
+# W: Weight matrix (metric)
 def LLL(M, W):
     res = olll.reduction(np.copy(M).T, delta=0.99, W=W).T
-    # res2 = np.array(olll2.reduction(np.copy(M).T, delta=0.99), dtype=np.int64).T
 
-    # sort 'em
+    # sort them by complexity
     # actually, this might be redundant.
     c_list = list(res.T)
     c_list.sort(key=lambda c: np.dot(c, W @ c))
@@ -61,10 +70,21 @@ def LLL(M, W):
     return np.array(c_list).T
 
 
+# Flips M along diagonal
 def antitranspose(M):
     return np.flipud(np.fliplr((M.T)))
 
 
+# Finds the Hermite normal form and 'defactors' it.
+# Defactoring is also known as saturation.
+# This removes torsion from the map.
+# Algorithm as described by:
+#
+# Clément Pernet and William Stein.
+# Fast Computation of HNF of Random Integer Matrices.
+# Journal of Number Theory.
+# https://doi.org/10.1016/j.jnt.2010.01.017
+# See section 8.
 def defactored_hnf(M):
     r, d = M.shape
 
@@ -100,11 +120,16 @@ def integer_det(M):
     return sign * M[-1, -1]
 
 
+# Order of factorization.
+# For a saturated basis this is 1.
 def factor_order(M):
     r, d = M.shape
     return integer_det(hnf(M.T)[:r].T)
 
 
+# Canonical maps
+# This is just the defactored HNF,
+# but for comma bases we do the antitranspose sandwich.
 def canonical(M):
     assert M.ndim == 2
     r, d = M.shape
@@ -132,7 +157,7 @@ def solve_diophantine(A, B):
 
     nullity = d - r
 
-    ## somehow we can solve the system even if the nullity is -1
+    # somehow we can solve the system even if the nullity is -1
     # aka the kernel is trivial
     # should double check when this actually works
     if nullity <= 0:
@@ -152,10 +177,10 @@ def solve_diophantine(A, B):
     return sol
 
 
+# Find a preimage of M
+# Amounts to solving MX = I
 def preimage(M):
     gens = []
-
-    r, d = M.shape
 
     rank = M.shape[0]
 
@@ -164,20 +189,20 @@ def preimage(M):
     return gens
 
 
-# simplify Intervals wrt Comma basis (should be in reduced LLL) wrt Weight matrix
+# Simplify Intervals wrt Comma basis with some Weight matrix.
+# The comma basis should be in reduced LLL form for this to work properly.
 def simplify(I, C, W):
-    It = I.T
-    Ct = C.T
+    intervals = I.T
+    commas = C.T
 
-    for i in range(len(It)):
-        v = It[i]
+    for i in range(len(intervals)):
+        v = intervals[i]
         p_best = np.dot(v, W @ v)
 
         cont = True
         while cont:
-            # print(v, np.dot(v, W @ v))
             cont = False
-            for c in Ct:
+            for c in commas:
                 new = v - c
                 p_new = np.dot(new, W @ new)
                 if p_new < p_best:
@@ -191,11 +216,13 @@ def simplify(I, C, W):
                         v = new
                         p_best = p_new
                         cont = True
-        It[i] = v
+        intervals[i] = v
 
-    return It.T
+    return intervals.T
 
 
+# Patent n-edo map
+# Just crudely rounds all the log primes, multiplied by n
 def patent_map(t, subgroup):
     logs = log_subgroup(subgroup)
 
@@ -206,6 +233,7 @@ def patent_map(t, subgroup):
     return np.atleast_2d(M)
 
 
+# Search for patent edo maps that are consistent with T up to some limit
 def find_edos_patent(T, subgroup):
     assert T.ndim == 2
     r, d = T.shape
@@ -262,6 +290,7 @@ def find_edos_patent(T, subgroup):
     return r_list
 
 
+# Search for edo maps (GPVs) that are consistent with T up to some limit
 def find_edos(T, subgroup):
     assert T.ndim == 2
     r, d = T.shape
@@ -281,7 +310,6 @@ def find_edos(T, subgroup):
     count = 0
     count2 = 0
     for m1, b1 in Pmaps(search_range, subgroup):
-        # print(m1[0,0])
         if m1[0, 0] % octave_div == 0:  # skip non multiples of the octave division
             count2 += 1
             if count2 > 8000:
@@ -319,6 +347,7 @@ def find_edos(T, subgroup):
     return r_list[: (r + 12)]
 
 
+# Select <rank> edos that, when joined together, are equivalent to the temperament
 def find_join(T, subgroup, m_list):
     assert T.ndim == 2
     r, d = T.shape
@@ -342,7 +371,7 @@ def find_join(T, subgroup, m_list):
     print("FAILED. number of combos checked: " + str(count))
 
 
-# patent map iterator
+# Iterator for general edo maps (GPVs)
 class Pmaps:
     def __init__(self, bounds, subgroup):
         self.stop = bounds[1]
@@ -381,6 +410,8 @@ class Pmaps:
         return self.cmap, (lb, ub)
 
 
+# Find the error of a temperament
+# Which here is taken as the tenney-weighted MSE
 def temp_error(temp):
     M, S = temp
     r, d = M.shape
@@ -399,6 +430,12 @@ def temp_error(temp):
     return err
 
 
+# Complexity of a temperament.
+# Here we take the 'simple' definition (i.e. don't try to adjust for rank or dimension).
+# 1. Find the gram matrix of the temperament with tenney metric.
+# 2. Calculate the determinant.
+#    This is the volume of the hyperparallellepid spanned by the basis.
+# 3. Take the square root.
 def temp_complexity(temp):
     M, S = temp
     r, d = M.shape
@@ -418,10 +455,26 @@ def temp_complexity(temp):
     return compl
 
 
-# logflat badness
-epsilon = 0.15
-
-
+# "logflat badness"
+# Combines complexity and error into a single measurement
+#
+# https://en.xen.wiki/w/Tenney-Euclidean_temperament_measures#TE_logflat_badness
+# The reason for the exponent here can be found in:
+#
+# On transfer inequalities in Diophantine approximation, II
+# Y. Bugeaud, M. Laurent
+# Mathematische Zeitschrift volume 265, pages249–262 (2010)
+#
+# See corollary 2.
+# Their way of counting dimensions is different:
+#  rank = d + 1
+#  dim = n + 1
+# Then we have
+#  omega = rank / (dim - rank) = dim / (dim - rank) - 1
+# the -1 is because we have
+# | y ∧ X | * | X | ^ omega <= C
+# | X | ~ complexity
+# | y ∧ X | ~ error * complexity
 def temp_measures(temp):
     M, S = temp
     r, d = M.shape
@@ -430,42 +483,5 @@ def temp_measures(temp):
     error = temp_error(temp)
 
     badness = error * (complexity ** (d / (d - r)))
-    # badness = error * complexity
-    # badness = (error**(1.0-epsilon)) * (complexity**(1.0+epsilon))
-    # badness = error * (complexity**(1.0+epsilon))
-
-    # badness = error * (1 + 0.01*complexity)*complexity
 
     return badness, complexity, error
-
-
-if __name__ == "__main__":
-    subgroup = [Fraction("2"), Fraction("5/4"), Fraction("9")]
-
-    s_basis, expanded = get_subgroup_basis(subgroup)
-
-    subgroup = get_subgroup(s_basis, expanded)
-
-    rational = False
-    for r in subgroup:
-        p, q = r.as_integer_ratio()
-        if q > 1:
-            rational = True
-
-    if not rational:
-        subgroup = list(map(int, subgroup))
-
-    # normalization test.. unsuited because it doesnt keep equave
-    # s_basis = hnf(s_basis, remove_zeros = True)
-    # s_basis = LLL(s_basis)
-    # # make positive
-    # for i in range(s_basis.shape[0]):
-    # 	if log_interval(s_basis[i], expanded) < 0:
-    # 		s_basis[i, :] = -s_basis[i, :]
-    # new_subgroup = []
-    # for b in s_basis:
-    # 	new_subgroup.append(ratio(b,expanded))
-
-    print(expanded)
-    print(s_basis)
-    print(subgroup)
