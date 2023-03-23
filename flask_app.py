@@ -6,54 +6,55 @@ import git
 app = f.Flask(__name__)
 
 
-@app.route('/')
+@app.route("/")
 def index():
-	return f.render_template("./temper.html")
+    return f.render_template("./temper.html")
 
 
-@app.route('/result', methods=['POST', 'GET'])
+@app.route("/result", methods=["POST", "GET"])
 def result():
-	if f.request.method == 'GET':
-		args = f.request.args
+    if f.request.method == "GET":
+        args = f.request.args
 
-		# options = dict()
-		args = args.to_dict()
+        # options = dict()
+        args = args.to_dict()
 
-		args["tenney"] = ("tenney" in args)
-		args["reduce"] = ("reduce" in args)
+        args["tenney"] = "tenney" in args
+        args["reduce"] = "reduce" in args
 
-		if "submit_edo" in args:
-			temp = from_edos(args)
-		elif "submit_comma" in args:
-			temp = from_commas(args)
-		else:
-			return "error"
+        if "submit_edo" in args:
+            temp = from_edos(args)
+        elif "submit_comma" in args:
+            temp = from_commas(args)
+        else:
+            return "error"
 
-		html_info = info(temp, args)
+        html_info = info(temp, args)
 
-		# print(f.url_for("result", **args))
+        # print(f.url_for("result", **args))
 
-		print("", flush=True)
-		return f.render_template("./result.html", res=html_info)
+        print("", flush=True)
+        return f.render_template("./result.html", res=html_info)
 
 
-@app.route('/update', methods=['POST'])
+@app.route("/update", methods=["POST"])
 def update():
-	if f.request.method == 'POST':
-		repo = git.Repo('./temper')
-		origin = repo.remotes.origin
-		if not 'main' in repo.heads:
-			repo.create_head('main', origin.refs.main)
-		repo.heads.main.set_tracking_branch(origin.refs.main).checkout()
-		origin.pull()
-		return '', 200
-	else:
-		return '', 400
+    if f.request.method == "POST":
+        repo = git.Repo("./temper")
+        origin = repo.remotes.origin
+        if not "main" in repo.heads:
+            repo.create_head("main", origin.refs.main)
+        repo.heads.main.set_tracking_branch(origin.refs.main).checkout()
+        origin.pull()
+        return "", 200
+    else:
+        return "", 400
 
 
-@app.route('/test')
+@app.route("/test")
 def test():
-	return "succes!\n v0.1.14"
+    return "succes!\n v0.1.14"
+
 
 @app.errorhandler(500)
 def internal_error(exception):
@@ -61,6 +62,6 @@ def internal_error(exception):
     return "<pre>" + traceback.format_exc() + "</pre>"
 
 
-if __name__ == '__main__':	
-	app.run(debug=True)
-	# app.run()
+if __name__ == "__main__":
+    app.run(debug=True)
+    # app.run()

@@ -14,9 +14,9 @@ l = farey(11)
 lv = []
 # print(list(map(str, l)))
 for i in l:
-	f = factors_unchecked(i, s)
-	if f is not None:
-		lv.append(f)
+    f = factors_unchecked(i, s)
+    if f is not None:
+        lv.append(f)
 
 lv = np.hstack(lv)
 
@@ -43,11 +43,11 @@ Gd2 = np.linalg.inv(G2)
 np.set_printoptions(precision=3, suppress=True)
 
 # U = (G2 @ j @ j.T @ G2)/(j.T @ G2 @ j)
-U = (G2 @ j @ j.T @ G2)
+U = G2 @ j @ j.T @ G2
 
 U = G2 - (U - G2) / (j.T @ G2 @ j)
 
-j_i = 1/j
+j_i = 1 / j
 n = len(s)
 
 U2 = G2 - (j_i @ j_i.T - G2) / n
@@ -61,14 +61,14 @@ Gd_u = np.linalg.inv(U)
 
 # print(G - U)
 
-# weil norm 
+# weil norm
 n = len(s)
-Bw = np.block([[np.eye(n)],[np.ones((1,n))]])
+Bw = np.block([[np.eye(n)], [np.ones((1, n))]])
 # Bw = np.ones((1,n))
 Bw2 = Bw @ np.diag(j.flatten())
 Gd3 = Bw2.T @ Bw2
 G3 = np.linalg.inv(Gd3)
-Gd3 = np.linalg.inv(G3 / G3[0,0])
+Gd3 = np.linalg.inv(G3 / G3[0, 0])
 print("===================")
 
 print(Gd)
@@ -79,7 +79,7 @@ print(Gd2)
 
 
 def norm(v, g):
-	return np.sqrt(v.T @ g @ v)
+    return np.sqrt(v.T @ g @ v)
 
 
 # v1 = factors("11/10", s)
@@ -89,8 +89,8 @@ v1 = factors("8/5", s)
 v2 = factors("5/3", s)
 
 # print(1200*np.log2(ratio(v1, s)))
-print(1200*np.sum(j*v1))
-print(1200*np.sum(j*v2))
+print(1200 * np.sum(j * v1))
+print(1200 * np.sum(j * v2))
 print("======")
 print("farey")
 print(norm(v1, Gd))
@@ -110,5 +110,3 @@ print((norm(v2, Gd3)))
 print(norm(v1, Gd3) / norm(v2, Gd3))
 
 print("===========")
-
-

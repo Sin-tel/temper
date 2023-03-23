@@ -21,7 +21,7 @@ j = log_subgroup(s_expanded)
 W_e = np.diag(1 / j)
 
 
-W = (W_e @ basis)
+W = W_e @ basis
 
 print(W)
 
@@ -38,18 +38,18 @@ G_e = W_e.T @ W_e
 # sol = np.linalg.lstsq((M_expanded @ W_e).T, (j @ W_e).T, rcond=None)[0]
 sol = np.linalg.inv(M_expanded @ G_e @ M_expanded.T) @ M_expanded @ G_e @ j.T
 
-tun = (sol.T @ M_expanded)
+tun = sol.T @ M_expanded
 te_err = (tun - j).flatten()
 
-te_tun = sol 
+te_tun = sol
 
 print("================")
-print(1200*te_tun)
+print(1200 * te_tun)
 
 
 te_tun2 = (te_tun.T @ M_expanded @ basis) @ gens
 
-print(1200*te_tun2)
+print(1200 * te_tun2)
 
 # print(M_expanded @ W_e)
 
@@ -64,7 +64,7 @@ j2 = np.atleast_2d(j2)
 G = W.T @ W
 
 G_inv = np.linalg.inv(G_e)
-G2 = (np.linalg.inv(basis.T @ G_inv @ basis))
+G2 = np.linalg.inv(basis.T @ G_inv @ basis)
 
 # print(G)
 te_tun3 = np.linalg.inv(M @ G2 @ M.T) @ M @ G2 @ j2.T
@@ -97,5 +97,3 @@ print(basis.T @ G_inv @ basis)
 
 # print(G_e)
 # print(G)
-
-
