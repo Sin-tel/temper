@@ -94,6 +94,28 @@ def from_edos(args):
 
 	return (M, basis, M_expanded, s_expanded)
 
+# given a map for some edo, return the string representation in the new format
+# (to replace warts notation)
+def edo_map_notation(this_map, subgroup):
+	this_edo = this_map[0]
+	j = log_subgroup(subgroup)
+
+	patent_map = np.round(this_edo * j).astype(np.int64)
+	diff = this_map - patent_map
+	adjustments = []
+	for i, p in enumerate(diff):
+		if p != 0:
+			sign = ""
+			if p < 0:
+				sign = "-"*abs(p)
+			elif p > 0:
+				sign = "+"*p
+			adjustments.append(sign + str(subgroup[i]))
+
+	mstr = str(this_edo)
+	if len(adjustments) > 0:
+		mstr += "["+ ", ".join(adjustments) +"]"
+	return mstr
 
 def info(temp, options):
 	T = temp[0]
@@ -143,20 +165,17 @@ def info(temp, options):
 	# edolist = find_edos_patent(T,s)
 
 	if edolist is not None and len(edolist) >= 1:
-		joins = find_join(T, s, edolist)
+		maps_join = find_join(T, s, edolist)
 
 		show_list = []
 		for m in edolist:
-			mstr = str(m[0][0][0])
-			if m[2]:
-				mstr = mstr + "'"
+			mstr = edo_map_notation(m[0][0], s)
 			show_list.append(mstr)
-		# show_list = [m[0][0][0] for m in edolist]
 
 		res["edos"] = ', '.join(map(str, show_list))
 
-		if joins is not None:
-			res["edo join"] = ' & '.join(map(str, joins))
+		if maps_join is not None:
+			res["edo join"] = ' & '.join(map(lambda x: edo_map_notation(x, s), maps_join))
 
 
 	# T = LLL(T.T, G_wilson_dual).T

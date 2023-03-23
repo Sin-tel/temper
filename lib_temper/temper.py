@@ -285,15 +285,7 @@ def find_edos(T, subgroup):
 				if np.gcd.reduce(m1.flatten().tolist()) == 1:
 					badness = temp_measures((m1, subgroup))[0]
 
-					# Check the bounds of the GPV map.
-					# The map is 'patent' if the interval includes the integer value.
-					# If they are e.g. [16.9, 17.1] then it is patent.
-					# In this case the floor() will be different (16 != 17).
-					# If it is not patent, they will be something like [17.1, 17.2].
-					# In this case, the floor() will be the same.
-					not_patent = (np.floor(b1[0]) == np.floor(b1[1]))
-
-					m_list.append((np.copy(m1), badness, not_patent))
+					m_list.append((np.copy(m1), badness))
 
 					# only count distinct octave divisions
 					if m1[0][0] not in seen:
@@ -338,7 +330,7 @@ def find_join(T, subgroup, m_list):
 
 		if (np.all(m_hnf == T)):
 			print("number of combos checked: " + str(count))
-			return [m[0] for m in m_new]
+			return [m for m in m_new]
 
 		if count > 500:
 			break
