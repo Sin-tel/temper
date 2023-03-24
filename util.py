@@ -97,9 +97,15 @@ def from_edos(args):
 # (to replace warts notation)
 def edo_map_notation(this_map, subgroup):
     this_edo = this_map[0]
-    j = log_subgroup(subgroup)
+
+    # divide by equave to fix non-octave temps
+    j = log_subgroup(subgroup) / np.log2(float(subgroup[0]))
 
     patent_map = np.round(this_edo * j).astype(np.int64)
+
+    print(this_edo)
+    print(patent_map)
+    print(this_map)
     diff = this_map - patent_map
     adjustments = []
     for i, p in enumerate(diff):
