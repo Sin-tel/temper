@@ -10,7 +10,7 @@ def cents(x, prec=3):
 
 
 def parse_subgroup(s):
-    s = [Fraction(i) for i in re.split("[\\.,; ]+", s)]
+    s = [Fraction(i) for i in re.split(r"[\\.,; ]+", s)]
 
     if len(s) == 1:
         expanded = p_limit(s[0])
@@ -22,18 +22,17 @@ def parse_subgroup(s):
 
 
 def parse_edos(s):
-    s = [int(i) for i in re.split("[\\.,; &]+", s)]
+    s = [int(i) for i in re.split(r"[\\.,; &]+", s)]
     return s
 
 
-ratioPattern = "(\d+)[/:](\d+)"
-vectorPattern = "[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]"
+ratioPattern = r"(\d+)[/:](\d+)"
+vectorPattern = r"[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]"
 
 
-def parse_commas(c, s):
+def parse_intervals(c, s):
     commas = []
     for n, d in re.findall(ratioPattern, c):
-        print(n, d, flush=True)
         commas.append(factors((int(n), int(d)), s))
     for v in re.findall(vectorPattern, c):
         l = len(s)
@@ -56,7 +55,7 @@ def format_matrix(matrix):
 def from_commas(args):
     basis, s_expanded = parse_subgroup(args["subgroup"])
 
-    commas = parse_commas(args["commas"], s_expanded)
+    commas = parse_intervals(args["commas"], s_expanded)
 
     commas = np.hstack(commas)
 
@@ -225,13 +224,20 @@ def info(temp, options):
 
     j2 = log_subgroup(s)
 
+    # print(T, s)
+    # print(T_expanded, s_expanded)
+
+    # get the equave
+    equave = factors(s[0], s_expanded)
+
     te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
-    cte_tun, cte_err = cte((T_expanded, s_expanded), weight)
+    cte_tun, cte_err = cte((T_expanded, s_expanded), weight, V = equave)
 
     showtarget = False
     if "target" in options:
-        targets = parse_commas(options["target"], s_expanded)
+        targets = parse_intervals(options["target"], s_expanded)
         showtarget = len(targets) > 0
+
 
     if showtarget:
         targets = np.hstack(targets)
@@ -245,7 +251,7 @@ def info(temp, options):
                 (T_expanded, s_expanded), weight="unweighted", V=targets
             )
 
-        # otherwise, use constraints with reguular weights
+        # otherwise, use constraints with regular weights
         else:
             target_tun, target_err = cte((T_expanded, s_expanded), weight, V=targets)
 
@@ -255,9 +261,6 @@ def info(temp, options):
 
     te_tun2 = (te_tun.T @ T_expanded @ basis) @ gens
     cte_tun2 = (cte_tun.T @ T_expanded @ basis) @ gens
-
-    print(te_tun.T @ T_expanded)
-    print((te_tun.T @ T_expanded @ basis) @ gens @ T)
 
     te_err2 = te_tun2 @ T - j2
     cte_err2 = cte_tun2 @ T - j2
@@ -276,9 +279,6 @@ def info(temp, options):
     res["CTE errors"] = ", ".join(map(cents, cte_err2.flatten()))
     if showtarget:
         res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
-
-    # print((cte_tun.T @ T_expanded @ basis))
-    # res["CTE map"] = " ".join(map(cents, (cte_tun.T @ T_expanded @ basis)))
 
     # badness, complexity, error = temp_measures((T_expanded, s_expanded))
     # res["badness"] = '{:.3e}'.format(badness)

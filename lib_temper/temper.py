@@ -273,7 +273,7 @@ def find_edos_patent(T, subgroup):
                         if count > r + 10:  # rank + 10 should be enough
                             break
 
-    print("list count: ", len(m_list))
+    # print("list count: ", len(m_list))
     print("nr checked: ", count2)
 
     # sort by badness
@@ -329,8 +329,8 @@ def find_edos(T, subgroup):
                         if count > r + 25:  # rank + 25 should be enough
                             break
 
-    print("list count: ", len(m_list))
-    print("nr checked: ", count2)
+    # print("list count: ", len(m_list))
+    print("nr edos checked: ", count2)
 
     # sort by badness
     m_list.sort(key=lambda l: l[1])
@@ -351,15 +351,12 @@ def find_edos(T, subgroup):
 def find_join(T, subgroup, m_list):
     assert T.ndim == 2
     r, d = T.shape
-    # T = hnf(T)
 
     count = 0
     for combo in comboBySum(r, 0, len(m_list) - 1):
-        # print(combo, flush=True)
         m_new = np.vstack([m_list[i][0] for i in combo])
         m_hnf = hnf(m_new)
 
-        # print(m_hnf)
         count += 1
 
         if np.all(m_hnf == T):
@@ -368,7 +365,7 @@ def find_join(T, subgroup, m_list):
 
         if count > 500:
             break
-    print("FAILED. number of combos checked: " + str(count))
+    print("Join search failed! Number of combos checked: " + str(count))
 
 
 # Iterator for general edo maps (GPVs)

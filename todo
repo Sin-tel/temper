@@ -18,6 +18,7 @@ x implement custom weights on dot product
 x check LLL reduction fp
 x sort commas by Wilson
 x reduce gens by commas
+x fix non-octave CTE
 
 find optimal maps for edo input
 

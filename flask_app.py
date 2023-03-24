@@ -16,7 +16,6 @@ def result():
     if f.request.method == "GET":
         args = f.request.args
 
-        # options = dict()
         args = args.to_dict()
 
         args["tenney"] = "tenney" in args
@@ -30,8 +29,6 @@ def result():
             return "error"
 
         html_info = info(temp, args)
-
-        # print(f.url_for("result", **args))
 
         print("", flush=True)
         return f.render_template("./result.html", res=html_info)
