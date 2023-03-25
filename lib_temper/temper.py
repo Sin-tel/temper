@@ -311,10 +311,12 @@ def find_edos(T, subgroup):
     for m1, b1 in Pmaps(search_range, subgroup):
         if m1[0, 0] % octave_div == 0:  # skip non multiples of the octave division
             count2 += 1
-            if count2 > 8000:
+            if count2 > 20000:
                 break
+
             # if it tempers out all commas
             if np.all(m1 @ c == 0):
+                print(m1[0][0])
                 # if it is not contorted
                 if np.gcd.reduce(m1.flatten().tolist()) == 1:
                     badness = temp_measures((m1, subgroup))[0]
