@@ -223,13 +223,12 @@ def simplify(I, C, W):
 
 # Patent n-edo map
 # Just crudely rounds all the log primes, multiplied by n
-def patent_map(t, subgroup):
-    logs = log_subgroup(subgroup)
-
-    t = t / logs[0]  # fix equave
+def patent_map(edo_num, subgroup):
+    log_s = log_subgroup(subgroup)
+    log_s = log_s / log_s[0]  # fix equave
 
     # floor(x+0.5) rounds more predictably (downwards on .5)
-    M = np.floor(t * logs + 0.5).astype(np.int64)
+    M = np.floor(edo_num * log_s + 0.5).astype(np.int64)
     return np.atleast_2d(M)
 
 
@@ -372,8 +371,8 @@ def find_join(T, subgroup, m_list):
 class Pmaps:
     def __init__(self, bounds, subgroup):
         self.stop = bounds[1]
-        self.logS = log_subgroup(subgroup)
-        # assert np.all(self.logS >= 1)
+        self.log_s = log_subgroup(subgroup)
+        # assert np.all(self.log_s >= 1)
 
         start = bounds[0]
 
@@ -391,8 +390,8 @@ class Pmaps:
 
         self.first = False
 
-        self.lbounds = (self.cmap - 0.5) / self.logS
-        self.ubounds = (self.cmap + 0.5) / self.logS
+        self.lbounds = (self.cmap - 0.5) / self.log_s
+        self.ubounds = (self.cmap + 0.5) / self.log_s
 
         lb = np.max(self.lbounds)
         ub = np.min(self.ubounds)
@@ -402,7 +401,7 @@ class Pmaps:
             raise StopIteration
 
         ind = (lb + ub) / 2.0
-        assert np.all(self.cmap == np.round(ind * self.logS).astype(np.int64))
+        assert np.all(self.cmap == np.round(ind * self.log_s).astype(np.int64))
 
         return self.cmap, (lb, ub)
 
