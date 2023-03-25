@@ -103,9 +103,6 @@ def edo_map_notation(this_map, subgroup):
 
     patent_map = np.round(this_edo * j).astype(np.int64)
 
-    print(this_edo)
-    print(patent_map)
-    print(this_map)
     diff = this_map - patent_map
     adjustments = []
     for i, p in enumerate(diff):
@@ -129,22 +126,31 @@ def info(temp, options):
     T_expanded = temp[2]
     s_expanded = temp[3]
 
+    # print(basis)
+
     s = get_subgroup(basis, s_expanded)
 
     res = dict()
 
     res["rank"] = T.shape[0]
-    res["dim"] = T.shape[1]
+    # res["dim"] = T.shape[1]
 
     res["subgroup"] = ".".join(map(str, s))
 
+    # https://en.xen.wiki/w/Generalized_Tenney_norms_and_Tp_interval_space
+    # b.T @ W^2 @ b
     s_w = []
-    for fr in s:
+    for fr in s_expanded:
         fr = fr.as_integer_ratio()
         s_w.append(fr[0] * fr[1])
-    W_wilson = np.diag(s_w).astype(np.double)
+    W_wilson = np.diag(s_w).astype(np.double) @ basis
 
-    G_wilson = W_wilson @ W_wilson.T
+
+    G_wilson = W_wilson.T @ W_wilson
+    # print(W_wilson)
+    # print(G_wilson)
+    print("Weight matrix det: ", np.linalg.det(G_wilson))
+
 
     commas = LLL(kernel(T), G_wilson)
 
@@ -216,7 +222,9 @@ def info(temp, options):
                 T[i, :] = -T[i, :]
                 gens[:, i] = -gens[:, i]
 
+    # print(gens)
     gens = simplify(gens, commas, G_wilson)
+    # print(gens)
 
     res["mapping"] = format_matrix(T)
 
@@ -251,7 +259,7 @@ def info(temp, options):
 
         # use least squares if theres more targets than constraints
         # (or equal, which will just solve the system)
-        # for soem reason it only works unweighted, need to investigate
+        # for some reason it only works unweighted, need to investigate
         if n_targets >= T_expanded.shape[0]:
             target_tun, target_err = lstsq(
                 (T_expanded, s_expanded), weight="unweighted", V=targets

@@ -19,6 +19,8 @@ x check LLL reduction fp
 x sort commas by Wilson
 x reduce gens by commas
 x fix non-octave CTE
+x fix output for non-octave stuff
+x fix complexity calculation for subgroup temps
 
 find optimal maps for edo input
 
