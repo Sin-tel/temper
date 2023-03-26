@@ -4,6 +4,8 @@ import numpy as np
 import re
 from lib_temper import *
 
+import time
+
 
 def cents(x, prec=3):
     return "{1:.{0}f}".format(prec, 1200 * x)
@@ -49,13 +51,11 @@ def parse_edos(s, subgroup):
     log_s = log_s / log_s[0]  # fix equave
 
     for e in s:
-        print("parse: ", repr(e))
         res = re.split(r"(\d+)", e)[1:]
         if res == []:
             continue
         edo_num = int(res[0])
         p_map = patent_map(edo_num, subgroup)
-        print(edo_num)
         if res[1] == "":
             # if the input was simply an integer, then add the patent map    
             edos.append(p_map)
@@ -73,7 +73,6 @@ def parse_edos(s, subgroup):
                         ratio = Fraction(int(ratio[0]))
                     else:
                         ratio = Fraction(int(ratio[0]), int(ratio[1]))
-                    print(repr(ratio))
 
                     index = None
                     for i, pr in enumerate(subgroup):
@@ -239,12 +238,7 @@ def info(temp, options):
         s_w.append(fr[0] * fr[1])
     W_wilson = np.diag(s_w).astype(np.double) @ basis
 
-
     G_wilson = W_wilson.T @ W_wilson
-    # print(W_wilson)
-    # print(G_wilson)
-    print("Weight matrix det: ", np.linalg.det(G_wilson))
-
 
     commas = LLL(kernel(T), G_wilson)
 
@@ -271,8 +265,12 @@ def info(temp, options):
 
     res["comma basis"] = "<br>".join(comma_str)
 
+    t_start = time.time()
+
     edolist = find_edos(T, s)
     # edolist = find_edos_patent(T,s)
+
+    print("find_edos() took: ", time.time() - t_start)
 
     if edolist is not None and len(edolist) >= 1:
         maps_join = find_join(T, s, edolist)
@@ -331,9 +329,6 @@ def info(temp, options):
         weight = "tenney"
 
     j2 = log_subgroup(s)
-
-    # print(T, s)
-    # print(T_expanded, s_expanded)
 
     # get the equave
     equave = factors(s[0], s_expanded)

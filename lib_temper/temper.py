@@ -233,60 +233,60 @@ def patent_map(edo_num, subgroup):
 
 
 # Search for patent edo maps that are consistent with T up to some limit
-def find_edos_patent(T, subgroup):
-    assert T.ndim == 2
-    r, d = T.shape
-    # T = hnf(T)
-    c = kernel(T)
+# def find_edos_patent(T, subgroup):
+#     assert T.ndim == 2
+#     r, d = T.shape
+#     # T = hnf(T)
+#     c = kernel(T)
 
-    octave_div = T[0, 0]
-    # print("octave mult:", octave_div)
-    # search_range = (4.5, 665.5)
+#     octave_div = T[0, 0]
+#     # print("octave mult:", octave_div)
+#     # search_range = (4.5, 665.5)
 
-    m_list = []
+#     m_list = []
 
-    if r == 1:
-        return
+#     if r == 1:
+#         return
 
-    seen = set()
-    count = 0
-    count2 = 0
-    for k in range(666):
-        m1 = patent_map(k, subgroup)
-        # print(m1[0,0])
-        if m1[0, 0] % octave_div == 0:  # skip non multiples of the octave division
-            count2 += 1
-            if count2 > 8000:
-                break
-            # if it tempers out all commas
-            if np.all(m1 @ c == 0):
-                # if it is not contorted
-                if np.gcd.reduce(m1.flatten().tolist()) == 1:
-                    badness = temp_measures((m1, subgroup))[0]
-                    m_list.append((np.copy(m1), badness))
+#     seen = set()
+#     count = 0
+#     count2 = 0
+#     for k in range(666):
+#         m1 = patent_map(k, subgroup)
+#         # print(m1[0,0])
+#         if m1[0, 0] % octave_div == 0:  # skip non multiples of the octave division
+#             count2 += 1
+#             if count2 > 8000:
+#                 break
+#             # if it tempers out all commas
+#             if np.all(m1 @ c == 0):
+#                 # if it is not contorted
+#                 if np.gcd.reduce(m1.flatten().tolist()) == 1:
+#                     badness = temp_measures((m1, subgroup))[0]
+#                     m_list.append((np.copy(m1), badness))
 
-                    # only count distinct octave divisions
-                    if m1[0][0] not in seen:
-                        seen.add(m1[0][0])
-                        count += 1
-                        if count > r + 10:  # rank + 10 should be enough
-                            break
+#                     # only count distinct octave divisions
+#                     if m1[0][0] not in seen:
+#                         seen.add(m1[0][0])
+#                         count += 1
+#                         if count > r + 10:  # rank + 10 should be enough
+#                             break
 
-    # print("list count: ", len(m_list))
-    print("nr checked: ", count2)
+#     # print("list count: ", len(m_list))
+#     print("nr checked: ", count2)
 
-    # sort by badness
-    m_list.sort(key=lambda l: l[1])
+#     # sort by badness
+#     m_list.sort(key=lambda l: l[1])
 
-    # filter so each edo only shows up once (first on the list)
-    r_list = []
-    seen = set()
-    for m in m_list:
-        if m[0][0][0] not in seen:
-            r_list.append(m)
-            seen.add(m[0][0][0])
+#     # filter so each edo only shows up once (first on the list)
+#     r_list = []
+#     seen = set()
+#     for m in m_list:
+#         if m[0][0][0] not in seen:
+#             r_list.append(m)
+#             seen.add(m[0][0][0])
 
-    return r_list
+#     return r_list
 
 
 # Search for edo maps (GPVs) that are consistent with T up to some limit
@@ -308,29 +308,33 @@ def find_edos(T, subgroup):
     seen = set()
     count = 0
     count2 = 0
-    for m1, b1 in Pmaps(search_range, subgroup):
-        if m1[0, 0] % octave_div == 0:  # skip non multiples of the octave division
-            count2 += 1
-            if count2 > 20000:
-                break
+    count3 = 0
+    for m1 in Pmaps(search_range, subgroup):
+        count2 += 1
+        if count2 > 20000:
+            break
 
-            # if it tempers out all commas
-            if np.all(m1 @ c == 0):
-                # if it is not contorted
-                if np.gcd.reduce(m1.flatten().tolist()) == 1:
-                    badness = temp_measures((m1, subgroup))[0]
+        # if it tempers out all commas
+        if not np.any(m1 @ c):
+            count3 += 1
 
-                    m_list.append((np.copy(m1), badness))
+            # if it is not contorted
+            if np.gcd.reduce(m1.flatten().tolist()) == 1:
+                badness = temp_measures((m1, subgroup))[0]
 
-                    # only count distinct octave divisions
-                    if m1[0][0] not in seen:
-                        seen.add(m1[0][0])
-                        count += 1
-                        if count > r + 25:  # rank + 25 should be enough
-                            break
+                m_list.append((np.copy(m1), badness))
+
+                # only count distinct octave divisions
+                if m1[0][0] not in seen:
+                    seen.add(m1[0][0])
+                    count += 1
+                    if count > r + 20:  # rank + 25 should be enough
+                        break
 
     # print("list count: ", len(m_list))
     print("nr edos checked: ", count2)
+    print("nr found: ", count3)
+
 
     # sort by badness
     m_list.sort(key=lambda l: l[1])
@@ -379,6 +383,8 @@ class Pmaps:
 
         self.cmap = patent_map(start, subgroup)
 
+        self.ubounds = (self.cmap + 0.5) / self.log_s
+
         self.first = True
 
     def __iter__(self):
@@ -388,23 +394,25 @@ class Pmaps:
         if not self.first:
             incr = np.argmin(self.ubounds)
             self.cmap[0, incr] += 1
+            # self.ubounds[0, incr] = (self.cmap[0, incr] + 0.5) / self.log_s[incr]
+            self.ubounds[0, incr] += 1 / self.log_s[incr]
+
 
         self.first = False
 
-        self.lbounds = (self.cmap - 0.5) / self.log_s
-        self.ubounds = (self.cmap + 0.5) / self.log_s
+        # self.lbounds = (self.cmap - 0.5) / self.log_s
 
-        lb = np.max(self.lbounds)
+        # lb = np.max(self.lbounds)
         ub = np.min(self.ubounds)
 
         # stop when new lower bound hits end of interval
-        if lb >= self.stop:
+        if ub >= self.stop:
             raise StopIteration
 
-        ind = (lb + ub) / 2.0
-        assert np.all(self.cmap == np.round(ind * self.log_s).astype(np.int64))
+        # ind = (lb + ub) / 2.0
+        # assert np.all(self.cmap == np.round(ind * self.log_s).astype(np.int64))
 
-        return self.cmap, (lb, ub)
+        return self.cmap
 
 
 # Find the error of a temperament
