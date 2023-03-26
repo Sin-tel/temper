@@ -298,7 +298,7 @@ def find_edos(T, subgroup):
 
     octave_div = T[0, 0]
     # print("octave mult:", octave_div)
-    search_range = (4.5, 4000.5)
+    search_range = (4.5, 1999.5)
 
     m_list = []
 
@@ -308,13 +308,16 @@ def find_edos(T, subgroup):
     seen = set()
     count = 0
     count2 = 0
+    count3 = 0
     for m1 in Pmaps(search_range, subgroup):
         count2 += 1
-        if count2 > 30000:
+        if count2 > 20000:
             break
 
         # if it tempers out all commas
         if not np.any(m1 @ c):
+            count3 += 1
+
             # if it is not contorted
             if np.gcd.reduce(m1.flatten().tolist()) == 1:
                 badness = temp_measures((m1, subgroup))[0]
@@ -325,12 +328,12 @@ def find_edos(T, subgroup):
                 if m1[0][0] not in seen:
                     seen.add(m1[0][0])
                     count += 1
-                    if count > r + 20:  # rank + 20 should be enough
+                    if count > r + 20:  # rank + 25 should be enough
                         break
 
     # print("list count: ", len(m_list))
     print("nr edos checked: ", count2)
-    print("nr found: ", count)
+    print("nr found: ", count3)
 
 
     # sort by badness
@@ -391,7 +394,9 @@ class Pmaps:
         if not self.first:
             incr = np.argmin(self.ubounds)
             self.cmap[0, incr] += 1
+            # self.ubounds[0, incr] = (self.cmap[0, incr] + 0.5) / self.log_s[incr]
             self.ubounds[0, incr] += 1 / self.log_s[incr]
+
 
         self.first = False
 
@@ -400,7 +405,7 @@ class Pmaps:
         # lb = np.max(self.lbounds)
         ub = np.min(self.ubounds)
 
-        # stop when new upper bound hits end of interval
+        # stop when new lower bound hits end of interval
         if ub >= self.stop:
             raise StopIteration
 
