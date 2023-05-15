@@ -21,6 +21,7 @@ def parse_subgroup(s):
         s_basis, expanded = get_subgroup_basis(s)
         return s_basis, expanded
 
+
 wart_map = {
     "a": 2,
     "b": 3,
@@ -38,6 +39,7 @@ wart_map = {
     "n": 43,
     "o": 47,
 }
+
 
 def parse_edos(s, subgroup):
     # split string by separators (,.;& ) but ignore when in square brackets
@@ -57,7 +59,7 @@ def parse_edos(s, subgroup):
         edo_num = int(res[0])
         p_map = patent_map(edo_num, subgroup)
         if res[1] == "":
-            # if the input was simply an integer, then add the patent map    
+            # if the input was simply an integer, then add the patent map
             edos.append(p_map)
         else:
             adjust = re.findall(r"\[.*\]", e)
@@ -84,9 +86,9 @@ def parse_edos(s, subgroup):
 
                     for c in adj_str:
                         if c == "+":
-                            p_map[0,index] = p_map[0,index] + 1
+                            p_map[0, index] = p_map[0, index] + 1
                         elif c == "-":
-                            p_map[0,index] = p_map[0,index] - 1
+                            p_map[0, index] = p_map[0, index] - 1
 
                 edos.append(p_map)
             else:
@@ -99,7 +101,9 @@ def parse_edos(s, subgroup):
 
                     index = None
                     for i, p in enumerate(subgroup):
-                        assert p.denominator == 1, "Warts can't be used in rational subgroups"
+                        assert (
+                            p.denominator == 1
+                        ), "Warts can't be used in rational subgroups"
                         if w_prime == p.numerator:
                             index = i
                             break
@@ -118,14 +122,16 @@ def parse_edos(s, subgroup):
                     if w_count % 2 == 0:
                         sign *= -1
 
-                    p_map[0,index] = p_map[0,index] + sign * count
+                    p_map[0, index] = p_map[0, index] + sign * count
 
                 edos.append(p_map)
 
     return edos
 
+
 ratio_pattern = r"(\d+)[/:](\d+)"
 vector_pattern = r"[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]"
+
 
 def parse_intervals(c, s):
     commas = []
@@ -334,13 +340,12 @@ def info(temp, options):
     equave = factors(s[0], s_expanded)
 
     te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
-    cte_tun, cte_err = cte((T_expanded, s_expanded), weight, V = equave)
+    cte_tun, cte_err = cte((T_expanded, s_expanded), weight, V=equave)
 
     showtarget = False
     if "target" in options:
         targets = parse_intervals(options["target"], s_expanded)
         showtarget = len(targets) > 0
-
 
     if showtarget:
         targets = np.hstack(targets)

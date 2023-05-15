@@ -8,6 +8,7 @@ import numpy as np
 # from primes import primes
 from itertools import combinations
 from . import diophantine
+from . import diophantine_sympy
 
 from .subgroup import *
 from .optimize import *
@@ -18,7 +19,13 @@ from .combo import comboBySum
 def hnf(M, remove_zeros=False, transformation=False):
     assert M.ndim == 2
 
-    solution = diophantine.lllhermite(M.astype(np.int64))
+    try:
+        solution = diophantine.lllhermite(M.astype(np.int64))
+    except OverflowError:
+        # sympy fallback when overflowing (very slow)
+        # hopefully this doesn't happen too often...
+        print("using sympy fallback!")
+        solution = diophantine_sympy.lllhermite(M.astype(np.int64))
 
     res = np.array(solution[0]).astype(np.int64)
 
@@ -41,7 +48,6 @@ def hnf(M, remove_zeros=False, transformation=False):
 def kernel(M):
     assert M.ndim == 2
     r, d = M.shape
-    n = d - r
 
     M = np.vstack([M, np.eye(d, dtype=np.int64)])
     K = hnf(M.T).T[r::, r::]
@@ -335,7 +341,6 @@ def find_edos(T, subgroup):
     print("nr edos checked: ", count2)
     print("nr found: ", count3)
 
-
     # sort by badness
     m_list.sort(key=lambda l: l[1])
 
@@ -396,7 +401,6 @@ class Pmaps:
             self.cmap[0, incr] += 1
             # self.ubounds[0, incr] = (self.cmap[0, incr] + 0.5) / self.log_s[incr]
             self.ubounds[0, incr] += 1 / self.log_s[incr]
-
 
         self.first = False
 
