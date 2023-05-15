@@ -24,8 +24,9 @@ def hnf(M, remove_zeros=False, transformation=False):
     except OverflowError:
         # sympy fallback when overflowing (very slow)
         # hopefully this doesn't happen too often...
-        print("using sympy fallback!")
-        solution = diophantine_sympy.lllhermite(M.astype(np.int64))
+        # print("using sympy fallback!")
+        # solution = diophantine_sympy.lllhermite(M.astype(np.int64))
+        raise Exception("your numbers are too big :( please use smalelr numbers i beg you please")
 
     res = np.array(solution[0]).astype(np.int64)
 
