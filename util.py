@@ -101,9 +101,7 @@ def parse_edos(s, subgroup):
 
                     index = None
                     for i, p in enumerate(subgroup):
-                        assert (
-                            p.denominator == 1
-                        ), "Warts can't be used in rational subgroups"
+                        assert p.denominator == 1, "Warts can't be used in rational subgroups"
                         if w_prime == p.numerator:
                             index = i
                             break
@@ -262,11 +260,7 @@ def info(temp, options):
         ## format spaces
         vec = "".join(["{1: {0}d}".format(c_length[i], c[i]) for i in range(len(c))])
         vec = vec.replace(" ", "&nbsp;")
-        vec = (
-            '<span style="font-family: var(--mono)">['
-            + vec
-            + "]<sup>T</sup></span>&nbsp; "
-        )
+        vec = '<span style="font-family: var(--mono)">[' + vec + "]<sup>T</sup></span>&nbsp; "
         comma_str.append(vec + str(ratio(c, s)))
 
     res["comma basis"] = "<br>".join(comma_str)
@@ -289,9 +283,7 @@ def info(temp, options):
         res["edos"] = ", ".join(map(str, show_list))
 
         if maps_join is not None:
-            res["edo join"] = " & ".join(
-                map(lambda x: edo_map_notation(x, s), maps_join)
-            )
+            res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
 
     # T = LLL(T.T, G_wilson_dual).T
 
@@ -355,9 +347,7 @@ def info(temp, options):
         # (or equal, which will just solve the system)
         # for some reason it only works unweighted, need to investigate
         if n_targets >= T_expanded.shape[0]:
-            target_tun, target_err = lstsq(
-                (T_expanded, s_expanded), weight="unweighted", V=targets
-            )
+            target_tun, target_err = lstsq((T_expanded, s_expanded), weight="unweighted", V=targets)
 
         # otherwise, use constraints with regular weights
         else:
@@ -389,7 +379,8 @@ def info(temp, options):
         res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
 
     # badness, complexity, error = temp_measures((T_expanded, s_expanded))
-    # res["badness"] = '{:.3e}'.format(badness)
+    badness = temp_badness((T_expanded, s_expanded))
+    res["badness"] = "{:.3f}".format(badness)
     # res["complexity"] = '{1:.{0}f}'.format(3, complexity)
     # res["error"] = '{1:.{0}f}'.format(3, 1200*error)
 
