@@ -236,13 +236,12 @@ def swap_rows(k, A, B, L, D):
     if verbose_hnf:
         print_all(A, B, L, D)
     t = L[(k + 1) :, k - 1] * D[k + 1] / D[k] - L[(k + 1) :, k] * L[k, k - 1] / D[k]
-    L[(k + 1) :, k - 1] = (
-        L[(k + 1) :, k - 1] * L[k, k - 1] + L[(k + 1) :, k] * D[k - 1]
-    ) / D[k]
+    L[(k + 1) :, k - 1] = (L[(k + 1) :, k - 1] * L[k, k - 1] + L[(k + 1) :, k] * D[k - 1]) / D[k]
     L[(k + 1) :, k] = t
     if verbose_hnf:
         print_all(A, B, L, D)
     t = int(D[k - 1]) * int(D[k + 1]) + int(L[k, k - 1]) * int(L[k, k - 1])
+    # print(t, D[k])
     D[k] = t / D[k]
 
 
@@ -334,9 +333,7 @@ def get_solutions(A):
                             print(
                                 (
                                     "i: {}, j: {}, Un: {}, Ud: {}, num: {}, "
-                                    "den: {}".format(
-                                        i, j, Un[i - 1], Ud[i - 1], num, den
-                                    )
+                                    "den: {}".format(i, j, Un[i - 1], Ud[i - 1], num, den)
                                 )
                             )
                     # now update T

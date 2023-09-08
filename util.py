@@ -229,7 +229,7 @@ def info(temp, options):
 
     res = dict()
 
-    res["rank"] = T.shape[0]
+    # res["rank"] = T.shape[0]
     # res["dim"] = T.shape[1]
 
     res["subgroup"] = ".".join(map(str, s))
@@ -322,7 +322,10 @@ def info(temp, options):
 
     res["preimage"] = list(map(str, gens_print))
 
-    weight = "unweighted"
+    if "weights" in options:
+        weight = options["weights"]
+
+    # legacy
     if options["tenney"]:
         weight = "tenney"
 
@@ -378,11 +381,10 @@ def info(temp, options):
     if showtarget:
         res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
 
-    # badness, complexity, error = temp_measures((T_expanded, s_expanded))
-    badness = temp_badness((T_expanded, s_expanded))
+    badness, error, complexity = temp_badness((T_expanded, s_expanded))
     res["badness"] = "{:.3f}".format(badness)
-    # res["complexity"] = '{1:.{0}f}'.format(3, complexity)
-    # res["error"] = '{1:.{0}f}'.format(3, 1200*error)
+    # res["complexity"] = "{1:.{0}f}".format(3, complexity)
+    # res["error"] = "{1:.{0}f}".format(3, 1200 * error)
 
     return res
 

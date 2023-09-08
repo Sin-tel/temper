@@ -1,0 +1,6 @@
+0.1597, 53 84, mercator
+0.2345, 12 19, compton*
+0.3777,  5  8, blackwood 
+0.6603,  7 11, whitewood
+0.6781, 41 65, counterpyth
+0.9468, 17 27, gothic

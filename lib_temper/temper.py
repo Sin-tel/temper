@@ -20,13 +20,13 @@ def hnf(M, remove_zeros=False, transformation=False):
     assert M.ndim == 2
 
     try:
-        solution = diophantine.lllhermite(M.astype(np.int64))
+        solution = diophantine.lllhermite(M.astype(np.int64), m1=1, n1=100)
     except OverflowError:
         # sympy fallback when overflowing (very slow)
         # hopefully this doesn't happen too often...
-        # print("using sympy fallback!")
-        # solution = diophantine_sympy.lllhermite(M.astype(np.int64))
-        raise Exception("your numbers are too big! :( please use smalelr numbers i beg you please")
+        print("using sympy fallback!")
+        solution = diophantine_sympy.lllhermite(M.astype(np.int64))
+        # raise Exception("your numbers are too big! :( please use smalelr numbers i beg you please")
 
     res = np.array(solution[0]).astype(np.int64)
 
@@ -51,7 +51,10 @@ def kernel(M):
     r, d = M.shape
 
     M = np.vstack([M, np.eye(d, dtype=np.int64)])
-    K = hnf(M.T).T[r::, r::]
+    print(M.T)
+    K = hnf(M.T).T
+    print(K.T)
+    K = K[r::, r::]
 
     return K
 
@@ -67,7 +70,7 @@ def cokernel(M):
 # M: Map
 # W: Weight matrix (metric)
 def LLL(M, W):
-    res = olll.reduction(np.copy(M).T, delta=0.99, W=W).T
+    res = olll.reduction(np.copy(M).T, delta=1.0, W=W).T
 
     # sort them by complexity
     # actually, this might be redundant.
@@ -270,7 +273,7 @@ def find_edos(T, subgroup):
 
             # if it is not contorted
             if np.gcd.reduce(m1.flatten().tolist()) == 1:
-                badness = temp_badness((m1, subgroup))
+                badness = temp_badness((m1, subgroup))[0]
 
                 m_list.append((np.copy(m1), badness))
 
@@ -405,8 +408,12 @@ def temp_badness(temp):
 
     # || M ^ j ||
     b = height(np.vstack([M, j]), W)
-    # || M || ^ omega
-    c = height(M, W) ** omega
+    # || M ||
+    c = height(M, W)
+    # ||j||
+    hj = height(j, W)
+
+    error = b / (c * hj)
 
     # (|| M ^ j || * || M || ^ omega ) / ||j||
-    return b * c / height(j, W)
+    return b * (c**omega) / hj, error, ((c / hj) ** omega)

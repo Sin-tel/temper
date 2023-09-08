@@ -1,0 +1,9 @@
+genes
+
+for rank two,
+ run all 2x3 subsets, check if unfactored
+ all of these correspond to a comma, look them up from a list
+ return ALL of these, named after the temp they originate from
+
+rank three...
+ i guess we can do the same but for 3x4
