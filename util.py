@@ -217,6 +217,17 @@ def edo_map_notation(this_map, subgroup):
     return mstr
 
 
+def name_tuning_weight(weight):
+    if weight == "unweighted":
+        return "E"
+    elif weight == "tenney":
+        return "TE"
+    elif weight == "weil":
+        return "WE"
+    else:
+        raise ValueError("unknown weight parameter")
+
+
 def info(temp, options):
     T = temp[0]
     basis = temp[1]
@@ -226,6 +237,10 @@ def info(temp, options):
     s = get_subgroup(basis, s_expanded)
 
     res = {}
+
+    # need to keep this here to get the layout correct
+    # it's stupid but whatever
+    res["rank"] = T.shape[0]
 
     res["subgroup"] = ".".join(map(str, s))
 
@@ -356,20 +371,22 @@ def info(temp, options):
     te_err2 = te_tun2 @ T - j2
     cte_err2 = cte_tun2 @ T - j2
 
-    res["optimal tuning"] = list(map(cents, te_tun2.flatten()))
-    res["optimal tuning (just octave)"] = list(map(cents, cte_tun2.flatten()))
+    weight_name = name_tuning_weight(weight)
+
+    res[f"{weight_name} tuning"] = list(map(cents, te_tun2.flatten()))
+    res[f"C{weight_name} tuning"] = list(map(cents, cte_tun2.flatten()))
     if showtarget:
         target_str = []
         for c in targets.T:
             target_str.append(str(ratio(c, s_expanded)))
-        res["optimal tuning (" + ", ".join(target_str) + ")"] = list(
+        res["target tuning (" + ", ".join(target_str) + ")"] = list(
             map(cents, target_tun2.flatten())
         )
 
-    res["errors"] = ", ".join(map(cents, te_err2.flatten()))
-    res["errors (just octave)"] = ", ".join(map(cents, cte_err2.flatten()))
+    res[f"{weight_name} errors"] = ", ".join(map(cents, te_err2.flatten()))
+    res[f"C{weight_name} errors"] = ", ".join(map(cents, cte_err2.flatten()))
     if showtarget:
-        res["errors (targets)"] = ", ".join(map(cents, target_err2.flatten()))
+        res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
 
     badness = temp_badness((T_expanded, s_expanded))
     res["badness"] = "{:.3f}".format(badness)
