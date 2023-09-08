@@ -223,14 +223,9 @@ def info(temp, options):
     T_expanded = temp[2]
     s_expanded = temp[3]
 
-    # print(basis)
-
     s = get_subgroup(basis, s_expanded)
 
-    res = dict()
-
-    res["rank"] = T.shape[0]
-    # res["dim"] = T.shape[1]
+    res = {}
 
     res["subgroup"] = ".".join(map(str, s))
 
@@ -249,8 +244,6 @@ def info(temp, options):
     for i in range(len(commas.T)):
         commas[:, i] = make_positive(commas[:, i], s)
 
-    # G_wilson_dual = np.linalg.inv(G_wilson)
-
     c_length = []
     for c_column in commas:
         c_length.append(max([len(str(x)) + 1 for x in list(c_column)]))
@@ -268,7 +261,6 @@ def info(temp, options):
     t_start = time.time()
 
     edolist = find_edos(T, s)
-    # edolist = find_edos_patent(T,s)
 
     print("find_edos() took: ", time.time() - t_start)
 
@@ -312,9 +304,7 @@ def info(temp, options):
                 T[i, :] = -T[i, :]
                 gens[:, i] = -gens[:, i]
 
-    # print(gens)
     gens = simplify(gens, commas, G_wilson)
-    # print(gens)
 
     res["mapping"] = format_matrix(T)
 
@@ -322,7 +312,10 @@ def info(temp, options):
 
     res["preimage"] = list(map(str, gens_print))
 
-    weight = "unweighted"
+    if "weights" in options:
+        weight = options["weights"]
+
+    # legacy
     if options["tenney"]:
         weight = "tenney"
 
@@ -363,26 +356,25 @@ def info(temp, options):
     te_err2 = te_tun2 @ T - j2
     cte_err2 = cte_tun2 @ T - j2
 
-    res["TE tuning"] = list(map(cents, te_tun2.flatten()))
-    res["CTE tuning"] = list(map(cents, cte_tun2.flatten()))
+    res["optimal tuning"] = list(map(cents, te_tun2.flatten()))
+    res["optimal tuning (just octave)"] = list(map(cents, cte_tun2.flatten()))
     if showtarget:
         target_str = []
         for c in targets.T:
             target_str.append(str(ratio(c, s_expanded)))
-        res["target tuning (" + ", ".join(target_str) + ")"] = list(
+        res["optimal tuning (" + ", ".join(target_str) + ")"] = list(
             map(cents, target_tun2.flatten())
         )
 
-    res["TE errors"] = ", ".join(map(cents, te_err2.flatten()))
-    res["CTE errors"] = ", ".join(map(cents, cte_err2.flatten()))
+    res["errors"] = ", ".join(map(cents, te_err2.flatten()))
+    res["errors (just octave)"] = ", ".join(map(cents, cte_err2.flatten()))
     if showtarget:
-        res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
+        res["errors (targets)"] = ", ".join(map(cents, target_err2.flatten()))
 
-    # badness, complexity, error = temp_measures((T_expanded, s_expanded))
     badness = temp_badness((T_expanded, s_expanded))
     res["badness"] = "{:.3f}".format(badness)
-    # res["complexity"] = '{1:.{0}f}'.format(3, complexity)
-    # res["error"] = '{1:.{0}f}'.format(3, 1200*error)
+    # res["complexity"] = "{1:.{0}f}".format(3, complexity)
+    # res["error"] = "{1:.{0}f}".format(3, 1200 * error)
 
     return res
 

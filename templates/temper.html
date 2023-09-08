@@ -17,7 +17,16 @@
 		<input type = "text" name = "subgroup" required /></p>
 	<p>Options:<br>
 	<input type="checkbox" name = "reduce" checked> Reduce generators <br>
-	<input type="checkbox" name = "tenney" checked> Tenney weights
+
+	<input type="radio" id="tenney" name="weights" value="tenney" checked="checked">
+	<label for="tenney">tenney</label>
+
+	<input type="radio" id="weil" name="weights" value="weil">
+	<label for="weil">weil</label>
+
+	<input type="radio" id="unweighted" name="weights" value="unweighted">
+	<label for="unweighted">unweighted</label>
+	
 	</p>
 	<p>Target intervals (optional)<br>
 		<input type = "text" name = "target" /></p>

@@ -17,13 +17,19 @@ def lstsq(temp, weight="tenney", V=None):
     if V is None:
         V = np.eye(len(s))
 
-    W = np.diag(1 / j)
     if weight == "unweighted":
-        W = np.eye(len(s))
+        G = np.eye(len(s))
+    elif weight == "tenney":
+        G = metric_tenney(s)
+    elif weight == "weil":
+        G = metric_weil(s)
+    else:
+        raise ValueError("unknown weight parameter")
 
     j = np.atleast_2d(j)
 
-    sol = np.linalg.lstsq((M @ W @ V).T, (j @ W @ V).T, rcond=None)[0]
+    sol = j @ G @ M.T @ np.linalg.inv(M @ G @ M.T)
+    sol = sol.T
 
     tun = sol.T @ M
     err = tun - j
@@ -38,14 +44,19 @@ def cte(temp, weight="tenney", V=None):
 
     j = log_subgroup(s)
 
-    W = np.diag(1 / j)
     if weight == "unweighted":
-        W = np.eye(len(s))
+        G = np.eye(len(s))
+    elif weight == "tenney":
+        G = metric_tenney(s)
+    elif weight == "weil":
+        G = metric_weil(s)
+    else:
+        raise ValueError("unknown weight parameter")
 
     j = np.atleast_2d(j)
 
-    A = (M @ W).T
-    b = (j @ W).T
+    A = M.T
+    b = j.T
 
     r, d = M.shape
 
@@ -58,7 +69,7 @@ def cte(temp, weight="tenney", V=None):
 
     Z = np.zeros((C.shape[0], C.shape[0]))
 
-    sol = np.linalg.solve(np.block([[A.T @ A, C.T], [C, Z]]), np.vstack([A.T @ b, d]))
+    sol = np.linalg.solve(np.block([[A.T @ G @ A, C.T], [C, Z]]), np.vstack([A.T @ G @ b, d]))
 
     sol = sol[:r]
 
@@ -96,6 +107,7 @@ def metric_weil(s):
     j = log_subgroup(s)
     Bw = np.block([[np.eye(n)], [np.ones((1, n))]])
     Bw2 = Bw @ np.diag(j.flatten())
+    print(Bw2)
     Gd = Bw2.T @ Bw2
     G = np.linalg.inv(Gd)
     G = G / G[0, 0]
