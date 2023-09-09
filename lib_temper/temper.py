@@ -8,7 +8,7 @@ import numpy as np
 # from primes import primes
 from itertools import combinations
 from . import diophantine
-from . import diophantine_sympy
+from .hnf_bigint import hnf_bigint
 
 from .subgroup import *
 from .optimize import *
@@ -20,17 +20,14 @@ def hnf(M, remove_zeros=False, transformation=False):
     assert M.ndim == 2
 
     try:
-        solution = diophantine.lllhermite(M.astype(np.int64))
+        if transformation:
+            solution = diophantine.lllhermite(M.astype(np.int64))
+            res = np.array(solution[0]).astype(np.int64)
+            unimod = np.array(solution[1]).astype(np.int64)
+        else:
+            res = hnf_bigint(M)
     except OverflowError:
-        # sympy fallback when overflowing (very slow)
-        # hopefully this doesn't happen too often...
-        print("using sympy fallback!")
-        solution = diophantine_sympy.lllhermite(M.astype(np.int64))
-        # raise Exception("your numbers are too big! :( please use smaller numbers i beg you please")
-
-    res = np.array(solution[0]).astype(np.int64)
-
-    unimod = np.array(solution[1]).astype(np.int64)
+        raise OverflowError("Your numbers are too big!")
 
     if remove_zeros:
         idx = np.argwhere(np.all(res[:] == 0, axis=1))
@@ -51,11 +48,8 @@ def kernel(M):
     r, d = M.shape
 
     M = np.vstack([M, np.eye(d, dtype=np.int64)])
-
-    # finding a small basis can fix coefficient explosion
-    # but hnf is still slow...
-    # M = LLL(M, np.eye(r + d))
-    K = hnf(M.T).T[r::, r::]
+    K = hnf(M.T).T
+    K = K[r::, r::]
 
     return K
 
@@ -188,9 +182,23 @@ def solve_diophantine(A, B):
     return sol
 
 
+def preimage(M):
+    # I have no idea how I came up with this but it seems to work
+
+    r, d = M.shape
+
+    B = np.block([[M.T, np.eye(d, dtype=np.int64)]])
+    H = hnf(B)
+    sol = H[0:r, r:].T
+
+    assert np.all(M @ sol == np.eye(r, dtype=np.int64)), "Could not solve system"
+
+    return sol
+
+
 # Find a preimage of M
 # Amounts to solving MX = I
-def preimage(M):
+def preimage2(M):
     gens = []
 
     rank = M.shape[0]

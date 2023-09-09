@@ -292,8 +292,6 @@ def info(temp, options):
         if maps_join is not None:
             res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
 
-    # T = LLL(T.T, G_wilson_dual).T
-
     gens = preimage(T)
 
     if options["reduce"]:
