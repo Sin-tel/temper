@@ -31,7 +31,7 @@ def result():
             return "error"
 
         try:
-            with time_limit(2):
+            with time_limit(5):
                 html_info = info(temp, args)
         except TimeoutException as e:
             raise TimeoutException("Calculation took too long!") from e
