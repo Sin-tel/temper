@@ -24,9 +24,9 @@ def hnf(M, remove_zeros=False, transformation=False):
     except OverflowError:
         # sympy fallback when overflowing (very slow)
         # hopefully this doesn't happen too often...
-        # print("using sympy fallback!")
-        # solution = diophantine_sympy.lllhermite(M.astype(np.int64))
-        raise Exception("your numbers are too big! :( please use smalelr numbers i beg you please")
+        print("using sympy fallback!")
+        solution = diophantine_sympy.lllhermite(M.astype(np.int64))
+        # raise Exception("your numbers are too big! :( please use smaller numbers i beg you please")
 
     res = np.array(solution[0]).astype(np.int64)
 
@@ -51,6 +51,10 @@ def kernel(M):
     r, d = M.shape
 
     M = np.vstack([M, np.eye(d, dtype=np.int64)])
+
+    # finding a small basis can fix coefficient explosion
+    # but hnf is still slow...
+    # M = LLL(M, np.eye(r + d))
     K = hnf(M.T).T[r::, r::]
 
     return K

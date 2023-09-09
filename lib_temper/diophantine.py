@@ -128,6 +128,7 @@ def lllhermite(G, m1=1, n1=1):
         A[m - 1, :] *= -1
     k = 1
     while k < m:
+        print(A)
         if verbose_hnf:
             print("k={k}, m={m}".format(k=k, m=m))
         col1, col2 = reduce_matrix(A, B, L, k, k - 1, D)
@@ -236,9 +237,7 @@ def swap_rows(k, A, B, L, D):
     if verbose_hnf:
         print_all(A, B, L, D)
     t = L[(k + 1) :, k - 1] * D[k + 1] / D[k] - L[(k + 1) :, k] * L[k, k - 1] / D[k]
-    L[(k + 1) :, k - 1] = (
-        L[(k + 1) :, k - 1] * L[k, k - 1] + L[(k + 1) :, k] * D[k - 1]
-    ) / D[k]
+    L[(k + 1) :, k - 1] = (L[(k + 1) :, k - 1] * L[k, k - 1] + L[(k + 1) :, k] * D[k - 1]) / D[k]
     L[(k + 1) :, k] = t
     if verbose_hnf:
         print_all(A, B, L, D)
@@ -334,9 +333,7 @@ def get_solutions(A):
                             print(
                                 (
                                     "i: {}, j: {}, Un: {}, Ud: {}, num: {}, "
-                                    "den: {}".format(
-                                        i, j, Un[i - 1], Ud[i - 1], num, den
-                                    )
+                                    "den: {}".format(i, j, Un[i - 1], Ud[i - 1], num, den)
                                 )
                             )
                     # now update T
