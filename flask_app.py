@@ -2,6 +2,8 @@ import flask as f
 from util import *
 import traceback
 import git
+from timeout import time_limit, TimeoutException
+
 
 app = f.Flask(__name__)
 
@@ -28,7 +30,11 @@ def result():
         else:
             return "error"
 
-        html_info = info(temp, args)
+        try:
+            with time_limit(2):
+                html_info = info(temp, args)
+        except TimeoutException as e:
+            print("Timed out!")
 
         print("", flush=True)
         return f.render_template("./result.html", res=html_info)
