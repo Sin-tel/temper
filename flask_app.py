@@ -34,7 +34,7 @@ def result():
             with time_limit(2):
                 html_info = info(temp, args)
         except TimeoutException as e:
-            print("Timed out!")
+            raise TimeoutException("Calculation took too long!") from e
 
         print("", flush=True)
         return f.render_template("./result.html", res=html_info)
