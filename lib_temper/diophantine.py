@@ -128,7 +128,6 @@ def lllhermite(G, m1=1, n1=1):
         A[m - 1, :] *= -1
     k = 1
     while k < m:
-        print(A)
         if verbose_hnf:
             print("k={k}, m={m}".format(k=k, m=m))
         col1, col2 = reduce_matrix(A, B, L, k, k - 1, D)
