@@ -1,10 +1,11 @@
 # utilities for the web app
 
-import numpy as np
 import re
-from lib_temper import *
-
+import sys
 import time
+
+import numpy as np
+from lib_temper import *
 
 
 def cents(x, prec=3):
@@ -246,13 +247,8 @@ def info(temp, options):
 
     # https://en.xen.wiki/w/Generalized_Tenney_norms_and_Tp_interval_space
     # b.T @ W^2 @ b
-    s_w = []
-    for fr in s_expanded:
-        fr = fr.as_integer_ratio()
-        s_w.append(fr[0] * fr[1])
-    W_wilson = np.diag(s_w).astype(np.double) @ basis
-
-    G_wilson = W_wilson.T @ W_wilson
+    G_wilson_exp = np.linalg.inv(metric_wilson(s_expanded))
+    G_wilson = basis.T @ G_wilson_exp @ basis
 
     commas = LLL(kernel(T), G_wilson)
 
@@ -261,7 +257,7 @@ def info(temp, options):
 
     c_length = []
     for c_column in commas:
-        c_length.append(max([len(str(x)) + 1 for x in list(c_column)]))
+        c_length.append(max(len(str(x)) + 1 for x in list(c_column)))
 
     comma_str = []
     for c in commas.T:
@@ -296,6 +292,7 @@ def info(temp, options):
     # T = LLL(T.T, WL).T
 
     gens = preimage(T)
+    gens = simplify(gens, commas, G_wilson)
 
     if options["reduce"]:
         # eq = log_interval(gens[0], s)
@@ -319,11 +316,10 @@ def info(temp, options):
             T[i, :] = -T[i, :]
             gens[:, i] = -gens[:, i]
 
-    gens = simplify(gens, commas, G_wilson)
-
     res["mapping"] = format_matrix(T)
 
     gens_print = [ratio(g, s) for g in gens.T]
+    print(gens_print)
 
     res["preimage"] = list(map(str, gens_print))
 
