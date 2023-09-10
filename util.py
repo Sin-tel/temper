@@ -292,6 +292,9 @@ def info(temp, options):
         if maps_join is not None:
             res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
 
+    # WL = metric_weil_k(s_expanded, 10.0)
+    # T = LLL(T.T, WL).T
+
     gens = preimage(T)
 
     if options["reduce"]:
@@ -310,12 +313,11 @@ def info(temp, options):
             gens[:, i] -= red * genoct
             T[0, :] += o * red * T[i, :]
 
-    else:
-        # make positive
-        for i in range(T.shape[0]):
-            if log_interval(gens[:, i], s) < 0:
-                T[i, :] = -T[i, :]
-                gens[:, i] = -gens[:, i]
+    # make positive
+    for i in range(T.shape[0]):
+        if log_interval(gens[:, i], s) < 0:
+            T[i, :] = -T[i, :]
+            gens[:, i] = -gens[:, i]
 
     gens = simplify(gens, commas, G_wilson)
 

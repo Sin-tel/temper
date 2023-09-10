@@ -107,7 +107,19 @@ def metric_weil(s):
     j = log_subgroup(s)
     Bw = np.block([[np.eye(n)], [np.ones((1, n))]])
     Bw2 = Bw @ np.diag(j.flatten())
-    print(Bw2)
+    Gd = Bw2.T @ Bw2
+    G = np.linalg.inv(Gd)
+    G = G / G[0, 0]
+
+    return G
+
+
+# k-weil norm
+def metric_weil_k(s, k):
+    n = len(s)
+    j = log_subgroup(s)
+    Bw = np.block([[np.eye(n)], [k * np.ones((1, n))]])
+    Bw2 = Bw @ np.diag(j.flatten())
     Gd = Bw2.T @ Bw2
     G = np.linalg.inv(Gd)
     G = G / G[0, 0]
