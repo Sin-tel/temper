@@ -98,30 +98,32 @@ def parse_edos(s, subgroup):
                 for g in warts:
                     w = g.group()
                     w_count = len(w)
-                    w_prime = wart_map[w[0]]
+                    # p means patent so we don't have to  adjust anything
+                    if w[0] != "p":
+                        w_prime = wart_map[w[0]]
 
-                    index = None
-                    for i, p in enumerate(subgroup):
-                        assert p.denominator == 1, "Warts can't be used in rational subgroups"
-                        if w_prime == p.numerator:
-                            index = i
-                            break
-                    if index is None:
-                        raise AssertionError("Wart not in subgroup")
+                        index = None
+                        for i, p in enumerate(subgroup):
+                            assert p.denominator == 1, "Warts can't be used in rational subgroups"
+                            if w_prime == p.numerator:
+                                index = i
+                                break
+                        if index is None:
+                            raise AssertionError("Wart not in subgroup")
 
-                    # the actual adjustment count is only half the number of letters
-                    count = (w_count + 1) // 2
+                        # the actual adjustment count is only half the number of letters
+                        count = (w_count + 1) // 2
 
-                    float_prime = edo_num * log_s[index]
-                    sign = 1
-                    # check if the first one has to round up or down
-                    if float_prime - np.floor(float_prime + 0.5) <= 0:
-                        sign *= -1
-                    # alternate added or subtracting
-                    if w_count % 2 == 0:
-                        sign *= -1
+                        float_prime = edo_num * log_s[index]
+                        sign = 1
+                        # check if the first one has to round up or down
+                        if float_prime - np.floor(float_prime + 0.5) <= 0:
+                            sign *= -1
+                        # alternate added or subtracting
+                        if w_count % 2 == 0:
+                            sign *= -1
 
-                    p_map[0, index] = p_map[0, index] + sign * count
+                        p_map[0, index] = p_map[0, index] + sign * count
 
                 edos.append(p_map)
 
@@ -288,26 +290,29 @@ def info(temp, options):
         if maps_join is not None:
             res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
 
+    # find norm on quotient space
     # WL = metric_weil_k(s_expanded, 10.0)
-    # T = LLL(T.T, WL).T
+    # WL = T @ WL @ T.T
+    # WL = np.linalg.inv(WL)
+
+    # gens2 = LLL(np.eye(T.shape[0], dtype=np.int64), WL)
+    # T = solve_diophantine(gens2, T)
 
     gens = preimage(T)
     gens = simplify(gens, commas, G_wilson)
 
     if options["reduce"]:
-        # eq = log_interval(gens[0], s)
         o = T[0, 0]
         genoct = np.zeros_like(gens[:, 0])
         genoct[0] = 1
-        # reduce by octave
+        # eq = log_interval(gens[:, 0], s)
+        eq = log_interval(genoct, s)
+        # reduce by equave
         for i in range(1, T.shape[0]):
-            # make positive first
-            if log_interval(gens[:, i], s) < 0:
-                T[i, :] = -T[i, :]
-                gens[:, i] = -gens[:, i]
-
-            red = int(np.floor(log_interval(gens[:, i], s)))
-            gens[:, i] -= red * genoct
+            # replacing floor by round will find smallest
+            # nb numpy floor rounds down for negative numbers, not towards zero
+            red = int(np.round(log_interval(gens[:, i], s) / eq))
+            gens[0, i] -= red
             T[0, :] += o * red * T[i, :]
 
     # make positive
@@ -319,7 +324,6 @@ def info(temp, options):
     res["mapping"] = format_matrix(T)
 
     gens_print = [ratio(g, s) for g in gens.T]
-    print(gens_print)
 
     res["preimage"] = list(map(str, gens_print))
 
@@ -390,21 +394,3 @@ def info(temp, options):
     # res["error"] = "{1:.{0}f}".format(3, 1200 * error)
 
     return res
-
-
-#########################################
-if __name__ == "__main__":
-    args = dict()
-    # args["subgroup"] = "2.3.5.7"
-    args["subgroup"] = "2.5.9/7"
-    # args["edos"] = "19,22"
-    args["commas"] = "225/224"
-
-    options = dict()
-
-    options["tenney"] = True
-    options["reduce"] = True
-
-    # temp = from_edos(args)
-    temp = from_commas(args)
-    html_info = info(temp, options)
