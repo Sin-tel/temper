@@ -311,7 +311,7 @@ def info(temp, options):
         for i in range(1, T.shape[0]):
             # replacing floor by round will find smallest
             # nb numpy floor rounds down for negative numbers, not towards zero
-            red = int(np.round(log_interval(gens[:, i], s) / eq))
+            red = int(np.floor(log_interval(gens[:, i], s) / eq))
             gens[0, i] -= red
             T[0, :] += o * red * T[i, :]
 
