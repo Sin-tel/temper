@@ -14,9 +14,6 @@ def lstsq(temp, weight="tenney", V=None):
 
     j = log_subgroup(s)
 
-    if V is None:
-        V = np.eye(len(s))
-
     if weight == "unweighted":
         G = np.eye(len(s))
     elif weight == "tenney":
@@ -25,6 +22,9 @@ def lstsq(temp, weight="tenney", V=None):
         G = metric_weil(s)
     else:
         raise ValueError("unknown weight parameter")
+
+    if V is not None:
+        G = V @ V.T
 
     j = np.atleast_2d(j)
 

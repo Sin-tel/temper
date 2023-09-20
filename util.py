@@ -351,9 +351,8 @@ def info(temp, options):
         targets = np.hstack(targets)
         n_targets = targets.shape[1]
 
-        # use least squares if theres more targets than constraints
-        # (or equal, which will just solve the system)
-        # for some reason it only works unweighted, need to investigate
+        # use least squares if theres more targets than degrees of freedom
+        # if equal, this just solves the system
         if n_targets >= T_expanded.shape[0]:
             target_tun, target_err = lstsq((T_expanded, s_expanded), weight="unweighted", V=targets)
 
@@ -362,7 +361,6 @@ def info(temp, options):
             target_tun, target_err = cte((T_expanded, s_expanded), weight, V=targets)
 
         target_tun2 = (target_tun.T @ T_expanded @ basis) @ gens
-
         target_err2 = target_tun2 @ T - j2
 
     te_tun2 = (te_tun.T @ T_expanded @ basis) @ gens
