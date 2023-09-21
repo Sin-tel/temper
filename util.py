@@ -301,6 +301,12 @@ def info(temp, options):
     gens = preimage(T)
     gens = simplify(gens, commas, G_wilson)
 
+    # make positive
+    for i in range(T.shape[0]):
+        if log_interval(gens[:, i], s) < 0:
+            T[i, :] = -T[i, :]
+            gens[:, i] = -gens[:, i]
+
     if options["reduce"]:
         o = T[0, 0]
         genoct = np.zeros_like(gens[:, 0])
@@ -314,12 +320,6 @@ def info(temp, options):
             red = int(np.floor(log_interval(gens[:, i], s) / eq))
             gens[0, i] -= red
             T[0, :] += o * red * T[i, :]
-
-    # make positive
-    for i in range(T.shape[0]):
-        if log_interval(gens[:, i], s) < 0:
-            T[i, :] = -T[i, :]
-            gens[:, i] = -gens[:, i]
 
     res["mapping"] = format_matrix(T)
 
