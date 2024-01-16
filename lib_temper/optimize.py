@@ -101,6 +101,15 @@ def metric_wilson(s):
     return G
 
 
+# diagonal inverse sqrt primes
+def metric_wilson_sqrt(s):
+    j = np.sqrt(np.array(s).astype(np.double))
+    W = np.diag(1.0 / j)
+    G = W @ W.T
+
+    return G
+
+
 # weil norm
 def metric_weil(s):
     n = len(s)

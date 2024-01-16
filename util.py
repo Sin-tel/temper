@@ -249,7 +249,8 @@ def info(temp, options):
 
     # https://en.xen.wiki/w/Generalized_Tenney_norms_and_Tp_interval_space
     # b.T @ W^2 @ b
-    G_wilson_exp = np.linalg.inv(metric_wilson(s_expanded))
+    # G_wilson_exp = np.linalg.inv(metric_wilson(s_expanded))
+    G_wilson_exp = np.linalg.inv(metric_wilson_sqrt(s_expanded))
     G_wilson = basis.T @ G_wilson_exp @ basis
 
     commas = LLL(kernel(T), G_wilson)
