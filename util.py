@@ -220,17 +220,6 @@ def edo_map_notation(this_map, subgroup):
     return mstr
 
 
-def name_tuning_weight(weight):
-    if weight == "unweighted":
-        return "E"
-    elif weight == "tenney":
-        return "TE"
-    elif weight == "weil":
-        return "WE"
-    else:
-        raise ValueError("unknown weight parameter")
-
-
 def info(temp, options):
     T = temp[0]
     basis = temp[1]
@@ -247,13 +236,18 @@ def info(temp, options):
 
     res["subgroup"] = ".".join(map(str, s))
 
+    # The metric used for complexity calculations,
+    # which should be the same regardless of the weights for optimization
+    # (used for calculating comma and basis)
+    # --
     # https://en.xen.wiki/w/Generalized_Tenney_norms_and_Tp_interval_space
     # b.T @ W^2 @ b
-    # G_wilson_exp = np.linalg.inv(metric_wilson(s_expanded))
-    G_wilson_exp = np.linalg.inv(metric_wilson_sqrt(s_expanded))
-    G_wilson = basis.T @ G_wilson_exp @ basis
 
-    commas = LLL(kernel(T), G_wilson)
+    # G_compl_exp = np.linalg.inv(metric_wilson(s_expanded))
+    G_compl_exp = np.linalg.inv(metric_fudged(s_expanded))
+    G_compl = basis.T @ G_compl_exp @ basis
+
+    commas = LLL(kernel(T), G_compl)
 
     for i in range(len(commas.T)):
         commas[:, i] = make_positive(commas[:, i], s)
@@ -300,7 +294,7 @@ def info(temp, options):
     # T = solve_diophantine(gens2, T)
 
     gens = preimage(T)
-    gens = simplify(gens, commas, G_wilson)
+    gens = simplify(gens, commas, G_compl)
 
     # make positive
     for i in range(T.shape[0]):

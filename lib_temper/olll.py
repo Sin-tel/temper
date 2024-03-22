@@ -1,8 +1,6 @@
 # https://github.com/higumachan/olll
 # corrected, and modified to use an arbitrary positive definite bilinear form
 
-from typing import Sequence, List
-
 import numpy as np
 
 
@@ -23,7 +21,7 @@ def gramschmidt(v: np.ndarray, W) -> np.ndarray:
     return u
 
 
-def reduction(basis: np.ndarray, delta: float, W) -> Sequence[Sequence[int]]:
+def reduction(basis: np.ndarray, delta: float, W) -> np.ndarray:
     n = len(basis)
     ortho = gramschmidt(basis, W)
 

@@ -5,6 +5,26 @@ import numpy as np
 from .interval import *
 from .farey import farey
 
+def name_tuning_weight(weight: str) -> str:
+    if weight == "unweighted":
+        return "E"
+    elif weight == "tenney":
+        return "TE"
+    elif weight == "weil":
+        return "WE"
+    else:
+        raise ValueError("unknown weight parameter")
+
+def get_metric(s: np.ndarray, weight: str) -> np.ndarray:
+    if weight == "unweighted":
+        return np.eye(len(s))
+    elif weight == "tenney":
+        return metric_tenney(s)
+    elif weight == "weil":
+        return metric_weil(s)
+    else:
+        raise ValueError(f"unknown weight parameter: {weight}")
+
 
 def lstsq(temp, weight="tenney", V=None):
     M = temp[0]
@@ -14,14 +34,7 @@ def lstsq(temp, weight="tenney", V=None):
 
     j = log_subgroup(s)
 
-    if weight == "unweighted":
-        G = np.eye(len(s))
-    elif weight == "tenney":
-        G = metric_tenney(s)
-    elif weight == "weil":
-        G = metric_weil(s)
-    else:
-        raise ValueError("unknown weight parameter")
+    G = get_metric(s, weight)
 
     if V is not None:
         G = V @ V.T
@@ -44,14 +57,7 @@ def cte(temp, weight="tenney", V=None):
 
     j = log_subgroup(s)
 
-    if weight == "unweighted":
-        G = np.eye(len(s))
-    elif weight == "tenney":
-        G = metric_tenney(s)
-    elif weight == "weil":
-        G = metric_weil(s)
-    else:
-        raise ValueError("unknown weight parameter")
+    G = get_metric(s, weight)
 
     j = np.atleast_2d(j)
 
@@ -100,15 +106,15 @@ def metric_wilson(s):
 
     return G
 
-
-# diagonal inverse sqrt primes
-def metric_wilson_sqrt(s):
-    j = np.sqrt(np.array(s).astype(np.double))
+# some empirical thing that gives the results I want
+def metric_fudged(s):
+    j = log_subgroup(s)
+    j = np.power(j, 1.8)
+    # j = np.power(np.array(s).astype(np.double), 0.5)
     W = np.diag(1.0 / j)
     G = W @ W.T
 
     return G
-
 
 # weil norm
 def metric_weil(s):
