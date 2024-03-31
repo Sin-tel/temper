@@ -23,10 +23,13 @@ names[(2, 3, 5)] = {
     (1, 1, 1, 0, 4, 9): "tetracot",
     (1, 1, 1, 0, 8, 18): "octacot",
     (1, 1, 2, 0, 2, 1): "dicot",
+    (1, 1, 2, 0, 9, 5): "valentine",
     (1, 1, 3, 0, 6, -7): "miracle",
+    (1, 2, 2, 0, 4, -3): "negri",
     (1, 2, 3, 0, 3, 5): "porcupine",
     (1, 6, 8, 0, 7, 9): "sensi",
     (1, 7, 3, 0, 8, 1): "würschmidt",
+    (1, 9, 9, 0, 10, 9): "myna",
     (2, 0, 11, 0, 1, -2): "pajara",  # aka diaschismatic, diaschismic, srutal
     (2, 1, 1, 0, 3, 5): "hedgehog",
     (3, 0, 7, 0, 1, 0): "augmented",
@@ -43,6 +46,7 @@ names[(2, 3, 7)] = {
     (1, 1, 3, 0, 3, -1): "slendric",
     (1, 1, 3, 0, 6, -2): "miracle",
     (1, 6, 11, 0, 7, 13): "sensi",
+    (2, 0, 31, 0, 1, -8): "diaschismic",
     (9, 1, 12, 0, 2, 2): "ennealimmal",
 }
 
