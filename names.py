@@ -1,5 +1,6 @@
-# names: dict[tuple[int, ...], dict[tuple[int, ...], str]] = {}
-names = {}
+from typing import TypeAlias
+
+names: dict[tuple[int, ...], dict[tuple[int, ...], str]] = {}
 
 names[(2, 3)] = {
     (5, 8): "blackwood",
