@@ -1,11 +1,12 @@
 # utilities for the web app
 
 import re
-import sys
 import time
+from typing import Optional, Any
 
 import numpy as np
 from lib_temper import *
+from names import names
 
 
 def cents(x, prec=3):
@@ -241,7 +242,19 @@ def edo_map_notation(this_map, subgroup):
     return mstr
 
 
-def info(temp, options):
+def subgroup_index(s, l) -> Optional[list[int]]:
+    res = [-1] * len(l)
+    for i, k in enumerate(l):
+        for j, v in enumerate(s):
+            if v == k:
+                res[i] = j
+    for k in res:
+        if k == -1:
+            return None
+    return res
+
+
+def info(temp, options) -> dict[str, Any]:
     T = temp[0]
     basis = temp[1]
     T_expanded = temp[2]
@@ -256,6 +269,26 @@ def info(temp, options):
     res["rank"] = T.shape[0]
 
     res["subgroup"] = ".".join(map(str, s))
+
+    # find temperament familiy names
+    families: list[str] = []
+
+    for restrict, family_list in names.items():
+        indices = subgroup_index(s_expanded, restrict)
+        if indices is not None:
+            r_ind = T_expanded[:, indices]
+            # delete zero rows
+            idx = np.argwhere(np.all(r_ind[:] == 0, axis=1))
+            r_ind = np.delete(r_ind, idx, axis=0)
+
+            family_index = tuple(r_ind.flatten())
+            print(f"{restrict}, {family_index}")
+            family = family_list.get(family_index)
+            if family is not None:
+                families.append(family)
+
+    if len(families) > 0:
+        res["families"] = ", ".join(set(sorted(families)))
 
     # The metric used for complexity calculations,
     # which should be the same regardless of the weights for optimization
@@ -311,7 +344,6 @@ def info(temp, options):
     # WL = metric_weil_k(s_expanded, 500.0)
     # WL = T @ WL @ T.T
     # WL = np.linalg.inv(WL)
-
     # gens2 = LLL(np.eye(T.shape[0], dtype=np.int64), WL)
     # T = solve_diophantine(gens2, T)
 

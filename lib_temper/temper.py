@@ -318,7 +318,6 @@ class Pmaps:
         self.stop = bounds[1]
         self.log_s = log_subgroup(subgroup)
         self.log_s = self.log_s / self.log_s[0]
-        print(self.log_s)
         assert np.all(self.log_s >= 0)
 
         start = bounds[0]
