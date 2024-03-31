@@ -5,6 +5,7 @@ import numpy as np
 from .interval import *
 from .farey import farey
 
+
 def name_tuning_weight(weight: str) -> str:
     if weight == "unweighted":
         return "E"
@@ -14,6 +15,7 @@ def name_tuning_weight(weight: str) -> str:
         return "WE"
     else:
         raise ValueError("unknown weight parameter")
+
 
 def get_metric(s: np.ndarray, weight: str) -> np.ndarray:
     if weight == "unweighted":
@@ -106,15 +108,6 @@ def metric_wilson(s):
 
     return G
 
-# some empirical thing that gives the results I want
-def metric_fudged(s):
-    j = log_subgroup(s)
-    j = np.power(j, 1.8)
-    # j = np.power(np.array(s).astype(np.double), 0.5)
-    W = np.diag(1.0 / j)
-    G = W @ W.T
-
-    return G
 
 # weil norm
 def metric_weil(s):

@@ -208,36 +208,16 @@ def preimage2(M):
     return gens
 
 
-# Simplify Intervals wrt Comma basis with some Weight matrix.
+# simplify list of intervals wrt a comma basis.
 # The comma basis should be in reduced LLL form for this to work properly.
-def simplify(I, C, W):
-    intervals = I.T
-    commas = C.T
-
-    for i in range(len(intervals)):
-        v = intervals[i]
-        p_best = np.dot(v, W @ v)
-
-        cont = True
-        while cont:
-            cont = False
-            for c in commas:
-                new = v - c
-                p_new = np.dot(new, W @ new)
-                if p_new < p_best:
-                    v = new
-                    p_best = p_new
-                    cont = True
-                else:
-                    new = v + c
-                    p_new = np.dot(new, W @ new)
-                    if p_new < p_best:
-                        v = new
-                        p_best = p_new
-                        cont = True
-        intervals[i] = v
-
-    return intervals.T
+def simplify(intervals, commas):
+    # system tries to find vectors approximately equal to zero
+    # approximate solution in floating point,
+    # then round to get integer solution
+    c_inv = np.linalg.pinv(commas)
+    s_vecs = np.round(c_inv @ intervals).astype(np.int64)
+    simpl = intervals - commas @ s_vecs
+    return simpl
 
 
 # Patent n-edo map

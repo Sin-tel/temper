@@ -7,8 +7,8 @@ http://127.0.0.1:5000/result?subgroup=2.3.5.7.11&reduce=on&weights=weil&target=&
 http://127.0.0.1:5000/result?subgroup=2.3.5.7.17&reduce=on&weights=tenney&target=&edos=&commas=24576%2F24565%2C+57375%2F57344%2C+1225%2F1224&submit_comma=submit
 => should have 2, 85/64 as generators
 
-
-
+http://127.0.0.1:5000/result?subgroup=19&reduce=on&weights=unweighted&target=2%2F1%2C+17%2F13&edos=&commas=169%2F168%2C+221%2F220%2C+286%2F285%2C+289%2F288%2C+325%2F324%2C+400%2F399&submit_comma=submit
+=> should give 12/11 and 49/45
 
 http://127.0.0.1:5000/result?subgroup=2.3.7.11&reduce=on&tenney=on&edos=26%2C22&submit_edo=submit&commas=
 http://127.0.0.1:5000/result?subgroup=11&reduce=on&tenney=on&edos=31%2C19&submit_edo=submit&commas=

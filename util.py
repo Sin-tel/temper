@@ -201,9 +201,9 @@ def edo_map_notation(this_map, subgroup):
     # divide by equave to fix non-octave temps
     j = log_subgroup(subgroup) / np.log2(float(subgroup[0]))
 
-    patent_map = np.round(this_edo * j).astype(np.int64)
+    p_map = np.round(this_edo * j).astype(np.int64)
 
-    diff = this_map - patent_map
+    diff = this_map - p_map
     adjustments = []
     for i, p in enumerate(diff):
         if p != 0:
@@ -243,8 +243,7 @@ def info(temp, options):
     # https://en.xen.wiki/w/Generalized_Tenney_norms_and_Tp_interval_space
     # b.T @ W^2 @ b
 
-    # G_compl_exp = np.linalg.inv(metric_wilson(s_expanded))
-    G_compl_exp = np.linalg.inv(metric_fudged(s_expanded))
+    G_compl_exp = np.linalg.inv(metric_wilson(s_expanded))
     G_compl = basis.T @ G_compl_exp @ basis
 
     commas = LLL(kernel(T), G_compl)
@@ -286,7 +285,7 @@ def info(temp, options):
             res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
 
     # find norm on quotient space
-    # WL = metric_weil_k(s_expanded, 10.0)
+    # WL = metric_weil_k(s_expanded, 500.0)
     # WL = T @ WL @ T.T
     # WL = np.linalg.inv(WL)
 
@@ -294,7 +293,7 @@ def info(temp, options):
     # T = solve_diophantine(gens2, T)
 
     gens = preimage(T)
-    gens = simplify(gens, commas, G_compl)
+    gens = simplify(gens, commas)
 
     # make positive
     for i in range(T.shape[0]):

@@ -24,9 +24,12 @@ x fix complexity calculation for subgroup temps
 
 find optimal maps for edo input
 
+search supported temps for an edo (irrespective of non-patent maps)
+temperament search in general
+
 switch for monospace formatting instead of latex
 
-find additional commas
+find additional commas, sort by wilson height
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 
