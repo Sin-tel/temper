@@ -1,6 +1,7 @@
 from typing import TypeAlias
 
-names: dict[tuple[int, ...], dict[tuple[int, ...], str]] = {}
+TempDict: TypeAlias = dict[tuple[int, ...], str]
+names: dict[tuple[int, ...], TempDict] = {}
 
 names[(2, 3)] = {
     (5, 8): "blackwood",
