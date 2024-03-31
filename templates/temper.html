@@ -15,9 +15,21 @@
 <form action = "{{ url_for('result') }}" method = "GET">
 	<p>Prime limit or subgroup<br>
 		<input type = "text" name = "subgroup" required /></p>
-	<p>Options:<br>
-	<label><input type="checkbox" name = "reduce" checked> Reduce generators</label><br>
+	<p>
+	Reduce generators:
+	<br>
+	<input type="radio" id="off" name="reduce" value="off">
+	<label for="off">off</label>
 
+	<input type="radio" id="reduce" name="reduce" value="on" checked="checked">
+	<label for="reduce">oct. reduce</label>
+
+	<input type="radio" id="spine" name="reduce" value="spine">
+	<label for="spine">spine+commas</label>
+
+	<br>
+	Weights:
+	<br>
 	<input type="radio" id="tenney" name="weights" value="tenney">
 	<label for="tenney">tenney</label>
 

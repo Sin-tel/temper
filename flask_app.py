@@ -21,7 +21,7 @@ def result():
         args = args.to_dict()
 
         args["tenney"] = "tenney" in args
-        args["reduce"] = "reduce" in args
+        args["reduce"] = args.get("reduce")
 
         if "submit_edo" in args:
             temp = from_edos(args)

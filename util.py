@@ -254,6 +254,11 @@ def subgroup_index(s, l) -> Optional[list[int]]:
     return res
 
 
+# fmt: off
+alternating_iter = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10, -10, 11, -11, 12, -12]
+# fmt: on
+
+
 def info(temp, options) -> dict[str, Any]:
     T = temp[0]
     basis = temp[1]
@@ -282,7 +287,7 @@ def info(temp, options) -> dict[str, Any]:
             r_ind = np.delete(r_ind, idx, axis=0)
 
             family_index = tuple(r_ind.flatten())
-            print(f"{restrict}, {family_index}")
+            # print(f"{restrict}, {family_index}")
             family = family_list.get(family_index)
             if family is not None:
                 families.append(family)
@@ -356,11 +361,14 @@ def info(temp, options) -> dict[str, Any]:
             T[i, :] = -T[i, :]
             gens[:, i] = -gens[:, i]
 
-    if options["reduce"]:
+    red = options["reduce"]
+    if red is None:
+        red = "off"
+
+    if red == "on":
         o = T[0, 0]
         genoct = np.zeros_like(gens[:, 0])
         genoct[0] = 1
-        # eq = log_interval(gens[:, 0], s)
         eq = log_interval(genoct, s)
         # reduce by equave
         for i in range(1, T.shape[0]):
@@ -369,6 +377,42 @@ def info(temp, options) -> dict[str, Any]:
             red = int(np.floor(log_interval(gens[:, i], s) / eq))
             gens[0, i] -= red
             T[0, :] += o * red * T[i, :]
+    elif red == "spine":
+        # TODO: simplify
+        # TODO: do the size calculations with tempered intervals instead
+        o = T[0, 0]
+        genoct = np.zeros_like(gens[:, 0])
+        genoct[0] = 1
+        eq = log_interval(genoct, s)
+        # reduce first two by equave
+        for i in range(1, min(2, T.shape[0])):
+            red = int(np.floor(log_interval(gens[:, i], s) / eq))
+            gens[0, i] -= red
+            T[0, :] += o * red * T[i, :]
+        if T.shape[0] > 2:
+            fifth = log_interval(gens[:, 1], s)
+            # reduce others
+            cutoff = 0.04736875252  # Same cutoff as in modified FJS = log2(sqrt(2187/2048))
+            for i in range(2, T.shape[0]):
+                interval_size = log_interval(gens[:, i], s)
+
+                for k in alternating_iter:
+                    try_next = interval_size + k * fifth
+                    eq_red = -int(np.round(try_next / eq))
+                    try_next += eq * eq_red
+                    # print(k, eq_red, try_next)
+                    if np.abs(try_next) <= cutoff:
+                        gens[:, i] += k * gens[:, 1] + eq_red * gens[:, 0]
+                        T[1, :] -= k * T[i, :]
+                        T[0, :] -= eq_red * T[i, :]
+
+                        break
+            gens = simplify(gens, commas)
+            # make positive
+            for i in range(T.shape[0]):
+                if log_interval(gens[:, i], s) < 0:
+                    T[i, :] = -T[i, :]
+                    gens[:, i] = -gens[:, i]
 
     res["mapping"] = format_matrix(T)
 
@@ -388,8 +432,8 @@ def info(temp, options) -> dict[str, Any]:
     # get the equave
     equave = factors(s[0], s_expanded)
 
-    te_tun, te_err = lstsq((T_expanded, s_expanded), weight)
-    cte_tun, cte_err = cte((T_expanded, s_expanded), weight, V=equave)
+    te_tun, _ = lstsq((T_expanded, s_expanded), weight)
+    cte_tun, _ = cte((T_expanded, s_expanded), weight, V=equave)
 
     showtarget = False
     if "target" in options:
