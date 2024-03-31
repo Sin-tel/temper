@@ -3,6 +3,7 @@ from typing import TypeAlias
 TempDict: TypeAlias = dict[tuple[int, ...], str]
 names: dict[tuple[int, ...], TempDict] = {}
 
+# fmt: off
 names[(2, 3)] = {
     (5, 8): "blackwood",
     (7, 11): "whitewood",
@@ -30,6 +31,7 @@ names[(2, 3, 5)] = {
     (1, 6, 8, 0, 7, 9): "sensi",
     (1, 7, 3, 0, 8, 1): "würschmidt",
     (1, 9, 9, 0, 10, 9): "myna",
+    (2, 0, -8, 0, 1, 4): "injera",
     (2, 0, 11, 0, 1, -2): "pajara",  # aka diaschismatic, diaschismic, srutal
     (2, 1, 1, 0, 3, 5): "hedgehog",
     (3, 0, 7, 0, 1, 0): "augmented",
@@ -64,8 +66,10 @@ names[(3, 5, 7)] = {
 }
 
 names[(2, 3, 5, 7)] = {
-    (1, 0, 0, -5, 0, 1, 0, 2, 0, 0, 1, 2): "marvel",
     (1, 0, 0, -1, 0, 1, 0, -2, 0, 0, 1, 3): "starling",
+    (1, 0, 0, -5, 0, 1, 0, 2, 0, 0, 1, 2): "marvel",
+    (1, 0, 0, 10, 0, 1, 0, -6, 0, 0, 1, 1): "hemifamity",  # this name name is so awful
+    (1, 1, 1, 2, 0, 2, 1, 1, 0, 0, 2, 1): "breed", # jove? breedsmic (ew)?
 }
 
 names[(2, 3, 11, 13)] = {
