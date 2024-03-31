@@ -1,4 +1,5 @@
-names: dict[tuple[int, ...], dict[tuple[int, ...], str]] = {}
+# names: dict[tuple[int, ...], dict[tuple[int, ...], str]] = {}
+names = {}
 
 names[(2, 3)] = {
     (5, 8): "blackwood",
