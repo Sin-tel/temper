@@ -15,6 +15,12 @@ def cents(x, prec=3):
 def parse_subgroup(s):
     s = [Fraction(i) for i in re.split(r"[\\.,; ]+", s)]
 
+    # make sure they are all > 1
+    for i, f in enumerate(s):
+        p, q = f.as_integer_ratio()
+        if np.log(p) - np.log(q) < 0.0:
+            s[i] = Fraction(q, p)
+
     if len(s) == 1:
         expanded = p_limit(s[0])
         return np.eye(len(expanded), dtype=np.int64), expanded
@@ -43,6 +49,8 @@ wart_map = {
 
 
 def parse_edos(s, subgroup):
+    print(subgroup)
+
     # split string by separators (,.;& ) but ignore when in square brackets
     # "12, 17[+5, 8], 22"
     # => ["12", "17[+5, 8]", "22"]
@@ -60,8 +68,21 @@ def parse_edos(s, subgroup):
         edo_num = int(res[0])
         p_map = patent_map(edo_num, subgroup)
         if res[1] == "":
-            # if the input was simply an integer, then add the patent map
-            edos.append(p_map)
+            # if the input was simply an integer, then find the best mapping
+            # TODO: this probably doesn't work correctly on subgroups
+            best_b = 100000.0
+            best_m = None
+            search_range = (edo_num - 0.5, edo_num + 0.5)
+            for m1 in Pmaps(search_range, subgroup):
+                badness = temp_badness((m1, subgroup))
+                if badness < best_b:
+                    best_b = badness
+                    best_m = np.copy(m1)
+            if best_m is None:
+                print(f"Somehow we did not find any patent maps for {edo_num} in {subgroup}")
+                # fallback
+                best_m = p_map
+            edos.append(best_m)
         else:
             adjust = re.findall(r"\[.*\]", e)
             if len(adjust) > 0:
@@ -283,6 +304,8 @@ def info(temp, options):
 
         if maps_join is not None:
             res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
+    elif T.shape[0] == 1:
+        res["edo"] = edo_map_notation(T[0], s)
 
     # find norm on quotient space
     # WL = metric_weil_k(s_expanded, 500.0)

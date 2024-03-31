@@ -235,7 +235,9 @@ def patent_map(edo_num, subgroup):
 def find_edos(T, subgroup):
     assert T.ndim == 2
     r, d = T.shape
-    # T = hnf(T)
+    if r == 1:
+        return
+
     c = kernel(T)
 
     octave_div = T[0, 0]
@@ -243,9 +245,6 @@ def find_edos(T, subgroup):
     search_range = (4.5, 1999.5)
 
     m_list = []
-
-    if r == 1:
-        return
 
     seen = set()
     count = 0
@@ -318,7 +317,9 @@ class Pmaps:
     def __init__(self, bounds, subgroup):
         self.stop = bounds[1]
         self.log_s = log_subgroup(subgroup)
-        # assert np.all(self.log_s >= 1)
+        self.log_s = self.log_s / self.log_s[0]
+        print(self.log_s)
+        assert np.all(self.log_s >= 0)
 
         start = bounds[0]
 
@@ -390,7 +391,9 @@ def temp_badness(temp):
     W = np.diagflat(1.0 / j)
 
     # normalize W so it has det(W) = 1
-    W = W / np.power(np.linalg.det(W), 1 / W.shape[0])
+    W_det = np.linalg.det(W)
+    assert W_det > 0
+    W = W / np.power(W_det, 1 / W.shape[0])
 
     # the exponent
     omega = r / (d - r)
