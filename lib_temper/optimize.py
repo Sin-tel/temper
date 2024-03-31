@@ -140,9 +140,11 @@ def metric_farey(n, s):
     l = farey(n)  # integer limit
     lv = []
     for i in l:
-        f = factors_unchecked(i, s)
-        if f is not None:
+        try:
+            f = factors(i, s)
             lv.append(f)
+        except AssertionError:
+            pass
 
     lv = np.hstack(lv)
     G = lv @ lv.T

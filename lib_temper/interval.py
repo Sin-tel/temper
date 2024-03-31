@@ -1,11 +1,14 @@
 # interval arithmetic
 
-import numpy as np
 from fractions import Fraction
+from numbers import Real
+from typing import TypeAlias, Any, Optional
+import numpy as np
+from .util_types import IntArray, IntVec, FloatVec
 
 
 # prime vector to ratio. subgroup may be rational
-def ratio(v, subgroup):
+def ratio(v: IntArray, subgroup: list[int]) -> Fraction:
     v = v.flatten().tolist()
     p = 1
     q = 1
@@ -20,19 +23,15 @@ def ratio(v, subgroup):
 
 # fraction to prime vector (aka prime factorization)
 # only works for integer subgroups (doesn't check for (co)primality in the basis)
-def factors(fr, subgroup):
-    assert type(subgroup) is list, "Subgroup must be a list."
-    assert all(isinstance(x, int) for x in subgroup)
+def factors(fr, subgroup: list[int]) -> IntVec:
+    f_vector = np.zeros((len(subgroup), 1), dtype=np.int64)
 
-    factors = np.zeros((len(subgroup), 1), dtype=np.int64)
+    if isinstance(fr, tuple):
+        fr = Fraction(fr[0], fr[1])
 
-    if type(fr) is tuple:
-        p = fr[0]
-        q = fr[1]
-    else:
-        frac = Fraction(fr)
-        p = frac.numerator
-        q = frac.denominator
+    frac = Fraction(fr)
+    p = frac.numerator
+    q = frac.denominator
 
     assert p > 0
     assert q > 0
@@ -40,48 +39,14 @@ def factors(fr, subgroup):
     for i, f in enumerate(subgroup):
         while p % f == 0:
             p //= f
-            factors[i, 0] += 1
+            f_vector[i, 0] += 1
         while q % f == 0:
             q //= f
-            factors[i, 0] -= 1
+            f_vector[i, 0] -= 1
 
-    # print(p,q, flush = True)
-    assert p == 1 and q == 1, "Decomposition not in subgroup."
+    assert p == 1 and q == 1, f"Decomposition of {fr} not in subgroup."
 
-    return factors
-
-
-def factors_unchecked(fr, subgroup):
-    assert type(subgroup) is list, "Subgroup must be a list."
-    assert all(isinstance(x, int) for x in subgroup)
-
-    factors = np.zeros((len(subgroup), 1), dtype=np.int64)
-
-    if type(fr) is tuple:
-        p = fr[0]
-        q = fr[1]
-    else:
-        frac = Fraction(fr)
-        p = frac.numerator
-        q = frac.denominator
-
-    assert p > 0
-    assert q > 0
-
-    for i, f in enumerate(subgroup):
-        while p % f == 0:
-            p //= f
-            factors[i, 0] += 1
-        while q % f == 0:
-            q //= f
-            factors[i, 0] -= 1
-
-    # print(p,q, flush = True)
-    # assert p == 1 and q == 1, "Decomposition not in subgroup."
-    if p != 1 or q != 1:
-        return None
-
-    return factors
+    return f_vector
 
 
 # make a prime vector positive
@@ -101,7 +66,5 @@ def log_interval(v, subgroup):
 
 
 # subgroup in octaves as numpy array
-def log_subgroup(subgroup):
-    assert type(subgroup) is list, "Subgroup must be a list."
-
-    return np.log2(np.array(subgroup).astype(np.double))
+def log_subgroup(subgroup: list[Real]) -> FloatVec:
+    return np.log2(np.array(subgroup).astype(np.float64))

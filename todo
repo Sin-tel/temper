@@ -21,6 +21,14 @@ x reduce gens by commas
 x fix non-octave CTE
 x fix output for non-octave stuff
 x fix complexity calculation for subgroup temps
+x naming
+x radio selector for norm
+
+add type hints
+
+better errors
+
+cents precision should be adaptive
 
 find optimal maps for edo input
 
@@ -33,15 +41,12 @@ find additional commas, sort by wilson height
 
 radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
 
-radio selector for norm
-
 fast rank test?
 
 make search better
  - only patent edos first?
 
 add tests for solver
-use yield in pmap iterator
 
 septimal meantone w just 5/4 and 7/4 is impossible because the intervals are collinear => deal w this properly
 
@@ -49,19 +54,14 @@ help page
 enter intervals to optimize
 make results page look nicer
 list more commas, sort by tenney/wilson
-adaptive precision of outputs
 when subgroup empty, infer from commas
 make search
-
-naming scheme proposal
 
 parser for ~ notation
   ie 9/8^2 ~ 5/4
 
 custom weights
-plot complexity vs error for random temperaments
 
-error msg
 input validation
 write tests
 
