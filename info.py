@@ -81,6 +81,7 @@ def info(temp, options) -> dict[str, Any]:
 
     # find temperament familiy names
     families: list[str] = []
+    families_weak: list[str] = []
 
     for restrict, family_list in names.items():
         indices = subgroup_index(s_expanded, restrict)
@@ -90,15 +91,34 @@ def info(temp, options) -> dict[str, Any]:
             idx = np.argwhere(np.all(r_ind[:] == 0, axis=1))
             r_ind = np.delete(r_ind, idx, axis=0)
 
+            if r_ind.shape[0] > r_ind.shape[1]:
+                continue
+
+            r_ind_weak = defactored_hnf(r_ind)
+
             family_index = tuple(r_ind.flatten())
+            family_index_weak = tuple(r_ind_weak.flatten())
             # print(f"{restrict}, {family_index}")
             family = family_list.get(family_index)
+            family_weak = family_list.get(family_index_weak)
             if family is not None:
                 families.append(family)
+            if family_weak is not None:
+                families_weak.append(family_weak)
 
+    families = set(families)  # type: ignore[assignment]
+    families_weak = set(families_weak).difference(families)  # type: ignore[assignment]
+
+    families_str = ""
     if len(families) > 0:
-        res["families"] = ", ".join(set(sorted(families)))
+        families_str += ", ".join(sorted(list(families)))
+    if len(families_weak) > 0:
+        if families_str != "":
+            families_str += ", "
+        families_str += "(" + ", ".join(sorted(list(families_weak))) + ")"
 
+    if families_str != "":
+        res["families"] = families_str
     # The metric used for complexity calculations,
     # which should be the same regardless of the weights for optimization
     # (used for calculating comma and basis)
@@ -157,7 +177,7 @@ def info(temp, options) -> dict[str, Any]:
     # T = solve_diophantine(gens2, T)
 
     gens = preimage(T)
-    gens = simplify(gens, commas)
+    gens = simplify(gens, commas, G_compl)
 
     # make positive
     for i in range(T.shape[0]):
@@ -182,7 +202,6 @@ def info(temp, options) -> dict[str, Any]:
             gens[0, i] -= red
             T[0, :] += o * red * T[i, :]
     elif red == "spine":
-        # TODO: simplify
         # TODO: do the size calculations with tempered intervals instead
         o = T[0, 0]
         genoct = np.zeros_like(gens[:, 0])
@@ -194,6 +213,7 @@ def info(temp, options) -> dict[str, Any]:
             gens[0, i] -= red
             T[0, :] += o * red * T[i, :]
         if T.shape[0] > 2:
+            # generally not a fifth, just the second generator
             fifth = log_interval(gens[:, 1], s)
             # reduce others
             cutoff = 0.04736875252  # Same cutoff as in modified FJS = log2(sqrt(2187/2048))
@@ -209,9 +229,9 @@ def info(temp, options) -> dict[str, Any]:
                         gens[:, i] += k * gens[:, 1] + eq_red * gens[:, 0]
                         T[1, :] -= k * T[i, :]
                         T[0, :] -= eq_red * T[i, :]
-
                         break
-            gens = simplify(gens, commas)
+            # we have to do this again because the resulting intervals may be complicated
+            gens = simplify(gens, commas, G_compl)
             # make positive
             for i in range(T.shape[0]):
                 if log_interval(gens[:, i], s) < 0:

@@ -212,12 +212,18 @@ def preimage2(M):
 
 # simplify list of intervals wrt a comma basis.
 # The comma basis should be in reduced LLL form for this to work properly.
-def simplify(intervals, commas):
+# TODO: figure out if the weight matrix here actually helps
+def simplify(intervals, commas, W=None):
     # system tries to find vectors approximately equal to zero
     # approximate solution in floating point,
     # then round to get integer solution
-    c_inv = np.linalg.pinv(commas)
-    s_vecs = np.round(c_inv @ intervals).astype(np.int64)
+
+    if W is None:
+        W = np.eye(commas.shape[0])
+
+    # c_inv = np.linalg.pinv(commas)
+    c_inv = np.linalg.inv(commas.T @ W @ commas) @ commas.T
+    s_vecs = np.round(c_inv @ W @ intervals).astype(np.int64)
     simpl = intervals - commas @ s_vecs
     return simpl
 
