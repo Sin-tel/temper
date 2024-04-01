@@ -64,7 +64,9 @@ def cokernel(M):
 # Tries to find the smallest basis vectors in some lattice
 # M: Map
 # W: Weight matrix (metric)
-def LLL(M, W):
+def LLL(M, W=None):
+    if W is None:
+        W = np.eye(M.shape[0])
     res = olll.reduction(np.copy(M).T, delta=0.99, W=W).T
 
     # sort them by complexity
