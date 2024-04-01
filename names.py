@@ -122,7 +122,7 @@ names[(2, 3, 7, 11)] = {
 }
 
 names[(2, 5, 7, 11)] = {
-    (1, 0, 0, -4, 0, 1, 0, 2, 0, 0, 1, 1): "valinorismic", # do better. shows up a lot!
+    (1, 0, 0, -4, 0, 1, 0, 2, 0, 0, 1, 1): "valinorismic", # 176/175; do better. shows up a lot!
     (1, 0, 0, 3, 0, 1, 0, -1, 0, 0, 1, 1): "konbini", # 56/55
 }
 
