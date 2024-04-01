@@ -1,8 +1,8 @@
 import flask as f
-from util import *
 import traceback
 import git
 from timeout import time_limit, TimeoutException
+from info import *
 
 
 app = f.Flask(__name__)
