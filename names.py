@@ -70,7 +70,7 @@ names[(2, 3, 7)] = {
 
 names[(2, 3, 11)] = {
     (1, 0, -6, 0, 1, 6):  "flattone",
-    (1, 0, 13, 0, 1, -6): "supra" # superpyth adjacent, 8192/8019
+    (1, 0, 13, 0, 1, -6): "supra", # superpyth adjacent, 8192/8019
     (1, 1, 2, 0, 2, 5):   "rastmic",
     (1, 2, 4, 0, 3, 4):   "porcupine",
 }
@@ -109,7 +109,7 @@ names[(2, 3, 5, 7)] = {
 names[(2, 3, 5, 11)] = {
     (1, 0, 0, 1, 0, 1, 0, 3, 0, 0, 1, -1): "55/54-comma",  # unnamed, 'telepathmic'??
     (1, 0, 0, 2, 0, 1, 0, -2, 0, 0, 1, 2): "ptolemismic",  # why not just ptolemaic
-    (1, 0, 0, 6, 0, 1, 0, -6, 0, 0, 1, 3): "trimitone"
+    (1, 0, 0, 6, 0, 1, 0, -6, 0, 0, 1, 3): "trimitone",
     (1, 0, 1, 2, 0, 1, 1, 1, 0, 0, 2, 1):  "biyatismic",
     (1, 2, 0, 1, 0, 3, 0, -1, 0, 0, 1, 1): "pine",
 }
@@ -131,7 +131,7 @@ names[(2, 3, 5, 13)] = {
 }
 
 names[(2, 3, 11, 13)] = {
-    (1, 0, 0, 4, 0, 1, 0, 2, 0, 0, 1, -1): "grossmic" # comma is named grossma, so thats how it is
+    (1, 0, 0, 4, 0, 1, 0, 2, 0, 0, 1, -1): "grossmic", # comma is named grossma, so thats how it is
     (1, 0, 0, 5, 0, 1, 0, -3, 0, 0, 1, 1): "major minthmic", # id prefer something simpler for this
 }
 
@@ -161,5 +161,5 @@ names[(2, 3, 5, 7, 13)] = {
 }
 
 names[(2, 3, 7, 11, 13)] = {
-    (1, 0, 0, 0, -2, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, 0, 1, 2): "minor minthmic"
+    (1, 0, 0, 0, -2, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, 0, 1, 2): "minor minthmic",
 }
