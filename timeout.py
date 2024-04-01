@@ -1,5 +1,6 @@
-import signal
 from contextlib import contextmanager
+
+USE_TIMEOUT = True
 
 
 class TimeoutException(Exception):
@@ -8,17 +9,21 @@ class TimeoutException(Exception):
 
 @contextmanager
 def time_limit(seconds):
-    def signal_handler(signum, frame):
-        raise TimeoutException("Timed out!")
+    if USE_TIMEOUT:
+        import signal
 
-    if not hasattr(signal, "SIGALRM"):
-        print("SIGALRM not available!")
-        yield
-        return
+        def signal_handler(signum, frame):
+            raise TimeoutException("Timed out!")
 
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(seconds)
-    try:
-        yield
-    finally:
-        signal.alarm(0)
+        if not hasattr(signal, "SIGALRM"):
+            print("SIGALRM not available!")
+            return
+
+        signal.signal(signal.SIGALRM, signal_handler)
+        signal.alarm(seconds)
+        try:
+            yield
+        finally:
+            signal.alarm(0)
+    else:
+        pass
