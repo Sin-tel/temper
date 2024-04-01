@@ -98,12 +98,13 @@ names[(3, 5, 7)] = {
 names[(2, 3, 5, 7)] = {
     (1, 0, 0, -1, 0, 1, 0, -2, 0, 0, 1, 3): "starling",
     (1, 0, 0, -5, 0, 1, 0, 2, 0, 0, 1, 2):  "marvel",
-    (1, 0, 0, 1, 0, 1, 0, 7, 0, 0, 1, -4):  "landscape",
+    (1, 0, 0, 1, 0, 1, 0, 7, 0, 0, 1, -4):  "ragismic",
     (1, 0, 0, 10, 0, 1, 0, -6, 0, 0, 1, 1): "hemifamity",  # this name name is so awful
     (1, 0, 0, 2, 0, 1, 0, 1, 0, 0, 3, -1):  "orwellismic", # bad. confusing wrt orwell
     (1, 0, 0, 5, 0, 1, 0, 3, 0, 0, 1, -3):  "supermagic", # keemic?
     (1, 0, 1, 4, 0, 1, 1, -1, 0, 0, 2, -3): "porwell", # lame, zeus would be cooler
     (1, 1, 1, 2, 0, 2, 1, 1, 0, 0, 2, 1):   "breed",  # jove? breedsmic (ew)?
+    (3, 0, 0, 4, 0, 1, 0, -2, 0, 0, 1, 2):  "landscape",
 }
 
 names[(2, 3, 5, 11)] = {
