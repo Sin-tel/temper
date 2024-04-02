@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools"]
+
+[tool.mypy]
+ignore_missing_imports = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+allow_redefinition = true
+warn_redundant_casts = true
+# warn_return_any = true
+# disallow_untyped_calls = true
+
+[tool.black]
+# line-length = 120
+
+[mypy]
+ignore_missing_imports = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+allow_redefinition = true
+warn_redundant_casts = true
+# warn_return_any = true
+# disallow_untyped_calls = true
+
+[tool.pylint.'MESSAGES CONTROL']
+disable=[
+	"missing-module-docstring",
+	"missing-class-docstring",
+	"missing-function-docstring",
+
+	"import-error",
+	"no-name-in-module",
+	"line-too-long",
+	"invalid-name",
+	"redefined-outer-name",
+
+	"too-many-locals",
+	"too-many-branches",
+	"too-many-arguments",
+	"too-many-locals",
+	"too-many-instance-attributes",
+	"too-many-public-methods",
+	"too-many-nested-blocks",
+	"too-many-statements",
+	"too-many-function-args",
+	"too-few-public-methods",
+	"too-many-lines",
+	"too-many-return-statements",
+	"wildcard-import",
+]
