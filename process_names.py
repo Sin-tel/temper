@@ -21,8 +21,8 @@ def write_names() -> None:
         comma = parse_intervals(comma_str, s)
         assert len(comma) == 1
         comma = comma[0]
-        print(name)
-        print(ratio(comma, s))
+        # print(name)
+        # print(ratio(comma, s))
 
         idx, _ = np.nonzero(comma)
         s_res = []
@@ -30,7 +30,7 @@ def write_names() -> None:
             s_res.append(s[i])
         c_res = comma[idx]
         # print(c_res)
-        print(s_res)
+        # print(s_res)
         s_key = str(tuple(s_res))
 
         if s_key not in name_list:
@@ -41,7 +41,7 @@ def write_names() -> None:
         # print(t)
         l_index = str(tuple(t.flatten()))
         name_list[s_key][l_index] = name
-        print("----")
+        # print("----")
 
     with open(comma_filename, "w", encoding="utf-8") as f:
         f.write(json.dumps(name_list, indent=4))
