@@ -6,7 +6,11 @@ from typing import Optional, Any
 import numpy as np
 from parse import *
 from lib_temper import *
-from names import names
+from process_names import load_names, write_names
+
+# TODO: we just stupidly do this on startup, if it starts taking to long do an actual cache
+write_names()
+names = load_names()
 
 
 def from_commas(args):
