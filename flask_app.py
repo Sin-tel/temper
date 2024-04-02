@@ -54,9 +54,9 @@ def update():
         return "", 400
 
 
-@app.route("/test")
+@app.route("/xen")
 def test():
-    return "succes!\n v0.1.14"
+    return '<img src="static/xen.png" width="550">'
 
 
 @app.errorhandler(500)
