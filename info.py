@@ -79,7 +79,7 @@ def info(temp, options) -> dict[str, Any]:
 
     res["subgroup"] = ".".join(map(str, s))
 
-    # find temperament familiy names
+    # find temperament family names
     families: list[str] = []
     families_weak: list[str] = []
 
@@ -87,11 +87,10 @@ def info(temp, options) -> dict[str, Any]:
         indices = subgroup_index(s_expanded, restrict)
         if indices is not None:
             r_ind = T_expanded[:, indices]
-            # delete zero rows
-            idx = np.argwhere(np.all(r_ind[:] == 0, axis=1))
-            r_ind = np.delete(r_ind, idx, axis=0)
+            r_ind = hnf(r_ind, remove_zeros=True)
 
-            if r_ind.shape[0] > r_ind.shape[1]:
+            if r_ind.shape[0] >= r_ind.shape[1]:
+                # if rank >= dim there is no point
                 continue
 
             r_ind_weak = defactored_hnf(r_ind)
@@ -304,8 +303,8 @@ def info(temp, options) -> dict[str, Any]:
         res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
 
     badness = temp_badness((T_expanded, s_expanded))
-    res["badness"] = "{:.3f}".format(badness)
-    # res["complexity"] = "{1:.{0}f}".format(3, complexity)
-    # res["error"] = "{1:.{0}f}".format(3, 1200 * error)
+    res["badness"] = f"{badness:.3f}"
+    # complexity = temp_complexity((T_expanded, s_expanded))
+    # res["complexity"] = f"{complexity:.2f}"
 
     return res
