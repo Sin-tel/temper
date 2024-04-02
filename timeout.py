@@ -17,6 +17,7 @@ def time_limit(seconds):
 
         if not hasattr(signal, "SIGALRM"):
             print("SIGALRM not available!")
+            yield
             return
 
         signal.signal(signal.SIGALRM, signal_handler)
@@ -26,4 +27,4 @@ def time_limit(seconds):
         finally:
             signal.alarm(0)
     else:
-        pass
+        yield
