@@ -11,8 +11,9 @@ names = [
     ("cloudy", "16807/16384"),
     ("compton", "531441/524288"),
     ("whitewood", "2187/2048"),
+
     # rank 2
-    ("[unnamed]", "512/507"),
+    ("512/507", "512/507"), # unnamed
     ("archytas", "64/63"),
     ("diaschismic", "2048/2025"),
     ("diaschismic", "2147483648/2109289329"),
@@ -27,7 +28,7 @@ names = [
     ("gariboh", "3125/3087"),  # what?
     ("hedgehog", "118098/117649"),  # 2.3.7, contorted in 5-lim
     ("injera", "6561/6272"),  # 2.3.7, contorted in 5-lim
-    ("jubilismic", "50/49"),
+    ("jubilee", "50/49"), # jubilismic
     ("kleismic", "15625/15552"),
     ("magic", "3125/3072"),
     ("mavila", "135/128"),
@@ -53,47 +54,56 @@ names = [
     ("sensi", "78732/78125"),  # 5-lim, aka sensipent
     ("slendric", "1029/1024"),
     ("superpyth", "20480/19683"), # 5-lim
-    ("supra", "8192/8019"),  # name correct?
+    ("supra", "8192/8019"),
     ("tetracot", "20000/19683"),
     ("tridecimal", "1053/1024"),
     ("valentine", "1990656/1953125"),
     ("würschmidt", "393216/390625"),
+    ("nexus", "1771561/1769472"),
+
     # rank 3
-    ("[unnamed]", "55/54"),
-    ("biyatismic", "121/120"),  # this is just misspelled?? protomere?
+    ("144/143", "144/143"),  # grossmic? needs better name!
+    ("1728/1715", "1728/1715"),  # orwellismic, bad. confusing wrt orwell
+    ("55/54", "55/54"), # unnamed
+    ("729/728", "729/728"),  # squbemic, needs better name
     ("breed", "2401/2400"), # breedsmic?
-    ("buzurgic", "169/168"),  # aka dhanvantari
-    ("grossmic", "144/143"),  # needs better name!
-    ("hemifamity", "5120/5103"),  # this name is so awful. pele?
+    ("buzurg", "169/168"),  # aka buzurg(ism)ic, dhanvantari
+    ("counterpyth", "1216/1215"),
+    ("demeter", "686/675"), # aka sengic
     ("island", "676/675"),
     ("konbini", "56/55"),
     ("landscape", "250047/250000"),
     ("major minthmic", "352/351"),  # needs better name!
     ("marvel", "225/224"),
     ("marveltwin", "325/324"),
-    ("mothwellsmic", "99/98"),  # -> mothwell
-    ("orwellismic", "1728/1715"),  # bad. confusing wrt orwell
+    ("mirkwai", "16875/16807"), # indra?
+    ("mothwellsmic", "99/98"),  # needs better name
+    ("pele", "5120/5103"),  # hemifamity
     ("pentacircle", "896/891"),
     ("pine", "4000/3993"),
-    ("porwell", "6144/6125"),  # lame, zeus would be cooler
-    ("ptolemismic", "100/99"), # -> ptolemy/ptolemaic
+    ("protomere", "121/120"),  # aka biyatismic
+    ("ptolemismic", "100/99"), # apollo?
     ("ragismic", "4375/4374"),
-    ("squbema", "729/728"),  # needs better name
     ("starling", "126/125"),
-    ("supermagic", "875/864"),  # keemic?
+    ("supermagic", "875/864"),
     ("trimitone", "8019/8000"),
-    ("valinorismic", "176/175"),  # -> valinor
-    ("demeter", "686/675"), # aka sengic
+    ("valinorismic", "176/175"),  # valinor?
+    ("vulkan", "512/495"),
+    ("zeus", "6144/6125"),  # aka porwell
+    # ("thor", "1890625/1889568"),
+    # ("odin", "[-17 24 -18 0 6]"),
+    # ("ganesha", "5632/5625"), # vishdel?
+
     # rank 4
     ("animist", "105/104"),
     ("biome", "91/90"),
+    ("gentle", "364/363"), # minor minthmic
     ("huntmic", "640/637"), # ehh
     ("kalismic", "9801/9800"),
-    ("keenanismic", "385/384"), # -> keenan? (i can literally ask him) "undecimal kleismic" doesnt sound that nice
-    ("lehmerismic", "3025/3024"), # -> lehmer?
-    ("minor minthmic", "364/363"), # needs better name!
+    ("keenanismic", "385/384"), # keenan? (i can literally ask him) "undecimal kleismic" doesnt sound that nice
+    ("lehmerismic", "3025/3024"), # lehmer?
     ("mynucumic", "196/195"), # needs better name!
     ("ratwolf", "351/350"),
-    ("swetismic", "540/539"), # -> swets?
-    ("werckismic", "441/440"), # -> werckmeister?
+    ("swetismic", "540/539"), # swets?
+    ("werckismic", "441/440"), # needs better name!
 ]
