@@ -74,6 +74,9 @@ def internal_error(exception):
 
 
 if __name__ == "__main__":
-    # app.run(host="127.0.0.1", debug=True)
+    import os
+
+    os.chdir("..")
+    app.run(host="127.0.0.1", debug=True)
     # app.run(debug=True, threaded=True)
-    app.run(threaded=True)
+    # app.run(threaded=True)

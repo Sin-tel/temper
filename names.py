@@ -60,11 +60,11 @@ names = [
     ("würschmidt", "393216/390625"),
     # rank 3
     ("[unnamed]", "55/54"),
-    ("biyatismic", "121/120"),  # this is just misspelled??
+    ("biyatismic", "121/120"),  # this is just misspelled?? protomere?
     ("breed", "2401/2400"), # breedsmic?
     ("buzurgic", "169/168"),  # aka dhanvantari
     ("grossmic", "144/143"),  # needs better name!
-    ("hemifamity", "5120/5103"),  # this name is so awful
+    ("hemifamity", "5120/5103"),  # this name is so awful. pele?
     ("island", "676/675"),
     ("konbini", "56/55"),
     ("landscape", "250047/250000"),

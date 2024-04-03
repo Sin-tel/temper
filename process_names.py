@@ -8,7 +8,8 @@ from names import names
 
 TempDict: TypeAlias = dict[tuple[int, ...], str]
 
-comma_filename = "names.json"
+# can be static if we don't generate it dynamically
+comma_filename = "temper/res/names.json"
 
 
 def write_names() -> None:
