@@ -4,8 +4,11 @@ import git
 from timeout import time_limit, TimeoutException
 from info import *
 
+# from werkzeug.middleware.profiler import ProfilerMiddleware
+
 
 app = f.Flask(__name__)
+# app.wsgi_app = ProfilerMiddleware(app.wsgi_app)
 
 
 @app.route("/")
@@ -55,8 +58,13 @@ def update():
 
 
 @app.route("/xen")
-def test():
+def xen():
     return '<img src="static/xen.png" width="550">'
+
+
+@app.route("/test")
+def test():
+    return "hey"
 
 
 @app.errorhandler(500)
@@ -66,5 +74,6 @@ def internal_error(exception):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    # app.run()
+    # app.run(host="127.0.0.1", debug=True)
+    # app.run(debug=True, threaded=True)
+    app.run(threaded=True)
