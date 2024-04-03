@@ -198,18 +198,6 @@ def preimage(M):
     return sol
 
 
-# Find a preimage of M
-# Amounts to solving MX = I
-def preimage2(M):
-    gens = []
-
-    rank = M.shape[0]
-
-    gens = solve_diophantine(M, np.eye(rank, dtype=np.int64))
-
-    return gens
-
-
 # simplify list of intervals wrt a comma basis.
 # The comma basis should be in reduced LLL form for this to work properly.
 # TODO: figure out if the weight matrix here actually helps
@@ -248,7 +236,7 @@ def find_edos(T, subgroup):
 
     c = kernel(T)
 
-    octave_div = T[0, 0]
+    # octave_div = T[0, 0]
     # print("octave mult:", octave_div)
     search_range = (4.5, 1999.5)
 
@@ -257,7 +245,6 @@ def find_edos(T, subgroup):
     seen = set()
     count = 0
     count2 = 0
-    count3 = 0
     for m1 in Pmaps(search_range, subgroup):
         count2 += 1
         if count2 > 20000:
@@ -265,8 +252,6 @@ def find_edos(T, subgroup):
 
         # if it tempers out all commas
         if not np.any(m1 @ c):
-            count3 += 1
-
             # if it is not contorted
             if np.gcd.reduce(m1.flatten().tolist()) == 1:
                 badness = temp_badness((m1, subgroup))
@@ -282,7 +267,6 @@ def find_edos(T, subgroup):
 
     # print("list count: ", len(m_list))
     print("nr edos checked: ", count2)
-    print("nr found: ", count3)
 
     # sort by badness
     m_list.sort(key=lambda l: l[1])
@@ -396,6 +380,8 @@ def temp_badness(temp):
 
     j = log_subgroup(S)[np.newaxis, :]
     W = np.diagflat(1.0 / j)
+    # W = np.diagflat(1.0 / np.array(S).astype(np.double))
+    # W = np.eye(d)
 
     # normalize W so it has det(W) = 1
     W_det = np.linalg.det(W)
