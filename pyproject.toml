@@ -46,5 +46,7 @@ disable=[
 	"too-few-public-methods",
 	"too-many-lines",
 	"too-many-return-statements",
+
+	"fixme",
 	"wildcard-import",
 ]

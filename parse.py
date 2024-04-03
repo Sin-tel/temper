@@ -1,11 +1,30 @@
 # parsing and formatting utils
 import re
 import numpy as np
+from typing import Optional
+from markupsafe import Markup
 from lib_temper import *
+from wiki.ratios import wiki_ratios
+from wiki.pages import wiki_pages
 
 
 def cents(x, prec=3):
     return "{1:.{0}f}".format(prec, 1200 * x)
+
+
+def ratio_with_link(frac: Fraction) -> str:
+    frac_str = str(frac)
+    p = (frac.numerator, frac.denominator)
+    if p in wiki_ratios:
+        return Markup(f'<a href="https://en.xen.wiki/w/{p[0]}/{p[1]}">{frac_str}</a>')
+    return str(frac)
+
+
+def page_with_link(titles: list[str], display: str) -> str:
+    for title in titles:
+        if title in wiki_pages:
+            return Markup(f'<a href="https://en.xen.wiki/w/{title}">{display}</a>')
+    return display
 
 
 def parse_subgroup(s):

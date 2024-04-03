@@ -9,7 +9,7 @@ from names import names
 TempDict: TypeAlias = dict[tuple[int, ...], str]
 
 # can be static if we don't generate it dynamically
-comma_filename = "temper/res/names.json"
+comma_filename = "res/names.json"
 
 
 def write_names() -> None:

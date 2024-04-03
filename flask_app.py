@@ -31,7 +31,7 @@ def result():
         elif "submit_comma" in args:
             temp = from_commas(args)
         else:
-            return "error"
+            raise ValueError("nothing submitted")
 
         try:
             with time_limit(5):
@@ -53,8 +53,7 @@ def update():
         repo.heads.main.set_tracking_branch(origin.refs.main).checkout()
         origin.pull()
         return "", 200
-    else:
-        return "", 400
+    return "", 400
 
 
 @app.route("/xen")
@@ -74,9 +73,7 @@ def internal_error(exception):
 
 
 if __name__ == "__main__":
-    import os
-
-    os.chdir("..")
-    app.run(host="127.0.0.1", debug=True)
+    # app.run(host="127.0.0.1", debug=True)
+    app.run(debug=True)
     # app.run(debug=True, threaded=True)
     # app.run(threaded=True)

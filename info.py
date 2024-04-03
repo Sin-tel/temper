@@ -2,6 +2,7 @@
 
 import time
 from typing import Optional, Any
+from markupsafe import Markup
 
 import numpy as np
 from parse import *
@@ -114,14 +115,18 @@ def info(temp, options) -> dict[str, Any]:
 
     families_str = ""
     if len(families) > 0:
-        families_str += ", ".join(sorted(list(families)))
+        f = [page_with_link([f"{s} family", s], s) for s in sorted(list(families))]
+        families_str += ", ".join(f)
     if len(families_weak) > 0:
         if families_str != "":
             families_str += ", "
-        families_str += "(" + ", ".join(sorted(list(families_weak))) + ")"
+        f = [page_with_link([f"{s} family", s], s) for s in sorted(list(families_weak))]
+        families_str += "(" + ", ".join(f) + ")"
 
+    # TODO: link wiki
     if families_str != "":
         res["families"] = families_str
+
     # The metric used for complexity calculations,
     # which should be the same regardless of the weights for optimization
     # (used for calculating comma and basis)
@@ -146,8 +151,9 @@ def info(temp, options) -> dict[str, Any]:
         ## format spaces
         vec = "".join(["{1: {0}d}".format(c_length[i], c[i]) for i in range(len(c))])
         vec = vec.replace(" ", "&nbsp;")
-        vec = '<span style="font-family: var(--mono)">[' + vec + "]<sup>T</sup></span>&nbsp; "
-        comma_str.append(vec + str(ratio(c, s)))
+        vec = Markup(f'<span style="font-family: var(--mono)">[{vec}]</span>&nbsp; ')
+        rat = ratio(c, s)
+        comma_str.append((vec + ratio_with_link(rat)))
 
     res["comma basis"] = "<br>".join(comma_str)
 
@@ -243,9 +249,9 @@ def info(temp, options) -> dict[str, Any]:
 
     res["mapping"] = format_matrix(T)
 
-    gens_print = [ratio(g, s) for g in gens.T]
+    gens_print = [ratio_with_link(ratio(g, s)) for g in gens.T]
 
-    res["preimage"] = list(map(str, gens_print))
+    res["preimage"] = gens_print
 
     if "weights" in options:
         weight = options["weights"]

@@ -15,7 +15,7 @@
 :root{
 --sans: 400 16px/1.5 "Open Sans", sans-serif;
 --mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, 'Courier New', monospace;
---c1:#0074d9; /*button*/
+--c1:#0059a6 ; /*button, link*/
 --c2:#ddd;  /*text field*/
 --c3:#F5F5F5;
 --c4:#0A0A0A;
