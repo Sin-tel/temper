@@ -2,6 +2,9 @@ import urllib.request
 import json
 import time
 
+# last scrape was: 2024-04-03
+
+
 headers = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -25,18 +28,21 @@ def get(cont=None):
 
 
 table = get()
-titles: list[str] = []
+titles: set[str] = set()
 while True:
     for p in table["query"]["allpages"]:
         title = p["title"]
-        titles.append(title)
+        titles.add(title.lower())
 
     if "continue" in table:
         cont = table["continue"]["apcontinue"]
-        # print(cont)
-        time.sleep(0.2)  # don't get banned
+        time.sleep(0.1)  # don't get banned
         table = get(cont)
     else:
         break
 
-print(repr(titles))
+print("wiki_pages = {")
+titles = sorted(list(titles))
+for k in titles:
+    print(f"\t{repr(k)},")
+print("}")
