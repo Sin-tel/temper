@@ -83,6 +83,7 @@ names = [
     ("supermagic", "875/864"),  # keemic?
     ("trimitone", "8019/8000"),
     ("valinorismic", "176/175"),  # -> valinor
+    ("demeter", "686/675"), # aka sengic
     # rank 4
     ("animist", "105/104"),
     ("biome", "91/90"),
