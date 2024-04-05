@@ -49,4 +49,6 @@ disable=[
 
 	"fixme",
 	"wildcard-import",
+	"unused-wildcard-import",
+	"consider-using-f-string",
 ]

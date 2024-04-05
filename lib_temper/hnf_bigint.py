@@ -7,9 +7,10 @@
 # In practice, this seems to be pretty fast
 
 import numpy as np
+from .util_types import IntMat
 
 
-def hnf_bigint(m):
+def hnf_bigint(m: IntMat) -> IntMat:
     h = lattice_reduction(m.tolist())
     return np.array(h, dtype=np.int64)
 

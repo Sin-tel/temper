@@ -4,8 +4,8 @@ from fractions import Fraction
 
 # "inverted" farey sequence, not including 0/1 and 1/1
 # this should be the same as the "integer limit"
-def farey(n):
-    l = []
+def farey(n: int) -> list[Fraction]:
+    l: list[Fraction] = []
     # We know first two terms are
     # 0/1 and 1/n
     x1 = 0

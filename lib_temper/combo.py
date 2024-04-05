@@ -12,7 +12,7 @@ def getOffsets(size, total, maxValue):
     if size == 1 and total == maxValue:
         yield [maxValue]
         return
-    while total >= 0 and size * maxValue >= total:
+    while 0 <= total <= size * maxValue:
         for prefix in getOffsets(size - 1, total - maxValue, maxValue):
             yield prefix + [maxValue]
         maxValue -= 1

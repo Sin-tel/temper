@@ -1,14 +1,12 @@
 # interval arithmetic
 
 from fractions import Fraction
-from numbers import Real
-from typing import TypeAlias, Any, Optional
 import numpy as np
-from .util_types import IntArray, IntVec, FloatVec
+from .util_types import IntArray, IntVec, FloatVec, Subgroup, SubgroupInt
 
 
 # prime vector to ratio. subgroup may be rational
-def ratio(v: IntArray, subgroup: list[int]) -> Fraction:
+def ratio(v: IntVec, subgroup: Subgroup) -> Fraction:
     v = v.flatten().tolist()
     p = 1
     q = 1
@@ -23,7 +21,7 @@ def ratio(v: IntArray, subgroup: list[int]) -> Fraction:
 
 # fraction to prime vector (aka prime factorization)
 # only works for integer subgroups (doesn't check for (co)primality in the basis)
-def factors(fr, subgroup: list[int]) -> IntVec:
+def factors(fr: int | Fraction | tuple[int, int], subgroup: SubgroupInt) -> IntVec:
     f_vector = np.zeros((len(subgroup), 1), dtype=np.int64)
 
     if isinstance(fr, tuple):
@@ -50,15 +48,14 @@ def factors(fr, subgroup: list[int]) -> IntVec:
 
 
 # make a prime vector positive
-def make_positive(v, subgroup):
+def make_positive(v: IntVec, subgroup: Subgroup) -> IntVec:
     if log_interval(v, subgroup) < 0:
         return -v
-    else:
-        return v
+    return v
 
 
 # prime vector span in octaves
-def log_interval(v, subgroup):
+def log_interval(v: IntVec, subgroup: Subgroup) -> float:
     vn = v.flatten()
     logs = log_subgroup(subgroup)
 
@@ -66,5 +63,5 @@ def log_interval(v, subgroup):
 
 
 # subgroup in octaves as numpy array
-def log_subgroup(subgroup: list[Real]) -> FloatVec:
+def log_subgroup(subgroup: Subgroup) -> FloatVec:
     return np.log2(np.array(subgroup).astype(np.float64))

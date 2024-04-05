@@ -1,22 +1,21 @@
 # collection of functions for dealing with regular temperaments
 
-from . import olll
-from fractions import Fraction
+from typing import Optional, TypeVar
+
 import numpy as np
 
-# from math import gcd
-# from primes import primes
-from itertools import combinations
+from . import olll
 from . import diophantine
 from .hnf_bigint import hnf_bigint
 
+from .util_types import IntMat, FloatMat
 from .subgroup import *
 from .optimize import *
 from .combo import comboBySum
 
 
 # Find the hermite normal form of M
-def hnf(M, remove_zeros=False, transformation=False):
+def hnf(M: IntMat, remove_zeros: bool = False, transformation: bool = False) -> IntMat:
     assert M.ndim == 2
 
     try:
@@ -26,24 +25,23 @@ def hnf(M, remove_zeros=False, transformation=False):
             unimod = np.array(solution[1]).astype(np.int64)
         else:
             res = hnf_bigint(M)
-    except OverflowError:
-        raise OverflowError("Your numbers are too big!")
+    except OverflowError as e:
+        raise OverflowError("Your numbers are too big!") from e
 
     if remove_zeros:
         idx = np.argwhere(np.all(res[:] == 0, axis=1))
         res = np.delete(res, idx, axis=0)
 
     if transformation:
-        return res, unimod
-    else:
-        return res
+        return res, unimod  # type: ignore[return-value]
+    return res
 
 
 # Find the left kernel (nullspace) of M.
 # Adjoin an identity block matrix and solve for HNF.
 # This is equivalent to the highschool maths method,
 # but using HNF instead of Gaussian elimination.
-def kernel(M):
+def kernel(M: IntMat) -> IntMat:
     assert M.ndim == 2
     r, d = M.shape
 
@@ -55,16 +53,20 @@ def kernel(M):
 
 
 # Find the right kernel (nullspace) of M
-def cokernel(M):
+def cokernel(M: IntMat) -> IntMat:
     assert M.ndim == 2
     return kernel(M.T).T
 
 
+T = TypeVar("T", bound=IntMat | FloatMat)
+
+
 # LLL reduction
 # Tries to find the smallest basis vectors in some lattice
+# Operates on columns
 # M: Map
 # W: Weight matrix (metric)
-def LLL(M, W=None, delta=0.99):
+def LLL(M: T, W: Optional[FloatMat] = None, delta: float = 0.99) -> T:
     if W is None:
         W = np.eye(M.shape[0])
     res = olll.reduction(np.copy(M).T, delta=delta, W=W).T

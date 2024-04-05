@@ -1,9 +1,10 @@
 # parsing and formatting utils
 import re
 import numpy as np
-from typing import Optional
 from markupsafe import Markup
+
 from lib_temper import *
+from lib_temper.util_types import IntMat
 from wiki.ratios import wiki_ratios
 from wiki.pages import wiki_pages
 
@@ -27,7 +28,7 @@ def page_with_link(titles: list[str], display: str) -> str:
     return display
 
 
-def parse_subgroup(s):
+def parse_subgroup(s: str) -> tuple[IntMat, Subgroup]:
     s = [Fraction(i) for i in re.split(r"[\\.,; ]+", s)]
 
     # make sure they are all > 1
@@ -36,12 +37,15 @@ def parse_subgroup(s):
         if np.log(p) - np.log(q) < 0.0:
             s[i] = Fraction(q, p)
 
+    # if only one number is supplied, we interpret it as a prime limit
     if len(s) == 1:
-        expanded = p_limit(s[0])
+        prime = s[0]
+        assert prime.denominator == 1, "Prime limit must be integer"
+        expanded = p_limit(prime.numerator)
         return np.eye(len(expanded), dtype=np.int64), expanded
-    else:
-        s_basis, expanded = get_subgroup_basis(s)
-        return s_basis, expanded
+
+    s_basis, expanded = get_subgroup_basis(s)
+    return s_basis, expanded
 
 
 wart_map = {
@@ -63,13 +67,13 @@ wart_map = {
 }
 
 
-def parse_edos(s, subgroup):
+def parse_edos(s: str, subgroup: Subgroup) -> list[IntVec]:
     # split string by separators (,.;& ) but ignore when in square brackets
     # "12, 17[+5, 8], 22"
     # => ["12", "17[+5, 8]", "22"]
     s = re.split(r"[\\.,; &]+(?!(?:[^,\[\]]+,)*[^,\[\]]+])", s.lower().strip())
 
-    edos = []
+    edos: list[IntVec] = []
 
     log_s = log_subgroup(subgroup)
     log_s = log_s / log_s[0]  # fix equave
@@ -100,19 +104,19 @@ def parse_edos(s, subgroup):
             best_m = p_map
             edos.append(best_m)
         else:
-            adjust = re.findall(r"\[.*\]", e)
-            if len(adjust) > 0:
+            adjust_matches: list[str] = re.findall(r"\[.*\]", e)
+            if len(adjust_matches) > 0:
                 # here we try to parse formats like '17[+5]'
-                adjust = adjust[0][1:-1]
+                adjust = adjust_matches[0][1:-1]
                 adjust = re.split(r"[\\.,; &]+", adjust)
                 for l in adjust:
                     p = re.split(r"([+-]+)", l)[1:]
                     adj_str = p[0]
-                    rat = re.split(r"[/:]", p[1])
-                    if len(rat) == 1:
-                        rat = Fraction(int(rat[0]))
+                    rat_match = re.split(r"[/:]", p[1])
+                    if len(rat_match) == 1:
+                        rat = Fraction(int(rat_match[0]))
                     else:
-                        rat = Fraction(int(rat[0]), int(rat[1]))
+                        rat = Fraction(int(rat_match[0]), int(rat_match[1]))
 
                     index = None
                     for i, pr in enumerate(subgroup):
@@ -140,10 +144,10 @@ def parse_edos(s, subgroup):
                         w_prime = wart_map[w[0]]
 
                         index = None
-                        for i, p in enumerate(subgroup):
-                            assert p.denominator == 1, "Warts can't be used in rational subgroups"
-                            if w_prime == p.numerator:
-                                index = i
+                        for k, v in enumerate(subgroup):
+                            assert v.denominator == 1, "Warts can't be used in rational subgroups"
+                            if w_prime == v.numerator:
+                                index = k
                                 break
                         if index is None:
                             raise AssertionError("Wart not in subgroup")
@@ -171,7 +175,7 @@ ratio_pattern = r"(\d+)[/:](\d+)"
 vector_pattern = r"[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]"
 
 
-def parse_intervals(c, s):
+def parse_intervals(c: str, s: SubgroupInt) -> list[IntVec]:
     commas = []
     for n, d in re.findall(ratio_pattern, c):
         commas.append(factors((int(n), int(d)), s))
@@ -185,7 +189,7 @@ def parse_intervals(c, s):
     return commas
 
 
-def format_matrix(matrix):
+def format_matrix(matrix: IntMat) -> str:
     """Format a matrix using LaTeX syntax"""
     body_lines = [" & ".join(map(str, row)) for row in matrix]
     body = "\\\\\n".join(body_lines)
@@ -195,7 +199,7 @@ def format_matrix(matrix):
 
 # given a map for some edo, return the string representation in the new format
 # (to replace warts notation)
-def edo_map_notation(this_map, subgroup):
+def edo_map_notation(this_map: IntVec, subgroup: Subgroup) -> str:
     this_edo = this_map[0]
 
     # divide by equave to fix non-octave temps
