@@ -81,20 +81,23 @@ def parse_edos(s, subgroup):
         edo_num = int(res[0])
         p_map = patent_map(edo_num, subgroup)
         if res[1] == "":
-            # if the input was simply an integer, then find the best mapping
-            # TODO: this probably doesn't work correctly on subgroups
-            best_b = 100000.0
-            best_m = None
-            search_range = (edo_num - 0.5, edo_num + 0.5)
-            for m1 in Pmaps(search_range, subgroup):
-                badness = temp_badness((m1, subgroup))
-                if badness < best_b:
-                    best_b = badness
-                    best_m = np.copy(m1)
-            if best_m is None:
-                print(f"Somehow we did not find any patent maps for {edo_num} in {subgroup}")
-                # fallback
-                best_m = p_map
+            ## if the input was simply an integer, then find the best mapping
+            ## TODO: this probably doesn't work correctly on subgroups
+            ## REVERTED for now, this is rather annoying.
+            ## needs a switch and also search over possible combinations
+            # best_b = 100000.0
+            # best_m = None
+            # search_range = (edo_num - 0.5, edo_num + 0.5)
+            # for m1 in Pmaps(search_range, subgroup):
+            #     badness = temp_badness((m1, subgroup))
+            #     if badness < best_b:
+            #         best_b = badness
+            #         best_m = np.copy(m1)
+            # if best_m is None:
+            #     print(f"Somehow we did not find any patent maps for {edo_num} in {subgroup}")
+            #     # fallback
+            #     best_m = p_map
+            best_m = p_map
             edos.append(best_m)
         else:
             adjust = re.findall(r"\[.*\]", e)
