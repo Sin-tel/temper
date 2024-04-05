@@ -64,10 +64,10 @@ def cokernel(M):
 # Tries to find the smallest basis vectors in some lattice
 # M: Map
 # W: Weight matrix (metric)
-def LLL(M, W=None):
+def LLL(M, W=None, delta=0.99):
     if W is None:
         W = np.eye(M.shape[0])
-    res = olll.reduction(np.copy(M).T, delta=0.99, W=W).T
+    res = olll.reduction(np.copy(M).T, delta=delta, W=W).T
 
     # sort them by complexity
     # actually, this might be redundant.
@@ -130,7 +130,7 @@ def integer_det(M):
 # Order of factorization.
 # For a saturated basis this is 1.
 def factor_order(M):
-    r, d = M.shape
+    r = M.shape[0]
     return integer_det(hnf(M.T)[:r].T)
 
 
@@ -143,9 +143,8 @@ def canonical(M):
     if r > d:
         # comma basis
         return antitranspose(defactored_hnf(antitranspose(M)))
-    else:
-        # mapping
-        return defactored_hnf(M)
+    # mapping
+    return defactored_hnf(M)
 
 
 # Solve AX = B in the integers
@@ -170,7 +169,7 @@ def solve_diophantine(A, B):
     if nullity <= 0:
         nullity = 0
 
-    H, U = hnf(aug, transformation=True)
+    _, U = hnf(aug, transformation=True)
 
     p2 = U.shape[0] - nullity
     p1 = p2 - B.shape[1]
@@ -230,7 +229,7 @@ def patent_map(edo_num, subgroup):
 # Search for edo maps (GPVs) that are consistent with T up to some limit
 def find_edos(T, subgroup):
     assert T.ndim == 2
-    r, d = T.shape
+    r = T.shape[0]
     if r == 1:
         return
 
@@ -262,7 +261,7 @@ def find_edos(T, subgroup):
                 if m1[0][0] not in seen:
                     seen.add(m1[0][0])
                     count += 1
-                    if count > r + 20:  # rank + 25 should be enough
+                    if count > r + 50:  # rank + 50 should be enough
                         break
 
     # print("list count: ", len(m_list))
@@ -286,7 +285,7 @@ def find_edos(T, subgroup):
 # Select <rank> edos that, when joined together, are equivalent to the temperament
 def find_join(T, subgroup, m_list):
     assert T.ndim == 2
-    r, d = T.shape
+    r = T.shape[0]
 
     count = 0
     for combo in comboBySum(r, 0, len(m_list) - 1):
@@ -297,7 +296,7 @@ def find_join(T, subgroup, m_list):
 
         if np.all(m_hnf == T):
             print("number of combos checked: " + str(count))
-            return [m for m in m_new]
+            return list(m_new)
 
         if count > 500:
             break
