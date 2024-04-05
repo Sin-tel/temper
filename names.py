@@ -63,36 +63,38 @@ names = [
 
     # rank 3
     ("144/143", "144/143"),  # grossmic? needs better name!
-    ("1728/1715", "1728/1715"),  # orwellismic, bad. confusing wrt orwell
     ("55/54", "55/54"), # unnamed
     ("729/728", "729/728"),  # squbemic, needs better name
+    ("apollo", "100/99"), # ptolemismic
+    ("arcturus", "15625/15309"),
     ("breed", "2401/2400"), # breedsmic?
     ("buzurg", "169/168"),  # aka buzurg(ism)ic, dhanvantari
     ("counterpyth", "1216/1215"),
-    ("demeter", "686/675"), # aka sengic
+    ("demeter", "686/675"), # sengic
+    ("guanyin", "1728/1715"),  # orwellismic
+    ("indra", "16875/16807"), # mirkwai
     ("island", "676/675"),
     ("konbini", "56/55"),
     ("landscape", "250047/250000"),
     ("major minthmic", "352/351"),  # needs better name!
     ("marvel", "225/224"),
     ("marveltwin", "325/324"),
-    ("mirkwai", "16875/16807"), # indra?
-    ("mothwellsmic", "99/98"),  # needs better name
+    ("minerva", "5632/5625"), # vishdel
+    ("mothwellsmic", "99/98"),  # needs better name!
+    ("odin", "[-17 24 -18 0 6]"),
     ("pele", "5120/5103"),  # hemifamity
     ("pentacircle", "896/891"),
     ("pine", "4000/3993"),
-    ("protomere", "121/120"),  # aka biyatismic
-    ("ptolemismic", "100/99"), # apollo?
-    ("ragismic", "4375/4374"),
+    ("ragismic", "4375/4374"), # -> thor?
     ("starling", "126/125"),
     ("supermagic", "875/864"),
+    ("symbiotic", "19712/19683"),
+    ("thor", "1890625/1889568"),
     ("trimitone", "8019/8000"),
-    ("valinorismic", "176/175"),  # valinor?
     ("vulkan", "512/495"),
-    ("zeus", "6144/6125"),  # aka porwell
-    # ("thor", "1890625/1889568"),
-    # ("odin", "[-17 24 -18 0 6]"),
-    # ("ganesha", "5632/5625"), # vishdel?
+    ("zeus", "121/120"),  # biyatismic
+    ("zeus", "176/175"),  # valinorismic
+    ("zeus", "6144/6125"),  # porwell
 
     # rank 4
     ("animist", "105/104"),
