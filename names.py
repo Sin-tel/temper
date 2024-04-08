@@ -17,6 +17,7 @@ names = [
     ("archytas", "64/63"),
     ("diaschismic", "2048/2025"),
     ("diaschismic", "2147483648/2109289329"),
+    ("liese", "[-9 11 0 -3]"),
     ("dicot", "25/24"),
     ("didacus", "3136/3125"),
     ("diminished", "648/625"),
@@ -48,6 +49,7 @@ names = [
     ("rainy", "2100875/2097152"),
     ("rastmic", "243/242"),
     ("schismatic", "32805/32768"),
+    ("schismatic", "[25 -14 0 -1]"), # garibaldi, garischismic
     ("semaphore", "49/48"),
     ("sensamagic", "245/243"),
     ("sensi", "1647086/1594323"),  # 2.3.7
@@ -76,13 +78,14 @@ names = [
     ("island", "676/675"),
     ("konbini", "56/55"),
     ("landscape", "250047/250000"),
-    ("major minthmic", "352/351"),  # needs better name!
+    ("parapyth", "352/351"),
     ("marvel", "225/224"),
     ("marveltwin", "325/324"),
     ("minerva", "5632/5625"), # vishdel
     ("mothwellsmic", "99/98"),  # needs better name!
     ("odin", "[-17 24 -18 0 6]"),
     ("pele", "5120/5103"),  # hemifamity
+    ("akea", "2200/2187"),  # small tetracot diesis
     ("pentacircle", "896/891"),
     ("pine", "4000/3993"),
     ("ragismic", "4375/4374"), # -> thor?
