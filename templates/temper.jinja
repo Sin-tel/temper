@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href= "{{ url_for('static', filename = 'basic.css') }}">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>temper</title>
+	<link rel="shortcut icon" type="image/jpg" href="{{ url_for('static', filename = 'icon.png') }}"/>
+</head>
+<body>
+<div class="normal">
+
+<h1>Temperament calculator</h1>
+<p><b><i>New!</i></b> try <a href="{{url_for('search')}}">search</a></p>
+<hr>
+<form action = "{{ url_for('result') }}" method = "GET">
+	<p>Prime limit or subgroup<br>
+		<input type = "text" name = "subgroup" required />
+	</p>
+	Reduce generators:
+	<br>
+	<input type="radio" id="off" name="reduce" value="off">
+	<label for="off">off</label>
+
+	<input type="radio" id="reduce" name="reduce" value="on" checked="checked">
+	<label for="reduce">oct. reduce</label>
+
+	<input type="radio" id="spine" name="reduce" value="spine">
+	<label for="spine">spine+commas</label>
+
+	<br>
+	Weights:
+	<br>
+	<input type="radio" id="tenney" name="weights" value="tenney">
+	<label for="tenney">tenney</label>
+
+	<input type="radio" id="weil" name="weights" value="weil" checked="checked">
+	<label for="weil">weil</label>
+
+	<input type="radio" id="unweighted" name="weights" value="unweighted">
+	<label for="unweighted">unweighted</label>
+	
+	</p>
+	<p>Target intervals (optional)<br>
+		<input type = "text" name = "target" /></p>
+	<hr>
+	<p>List of edos<br>
+		<input type = "text" name = "edos" /></p>
+	<p><input type = "submit" name = "submit_edo" value = "submit"/></p>
+	<hr>
+	<p>List of commas<br>
+		<textarea name = "commas" rows="5"/></textarea> </p>
+	<p><input type = "submit" name = "submit_comma" value = "submit"/></p>
+</form>
+
+<hr>
+
+
+<p>
+Most of the methods used here can be found at <a href="https://en.xen.wiki/">xen.wiki</a>. 
+The derivation of the optimizations can be found <a href="https://en.xen.wiki/w/User:Sintel/Generator_optimization"> here</a> as well. 
+Many thanks to Graham Breed at <a href="http://x31eq.com/temper/">x31eq.com</a> for his explanation of his methods.
+</p>
+
+<p>Made by <a href="https://sintel.website/">sintel</a>. The code is open source and can be found on <a href="https://github.com/Sin-tel/temper">Github</a>.<p>
+
+</div>
+</body>
+</html>
+

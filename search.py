@@ -21,6 +21,11 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     if (basis.shape[0] == basis.shape[1]) and (basis == np.eye(basis.shape[0])).all():
         s_non_prime = False
 
+    badness_type = "cangwu"
+    if "badness" in args:
+        if args["badness"] == "dirichlet":
+            badness_type = "dirichlet"
+
     t_map = np.eye(len(s), dtype=np.int64)
     if "commas" in args:
         t_map, _ = from_commas(args["commas"], basis, s_expanded)
@@ -38,8 +43,14 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     W_wilson = basis.T @ np.linalg.inv(metric_wilson(s_expanded)) @ basis
     W_wilson = W_wilson.astype(np.float64)
 
-    # W = basis.T @ np.linalg.inv(metric_weil_k(s_expanded, 1200.0)) @ basis
-    # W_inv = np.linalg.inv(W)
+    W_weil = basis.T @ np.linalg.inv(metric_weil_k(s_expanded, 800.0)) @ basis
+    W_weil = W_weil.astype(np.float64)
+    W_weil_inv = np.linalg.inv(W_weil)
+
+    # normalize W so it has det(W) = 1
+    W_det = np.linalg.det(W_weil_inv)
+    assert W_det > 0
+    W_weil_inv = W_weil_inv / np.power(W_det, 1 / W_weil_inv.shape[0])
 
     log_s = np.log2(np.array(s).astype(np.float64))
 
@@ -77,6 +88,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
     checked: set[tuple[int, ...]] = set()
 
+    f_prev = None
+
     for i in range(6):
         if total_count > 200:
             break
@@ -87,21 +100,26 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
         found = np.abs(B[0:dim].T)
 
-        # if np.any(found[:, 0] > 311):
-        if np.any(found[:, 0] > 1000):
+        if np.any(found[:, 0] > 600):
             break
 
         assert np.allclose(found - np.round(found), 0)
         found = np.round(found).astype(np.int64)
 
-        # print(B)
-        print(found[:, 0])
+        if f_prev and f_prev == tuple(found[:, 0]):
+            break
+        f_prev = tuple(found[:, 0])
+        print(f_prev)
 
         edo_list = []
         for k in found:
             if 2 < k[0] <= 311:
                 label = edo_map_notation(k, s)
-                b = temp_badness((k[None, :], s), W_tenney_inv)
+                if badness_type == "dirichlet":
+                    b = temp_badness((k[None, :], s), W_tenney_inv)
+                else:
+                    b = height(k[None, :], W_weil_inv)
+
                 edo_list.append((label, k, b, "edos"))
         edo_list = sorted(edo_list, key=lambda v: v[2])
 
@@ -138,7 +156,10 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
                     label = ", ".join(comma_rat)
                     label_type = "commas"
 
-                b = temp_badness((t_mat, s), W_tenney_inv)
+                if badness_type == "dirichlet":
+                    b = temp_badness((t_mat, s), W_tenney_inv)
+                else:
+                    b = height(t_mat, W_weil_inv)
 
                 by_rank[r_s].append((label, t_mat, b, label_type))
                 total_count += 1
@@ -157,7 +178,9 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         for k in res_list[0:20]:
             t_mat = np.atleast_2d(k[1])
             r, d = t_mat.shape
-            compl = (2 * d) ** (r - 1) * height(t_mat, W_tenney_inv) / np.sqrt(d)
+            compl = (d) ** (r - 1) * height(t_mat, W_tenney_inv) / np.sqrt(d)
+            # compl = height(t_mat, W_tenney_inv) / np.sqrt(d)
+            # compl = height(t_mat, W_tenney_inv) / np.sqrt(d)
 
             if s_non_prime:
                 t_expanded = hnf(cokernel(basis @ kernel(t_mat)))

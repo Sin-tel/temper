@@ -14,6 +14,28 @@
 <hr>
 
 <form action = "{{ url_for('search') }}" method = "GET">
+	Sort by:
+	<br>
+	<input type="radio" id="cangwu" name="badness" value="cangwu"
+		{% if args is defined %}
+		{% if args.badness == "cangwu" %}
+		checked="checked"
+		{% endif %}
+		{% else %}
+		checked="checked"
+		{% endif %}
+	>
+	<label for="cangwu">Cangwu badness</label>
+
+	<input type="radio" id="dirichlet" name="badness" value="dirichlet"
+		{% if args is defined %}
+		{% if args.badness == "dirichlet" %}
+		checked="checked"
+		{% endif %}
+		{% endif %}
+	>
+	<label for="dirichlet">Dirichlet badness</label>
+
 	<p>Prime limit or subgroup<br>
 		<input type = "text" name = "subgroup"
 			{% if args is defined %}

@@ -18,8 +18,8 @@ app = f.Flask(__name__)
 def index():
     if f.request.method == "GET":
         args = f.request.args
-        return f.render_template("./temper.html", args=args)
-    return f.render_template("./temper.html")
+        return f.render_template("./temper.jinja", args=args)
+    return f.render_template("./temper.jinja")
 
 
 @app.route("/search", methods=["GET"])
@@ -27,14 +27,14 @@ def search():
     if f.request.method == "GET":
         args = f.request.args.to_dict()
         if len(args) == 0:
-            return f.render_template("./search.html")
+            return f.render_template("./search.jinja")
 
         for k in list(args.keys()):
             if args[k] == "":
                 del args[k]
 
         res = temperament_search(args)
-        return f.render_template("./search.html", args=args, res=res)
+        return f.render_template("./search.jinja", args=args, res=res)
 
     raise ValueError("nothing submitted")
 
@@ -67,7 +67,7 @@ def result():
         except TimeoutException as e:
             raise TimeoutException("Calculation took too long!") from e
 
-        return f.render_template("./result.html", res=html_info, args=f.request.args)
+        return f.render_template("./result.jinja", res=html_info, args=f.request.args)
     raise ValueError("nothing submitted")
 
 
