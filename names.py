@@ -3,7 +3,8 @@
 
 # fmt: off
 names = [
-    # temps not organised in the above and temps in different subgroups:
+# temps organised only by rank:
+    # rank 2
     ('512/507', '512/507'),
     ('diaschismic', '2147483648/2109289329'),
     ('flattone', '137781/131072'),
@@ -26,28 +27,30 @@ names = [
     ('superpyth', '20480/19683'),
     ('supra', '8192/8019'),
     ('tridecimal', '1053/1024'),
-    ('144/143', '144/143'),
-    ('55/54', '55/54'),
-    ('729/728', '729/728'),
-    ('apollo', '100/99'),
+
+    # rank 3
+    ("144/143", "144/143"),  # grossmic? needs better name!
+    ("55/54", "55/54"), # unnamed
+    ("729/728", "729/728"),  # squbemic, needs better name
+    ("apollo", "100/99"), # ptolemismic
     ('arcturus', '15625/15309'),
-    ('breed', '2401/2400'),
-    ('buzurg', '169/168'),
+    ("breed", "2401/2400"), # breedsmic?
+    ("buzurg", "169/168"),  # aka buzurg(ism)ic, dhanvantari
     ('counterpyth', '1216/1215'),
-    ('demeter', '686/675'),
-    ('guanyin', '1728/1715'),
-    ('indra', '16875/16807'),
+    ("demeter", "686/675"), # sengic
+    ("guanyin", "1728/1715"),  # orwellismic
+    ("indra", "16875/16807"), # mirkwai
     ('island', '676/675'),
     ('konbini', '56/55'),
     ('landscape', '250047/250000'),
     ('parapyth', '352/351'),
     ('marvel', '225/224'),
     ('marveltwin', '325/324'),
-    ('minerva', '5632/5625'),
-    ('mothwellsmic', '99/98'),
-    ('odin', '[-17 24 -18 0 6]'),
-    ('pele', '5120/5103'),
-    ('akea', '2200/2187'),
+    ("minerva", "5632/5625"), # vishdel
+    ("mothwellsmic", "99/98"),  # needs better name!
+    ("odin", "[-17 24 -18 0 6]"),
+    ("pele", "5120/5103"),  # hemifamity
+    ("akea", "2200/2187"),  # small tetracot diesis
     ('pentacircle', '896/891'),
     ('pine', '4000/3993'),
     ('ragismic', '4375/4374'),
@@ -57,20 +60,22 @@ names = [
     ('thor', '1890625/1889568'),
     ('trimitone', '8019/8000'),
     ('vulkan', '512/495'),
-    ('zeus', '121/120'),
-    ('zeus', '176/175'),
-    ('zeus', '6144/6125'),
+    ('zeus', '121/120'),  # biyatismic
+    ('zeus', '176/175'),  # valinorismic
+    ('zeus', '6144/6125'),  # porwell
+
+    # rank 4
     ('animist', '105/104'),
     ('biome', '91/90'),
-    ('gentle', '364/363'),
-    ('huntmic', '640/637'),
+    ("gentle", "364/363"), # minor minthmic
+    ("huntmic", "640/637"), # ehh
     ('kalismic', '9801/9800'),
-    ('keenanismic', '385/384'),
-    ('lehmerismic', '3025/3024'),
-    ('mynucumic', '196/195'),
+    ("keenanismic", "385/384"), # keenan? (i can literally ask him) "undecimal kleismic" doesnt sound that nice
+    ("lehmerismic", "3025/3024"), # lehmer?
+    ("mynucumic", "196/195"), # needs better name!
     ('ratwolf', '351/350'),
-    ('swetismic', '540/539'),
-    ('werckismic', '441/440'),
+    ("swetismic", "540/539"), # swets?
+    ("werckismic", "441/440"), # needs better name!
 
 
 # organised temps below:
@@ -132,7 +137,7 @@ names = [
 ('nusecond','[5 13 -11]'),# 11
 ('myna','[9 9 -10]'),# 10
 ('valentine','[13 5 -9]'),# 9
-('wurschmidt','[17 1 -8]'),# 8
+('würschmidt','[17 1 -8]'),# 8
 # birds is here at 7.75 btw but it's in the no-3's 5-limit
 ('hemithirds','[38 -2 -15]'),# 7.5 (AKA luna; very close to just)
 ('tertiaseptal','[-59 5 22]'),# 7.333... = 22/3
