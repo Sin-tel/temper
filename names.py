@@ -17,7 +17,6 @@ names = [
     ("archytas", "64/63"),
     ("diaschismic", "2048/2025"),
     ("diaschismic", "2147483648/2109289329"),
-    ("liese", "[-9 11 0 -3]"),
     ("dicot", "25/24"),
     ("didacus", "3136/3125"),
     ("diminished", "648/625"),
@@ -27,10 +26,12 @@ names = [
     ("flattone", "137781/131072"),  # 2.3.7
     ("flattone", "729/704"),  # 2.3.11
     ("gariboh", "3125/3087"),  # what?
+    ("garischismic", "[25 -14 0 -1]"), # garibaldi, schismatic
     ("hedgehog", "118098/117649"),  # 2.3.7, contorted in 5-lim
     ("injera", "6561/6272"),  # 2.3.7, contorted in 5-lim
     ("jubilee", "50/49"), # jubilismic
     ("kleismic", "15625/15552"),
+    ("liese", "[-9 11 0 -3]"),
     ("magic", "3125/3072"),
     ("mavila", "135/128"),
     ("meantone", "59049/57344"),  # 2.3.7 alternative
@@ -40,6 +41,7 @@ names = [
     ("mohajira", "214358881/204800000"),  # 2.5.11, contorted in 5-lim
     ("myna", "10077696/9765625"),
     ("negri", "16875/16384"),
+    ("nexus", "1771561/1769472"),
     ("octacot", "5764801/5668704"),  # 2.3.7, contorted in 5-lim
     ("orwell", "2109375/2097152"), # 5-lim
     ("orwell", "839808/823543"),  # 2.3.7 alternative
@@ -49,7 +51,6 @@ names = [
     ("rainy", "2100875/2097152"),
     ("rastmic", "243/242"),
     ("schismatic", "32805/32768"),
-    ("schismatic", "[25 -14 0 -1]"), # garibaldi, garischismic
     ("semaphore", "49/48"),
     ("sensamagic", "245/243"),
     ("sensi", "1647086/1594323"),  # 2.3.7
@@ -61,7 +62,6 @@ names = [
     ("tridecimal", "1053/1024"),
     ("valentine", "1990656/1953125"),
     ("würschmidt", "393216/390625"),
-    ("nexus", "1771561/1769472"),
 
     # rank 3
     ("144/143", "144/143"),  # grossmic? needs better name!
