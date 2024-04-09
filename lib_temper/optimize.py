@@ -2,6 +2,7 @@
 
 import numpy as np
 
+from .util_types import FloatMat, Subgroup, SubgroupInt
 from .interval import *
 from .farey import farey
 
@@ -9,23 +10,21 @@ from .farey import farey
 def name_tuning_weight(weight: str) -> str:
     if weight == "unweighted":
         return "E"
-    elif weight == "tenney":
+    if weight == "tenney":
         return "TE"
-    elif weight == "weil":
+    if weight == "weil":
         return "WE"
-    else:
-        raise ValueError("unknown weight parameter")
+    raise ValueError("unknown weight parameter")
 
 
-def get_metric(s: np.ndarray, weight: str) -> np.ndarray:
+def get_metric(s: Subgroup, weight: str) -> np.ndarray:
     if weight == "unweighted":
         return np.eye(len(s))
-    elif weight == "tenney":
+    if weight == "tenney":
         return metric_tenney(s)
-    elif weight == "weil":
+    if weight == "weil":
         return metric_weil(s)
-    else:
-        raise ValueError(f"unknown weight parameter: {weight}")
+    raise ValueError(f"unknown weight parameter: {weight}")
 
 
 def lstsq(temp, weight="tenney", V=None):
@@ -92,7 +91,7 @@ def cte(temp, weight="tenney", V=None):
 
 
 # diagonal inverse log primes
-def metric_tenney(s):
+def metric_tenney(s: Subgroup) -> FloatMat:
     j = log_subgroup(s)
     W = np.diag(1.0 / j)
     G = W @ W.T
@@ -101,7 +100,7 @@ def metric_tenney(s):
 
 
 # diagonal inverse primes
-def metric_wilson(s):
+def metric_wilson(s: Subgroup) -> FloatMat:
     j = np.array(s).astype(np.double)
     W = np.diag(1.0 / j)
     G = W @ W.T
@@ -110,7 +109,7 @@ def metric_wilson(s):
 
 
 # weil norm
-def metric_weil(s):
+def metric_weil(s: Subgroup) -> FloatMat:
     n = len(s)
     j = log_subgroup(s)
     Bw = np.block([[np.eye(n)], [np.ones((1, n))]])
@@ -123,7 +122,7 @@ def metric_weil(s):
 
 
 # k-weil norm
-def metric_weil_k(s, k):
+def metric_weil_k(s: Subgroup, k: float) -> FloatMat:
     n = len(s)
     j = log_subgroup(s)
     Bw = np.block([[np.eye(n)], [k * np.ones((1, n))]])
@@ -136,7 +135,7 @@ def metric_weil_k(s, k):
 
 
 # farey series (integer limit) norm
-def metric_farey(n, s):
+def metric_farey(s: SubgroupInt, n: int) -> FloatMat:
     l = farey(n)  # integer limit
     lv = []
     for i in l:

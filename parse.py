@@ -28,7 +28,7 @@ def page_with_link(titles: list[str], display: str) -> str:
     return display
 
 
-def parse_subgroup(s: str) -> tuple[IntMat, Subgroup]:
+def parse_subgroup(s: str) -> tuple[IntMat, SubgroupInt]:
     s = [Fraction(i) for i in re.split(r"[\\.,; ]+", s)]
 
     # make sure they are all > 1

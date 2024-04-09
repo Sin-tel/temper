@@ -351,8 +351,7 @@ class Pmaps:
 # calculates the size of some exterior product, wrt weight matrix w
 # sqrt determinant of the gramian matrix
 def height(M, W):
-    V = M @ W
-    return np.sqrt(np.linalg.det(V @ V.T))
+    return np.sqrt(np.linalg.det(M @ W @ M.T))
 
 
 # "logflat badness"
@@ -375,14 +374,15 @@ def height(M, W):
 #
 # | X | ~ complexity
 # | y ∧ X | ~ error * complexity
-def temp_badness(temp):
+def temp_badness(temp, W=None):
     M, S = temp
     r, d = M.shape
 
     j = log_subgroup(S)[np.newaxis, :]
-    W = np.diagflat(1.0 / j)
-    # W = np.diagflat(1.0 / np.array(S).astype(np.double))
-    # W = np.eye(d)
+    if W is None:
+        W = np.diagflat(1.0 / j) ** 2
+        # W = np.diagflat(1.0 / np.array(S).astype(np.double))
+        # W = np.eye(d)
 
     # normalize W so it has det(W) = 1
     W_det = np.linalg.det(W)
@@ -393,9 +393,12 @@ def temp_badness(temp):
     omega = r / (d - r)
 
     # || M ^ j ||
-    b = height(np.vstack([M, j]), W)
+    b = height(np.vstack([M, j]), W) + 1e-7
     # || M || ^ omega
-    c = height(M, W) ** omega
+    c = height(M, W)
+    c = c**omega
 
     # (|| M ^ j || * || M || ^ omega ) / ||j||
     return b * c / height(j, W)
+    # return b
+    # return c

@@ -1,7 +1,7 @@
 # utilities for the web app
 
 import time
-from typing import Optional, Any
+from typing import Optional, Any, Sequence
 from markupsafe import Markup
 
 import numpy as np
@@ -11,16 +11,13 @@ from process_names import load_names, write_names
 
 # TODO: we just stupidly do this on startup, if it starts taking to long do an actual cache
 write_names()
-names = load_names()
+temperament_names = load_names()
 
 
-def from_commas(args):
-    basis, s_expanded = parse_subgroup(args["subgroup"])
-
-    commas = parse_intervals(args["commas"], s_expanded)
-
+def from_commas(comma_str: str, basis: IntMat, s_expanded: SubgroupInt) -> tuple[IntMat, IntMat]:
+    commas = parse_intervals(comma_str, s_expanded)
+    assert len(commas) > 0, "need at least one comma"
     commas = np.hstack(commas)
-
     commas = hnf(commas.T, remove_zeros=True).T  # fix redundant commas
 
     M_expanded = cokernel(commas)
@@ -31,14 +28,13 @@ def from_commas(args):
 
     M = cokernel(commas_2)
 
-    assert np.allclose(M_expanded @ basis @ commas_2, 0), "comma not in basis"
+    assert np.allclose(M_expanded @ basis @ commas_2, 0), "comma not in subgroup"
 
-    return (M, basis, M_expanded, s_expanded)
+    return (M, M_expanded)
 
 
-def from_edos(args):
-    basis, s_expanded = parse_subgroup(args["subgroup"])
-    edos = parse_edos(args["edos"], get_subgroup(basis, s_expanded))
+def from_edos(edo_str: str, basis: IntMat, s_expanded: SubgroupInt) -> tuple[IntMat, IntMat]:
+    edos = parse_edos(edo_str, get_subgroup(basis, s_expanded))
 
     M = hnf(np.vstack(edos), remove_zeros=True)
 
@@ -48,47 +44,15 @@ def from_edos(args):
     # find expansion with the same kernel
     M_expanded = hnf(cokernel(basis @ kernel(M)))
 
-    return (M, basis, M_expanded, s_expanded)
+    return (M, M_expanded)
 
 
-def subgroup_index(s, l) -> Optional[list[int]]:
-    res = [-1] * len(l)
-    for i, k in enumerate(l):
-        for j, v in enumerate(s):
-            if v == k:
-                res[i] = j
-    for k in res:
-        if k == -1:
-            return None
-    return res
-
-
-# fmt: off
-alternating_iter = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10, -10, 11, -11, 12, -12]
-# fmt: on
-
-
-def info(temp, options) -> dict[str, Any]:
-    T = temp[0]
-    basis = temp[1]
-    T_expanded = temp[2]
-    s_expanded = temp[3]
-
-    s = get_subgroup(basis, s_expanded)
-
-    res = {}
-
-    # need to keep this here to get the layout correct
-    # it's stupid but whatever
-    res["rank"] = T.shape[0]
-
-    res["subgroup"] = ".".join(map(str, s))
-
+def search_families(s_expanded, T_expanded):
     # find temperament family names
     families: list[str] = []
     families_weak: list[str] = []
 
-    for restrict, family_list in names.items():
+    for restrict, family_list in temperament_names.items():
         indices = subgroup_index(s_expanded, restrict)
         if indices is not None:
             r_ind = T_expanded[:, indices]
@@ -113,15 +77,50 @@ def info(temp, options) -> dict[str, Any]:
     families = set(families)  # type: ignore[assignment]
     families_weak = set(families_weak).difference(families)  # type: ignore[assignment]
 
+    return families, families_weak
+
+
+def subgroup_index(s: Sequence[int], l: Sequence[int]) -> Optional[list[int]]:
+    res = [-1] * len(l)
+    for i, k in enumerate(l):
+        for j, v in enumerate(s):
+            if v == k:
+                res[i] = j
+    for k in res:
+        if k == -1:
+            return None
+    return res
+
+
+# fmt: off
+alternating_iter = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10, -10, 11, -11, 12, -12]
+# fmt: on
+
+
+def info(
+    T: IntMat, basis: IntMat, T_expanded: IntMat, s_expanded: SubgroupInt, options: dict[str, Any]
+) -> dict[str, Any]:
+    s = get_subgroup(basis, s_expanded)
+
+    res: dict[str, Any] = {}
+
+    # need to keep this here to get the layout correct
+    # it's stupid but whatever
+    res["rank"] = T.shape[0]
+
+    res["subgroup"] = ".".join(map(str, s))
+
+    families, families_weak = search_families(s_expanded, T_expanded)
+
     families_str = ""
     if len(families) > 0:
-        f = [page_with_link([f"{s} family", s], s) for s in sorted(list(families))]
-        families_str += ", ".join(f)
+        names = [page_with_link([f"{s} family", s], s) for s in sorted(list(families))]
+        families_str += ", ".join(names)
     if len(families_weak) > 0:
         if families_str != "":
             families_str += ", "
-        f = [page_with_link([f"{s} family", s], s) for s in sorted(list(families_weak))]
-        families_str += "(" + ", ".join(f) + ")"
+        names = [page_with_link([f"{s} family", s], s) for s in sorted(list(families_weak))]
+        families_str += "(" + ", ".join(names) + ")"
 
     # TODO: link wiki
     if families_str != "":
@@ -135,7 +134,7 @@ def info(temp, options) -> dict[str, Any]:
     # b.T @ W^2 @ b
 
     G_compl_exp = np.linalg.inv(metric_wilson(s_expanded))
-    G_compl = basis.T @ G_compl_exp @ basis
+    G_compl = (basis.T @ G_compl_exp @ basis).astype(np.float64)
 
     commas = LLL(kernel(T), G_compl)
 
@@ -194,9 +193,10 @@ def info(temp, options) -> dict[str, Any]:
             T[i, :] = -T[i, :]
             gens[:, i] = -gens[:, i]
 
-    red = options["reduce"]
-    if red is None:
-        red = "off"
+    if "reduce" in options:
+        red = options["reduce"]
+    else:
+        red = "on"
 
     if red == "on":
         o = T[0, 0]
@@ -255,6 +255,8 @@ def info(temp, options) -> dict[str, Any]:
 
     if "weights" in options:
         weight = options["weights"]
+    else:
+        weight = "weil"
 
     # legacy
     if options["tenney"]:

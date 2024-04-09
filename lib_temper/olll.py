@@ -42,7 +42,8 @@ def reduction(basis: np.ndarray, delta: float, W: np.ndarray) -> np.ndarray:
         ):
             k += 1
         else:
-            basis[k], basis[k - 1] = basis[k - 1], basis[k].copy()  ##fix
+            # basis[k], basis[k - 1] = basis[k - 1], basis[k].copy()  ##fix
+            basis[[k - 1, k]] = basis[[k, k - 1]]
             ortho = gramschmidt(basis, W)
             k = max(k - 1, 1)
 

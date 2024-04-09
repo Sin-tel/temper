@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href= "{{ url_for('static', filename = 'basic.css') }}">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>temper</title>
+	<link rel="shortcut icon" type="image/jpg" href="{{ url_for('static', filename = 'icon.png') }}"/>
+</head>
+<body>
+<div class="normal">
+
+<h1>Search temperaments</h1>
+<p> Work in progress! Enter a subgroup and optionally a list of commas. </p>
+<hr>
+
+<form action = "{{ url_for('search') }}" method = "GET">
+	<p>Prime limit or subgroup<br>
+		<input type = "text" name = "subgroup"
+			{% if args is defined %}
+				value= {{args.subgroup}}
+			{% endif %}
+		required />
+	</p>
+	<!-- <p>
+		List of edos<br>
+		<input type = "text" name = "edos" />
+	</p> -->
+	<p>
+		List of commas<br>
+		<textarea name = "commas" rows="5"/>{% if args is defined %}{{args.commas}}{% endif %}</textarea>
+	</p>
+	<p>
+		<input type = "submit" value="Search" />
+	</p>
+</form>
+<hr>
+
+{% if res is defined %}
+<table>
+	{% for key, value in res.items() %}
+		<tr>
+			<th> {{ key }} </th>
+			{% if value is not string and value is iterable%}
+				<td> {{ value[0] }} </td>
+				<td style="text-align: right;"> {{ value[1] }} </td>
+				<td style="text-align: right;"> {{ value[2] }} </td>
+				<!-- {% for i in value %}
+					{% if i is number %}
+						<td style="text-align: right;"> {{ i }} </td>
+					{% endif %}
+				{% endfor %} -->
+			{% else %}
+				<td colspan= 3> {{ value|safe  }} </td>
+			{% endif %}
+		</tr>
+	{% endfor %}
+</table>
+{% endif %}
+
+</div>
+
+</body>
+</html>
+

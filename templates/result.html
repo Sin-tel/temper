@@ -20,7 +20,7 @@
 
 <h1>Temperament info</h1>
 
-<a href="/">back</a>
+
 
 <table border = 1>
 	{% for key, value in res.items() %}
@@ -28,7 +28,7 @@
 			<th> {{ key }} </th>
 			{% if value is not string and value is iterable%}
 				{% for i in value %}
-					<td> {{ i  }} </td>
+					<td> {{ i }} </td>
 				{% endfor %}
 			{% else %}
 				<td colspan= "{{res['rank']}}" > {{ value|safe  }} </td>
@@ -36,6 +36,9 @@
 		</tr>
 	{% endfor %}
 </table>
+
+<!-- <a href="{{ url_for('index', **args ) | safe }}">back</a> -->
+<a href="{{ url_for('index') }}">back</a>
 
 </div>
 </body>
