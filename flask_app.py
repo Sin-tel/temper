@@ -30,7 +30,7 @@ def search():
             return f.render_template("./search.jinja")
 
         for k in list(args.keys()):
-            if args[k] == "":
+            if args[k] == "" or args[k].isspace():
                 del args[k]
 
         res = temperament_search(args)
@@ -46,7 +46,7 @@ def result():
 
         args = args.to_dict()
         for k in list(args.keys()):
-            if args[k] == "":
+            if args[k] == "" or args[k].isspace():
                 del args[k]
 
         args["tenney"] = "tenney" in args
