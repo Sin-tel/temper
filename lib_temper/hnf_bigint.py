@@ -1,5 +1,5 @@
 # Algorithm adapted from https://github.com/lan496/hsnf
-# Works with lists native python integers, as this turns out to be faster for small matrices!
+# Works with lists of native python integers, as this turns out to be faster for small matrices!
 # Also guaranteed to not overflow
 
 import numpy as np
