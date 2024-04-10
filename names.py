@@ -63,6 +63,7 @@ names = [
     ("zeus", "121/120"),  # biyatismic
     ("zeus", "176/175"),  # valinorismic
     ("zeus", "6144/6125"),  # porwell
+    ("freya", "[-21 -13 6 0 8]"),
 
     # rank 4
     ("animist", "105/104"),
