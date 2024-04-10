@@ -20,7 +20,7 @@ def write_names() -> None:
     name_list: dict[str, dict[str, str]] = {}
 
     for name, comma_str in names:
-        comma = parse_intervals(comma_str, s)
+        comma = parse_intervals(comma_str, np.eye(len(s), dtype=np.int64), s)
         assert len(comma) == 1
         comma = comma[0]
         # print(name)

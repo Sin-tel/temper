@@ -5,7 +5,6 @@ from typing import Optional, TypeVar
 import numpy as np
 
 from . import olll
-from . import diophantine
 from .hnf_bigint import hnf_bigint
 
 from .util_types import IntMat, FloatMat
@@ -15,25 +14,15 @@ from .combo import comboBySum
 
 
 # Find the hermite normal form of M
-def hnf(M: IntMat, remove_zeros: bool = False, transformation: bool = False) -> IntMat:
+def hnf(M: IntMat, remove_zeros: bool = False) -> IntMat:
     assert M.ndim == 2
 
-    try:
-        if transformation:
-            solution = diophantine.lllhermite(M.astype(np.int64))
-            res = np.array(solution[0]).astype(np.int64)
-            unimod = np.array(solution[1]).astype(np.int64)
-        else:
-            res = hnf_bigint(M)
-    except OverflowError as e:
-        raise OverflowError("Your numbers are too big!") from e
+    res = hnf_bigint(M)
 
     if remove_zeros:
         idx = np.argwhere(np.all(res[:] == 0, axis=1))
         res = np.delete(res, idx, axis=0)
 
-    if transformation:
-        return res, unimod  # type: ignore[return-value]
     return res
 
 
@@ -75,12 +64,13 @@ def LLL(M: T, W: Optional[FloatMat] = None, delta: float = 0.99) -> T:
     # actually, this might be redundant.
     c_list = list(res.T)
     c_list.sort(key=lambda c: np.dot(c, W @ c))
+    return np.array(c_list).T  # type: ignore[return-value]
 
-    return np.array(c_list).T
+    # return res
 
 
 # Flips M along diagonal
-def antitranspose(M):
+def antitranspose(M: IntMat) -> IntMat:
     return np.flipud(np.fliplr((M.T)))
 
 
@@ -94,22 +84,25 @@ def antitranspose(M):
 # Journal of Number Theory.
 # https://doi.org/10.1016/j.jnt.2010.01.017
 # See section 8.
-def defactored_hnf(M):
-    r, d = M.shape
+def defactored_hnf(M: IntMat) -> IntMat:
+    r, _ = M.shape
 
-    S = np.linalg.inv(hnf(M.T)[:r].T)
+    K = hnf(M.T)[:r].T
+    if np.isclose(np.linalg.det(K), 1.0):
+        return hnf(M)
 
-    assert np.allclose(S @ M, np.round(S @ M))
+    S = np.linalg.inv(K)
 
-    D = np.round(S @ M).astype(np.int64)
+    D = np.round(S @ M)
+    assert np.allclose(S @ M, D)
 
-    return hnf(D)
+    return hnf(D.astype(np.int64))
 
 
 # exact integer determinant using Bareiss algorithm
 # modified slightly from:
 ## https://stackoverflow.com/questions/66192894/precise-determinant-of-integer-nxn-matrix
-def integer_det(M):
+def integer_det(M: IntMat) -> int:
     M = np.copy(M)  # make a copy to keep original M unmodified
 
     N, sign, prev = len(M), 1, 1
@@ -131,7 +124,7 @@ def integer_det(M):
 
 # Order of factorization.
 # For a saturated basis this is 1.
-def factor_order(M):
+def factor_order(M: IntMat) -> int:
     r = M.shape[0]
     return integer_det(hnf(M.T)[:r].T)
 
@@ -150,33 +143,15 @@ def canonical(M):
 
 
 # Solve AX = B in the integers
-# for the method used, see https://github.com/tclose/Diophantine/blob/master/algorithm.pdf
 def solve_diophantine(A, B):
-    B = np.atleast_2d(B)
     assert A.shape[0] == B.shape[0]
-    aug = np.block(
-        [
-            [A.T, np.zeros((A.shape[1], B.shape[1]), dtype=np.int64)],
-            [B.T, np.eye(B.shape[1], dtype=np.int64)],
-        ]
-    )
+    _, d = A.shape
 
-    r, d = A.shape
+    B = np.atleast_2d(B)
+    aug = np.block([[A, B]])
 
-    nullity = d - r
-
-    # somehow we can solve the system even if the nullity is -1
-    # aka the kernel is trivial
-    # should double check when this actually works
-    if nullity <= 0:
-        nullity = 0
-
-    _, U = hnf(aug, transformation=True)
-
-    p2 = U.shape[0] - nullity
-    p1 = p2 - B.shape[1]
-
-    sol = -U[p1:p2, : A.shape[1]].T
+    H = hnf(aug)
+    sol = H[0:d, d:]
 
     # Check that the solution actually works.
     # Probably the easiest way to guarantee this routine works correctly.
@@ -185,9 +160,8 @@ def solve_diophantine(A, B):
     return sol
 
 
+# Solves MX = I in the integers (basically as above)
 def preimage(M):
-    # I have no idea how I came up with this but it seems to work
-
     r, d = M.shape
 
     B = np.block([[M.T, np.eye(d, dtype=np.int64)]])

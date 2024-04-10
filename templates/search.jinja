@@ -18,11 +18,11 @@
 	<br>
 	<input type="radio" id="cangwu" name="badness" value="cangwu"
 		{% if args is defined %}
-		{% if args.badness == "cangwu" %}
-		checked="checked"
-		{% endif %}
+			{% if args.badness == "cangwu" %}
+				checked="checked"
+			{% endif %}
 		{% else %}
-		checked="checked"
+			checked="checked"
 		{% endif %}
 	>
 	<label for="cangwu">Cangwu badness</label>

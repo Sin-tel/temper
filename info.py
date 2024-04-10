@@ -15,7 +15,7 @@ temperament_names = load_names()
 
 
 def from_commas(comma_str: str, basis: IntMat, s_expanded: SubgroupInt) -> tuple[IntMat, IntMat]:
-    commas = parse_intervals(comma_str, s_expanded)
+    commas = parse_intervals(comma_str, basis, s_expanded)
     assert len(commas) > 0, "need at least one comma"
     commas = np.hstack(commas)
     commas = hnf(commas.T, remove_zeros=True).T  # fix redundant commas
@@ -272,7 +272,7 @@ def info(
 
     showtarget = False
     if "target" in options:
-        targets = parse_intervals(options["target"], s_expanded)
+        targets = parse_intervals(options["target"], basis, s_expanded)
         showtarget = len(targets) > 0
 
     if showtarget:

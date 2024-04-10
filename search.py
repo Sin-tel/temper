@@ -1,5 +1,4 @@
 from typing import Any
-import math
 import time
 import numpy as np
 import flask
@@ -54,8 +53,9 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
     log_s = np.log2(np.array(s).astype(np.float64))
 
-    f_init = 100 * rank
+    f_init = 32 * rank * np.max(log_s)
     f = 1.4 * (1.2 ** (dim - 1))
+    # f = 2.0
 
     print(f"f init = {f_init}")
     print(f"f = {f}")
@@ -64,10 +64,10 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     log_s = log_s[1:]
     log_s = np.atleast_2d(log_s)
 
-    # B = np.block([[np.eye(dim)], [f * log_s.T, -f * eq * np.eye(dim - 1)]])
-    B = np.block(
-        [[np.eye(dim)], [f_init * np.ones((dim - 1, 1)), -f_init * eq * np.diagflat(1 / log_s)]]
-    )
+    B = np.block([[np.eye(dim)], [f_init * log_s.T, -f_init * eq * np.eye(dim - 1)]])
+    # B = np.block(
+    #     [[np.eye(dim)], [f_init * np.ones((dim - 1, 1)), -f_init * eq * np.diagflat(1 / log_s)]]
+    # )
     # print(B)
     B = B @ t_map.astype(np.float64).T
     # print(B)
@@ -79,7 +79,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     # print(B)
     # print(W_LLL)
 
-    by_rank: dict[int, list[tuple[str, Any, float, str]]] = {}
+    by_rank: dict[int, list[tuple[str, Any, float]]] = {}
     for r_s in range(rank - 1, 0, -1):
         by_rank[r_s] = []
 
@@ -90,17 +90,18 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
     f_prev = None
 
-    for i in range(6):
-        if total_count > 200:
+    for i in range(8):
+        if total_count > 100:
             break
         B = LLL(B, W=W_LLL, delta=0.9)
+        # B = LLL(B, delta=0.9)
         # B = LLL(B, delta=0.9)
 
         B[dim:] *= f
 
         found = np.abs(B[0:dim].T)
 
-        if np.any(found[:, 0] > 600):
+        if np.any(found[:, 0] > 1000):
             break
 
         assert np.allclose(found - np.round(found), 0)
@@ -113,17 +114,23 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
         edo_list = []
         for k in found:
-            if 2 < k[0] <= 311:
+            if 2 < k[0] <= 1000:
+                t_edo = k[None, :]
                 label = edo_map_notation(k, s)
                 if badness_type == "dirichlet":
                     b = temp_badness((k[None, :], s), W_tenney_inv)
                 else:
                     b = height(k[None, :], W_weil_inv)
 
-                edo_list.append((label, k, b, "edos"))
-        edo_list = sorted(edo_list, key=lambda v: v[2])
+                r_edo = (label, k, b)
 
-        by_rank[1] += edo_list
+                t_tup = tuple(t_edo.flatten())
+                if t_tup not in checked:
+                    by_rank[1].append(r_edo)
+                checked.add(t_tup)
+
+                edo_list.append(r_edo)
+        edo_list = sorted(edo_list, key=lambda v: v[2])
 
         for r_s in range(2, rank):
             count = 0
@@ -139,47 +146,29 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
                 checked.add(t_tup)
 
-                if r_s <= dim - r_s:
-                    label = " & ".join([k[0] for k in combo])
-                    label_type = "edos"
-                else:
-                    t_commas = kernel(t_mat)
-                    t_commas = LLL(t_commas, W=W_wilson)
-                    comma_rat = []
-                    for c in t_commas.T:
-                        c = make_positive(c, s)
-                        comma_str = str(ratio(c, s))
-                        if len(comma_str) >= 11:
-                            comma_str = "[" + " ".join(map(str, c)) + "]"
-                        comma_rat.append(comma_str)
-
-                    label = ", ".join(comma_rat)
-                    label_type = "commas"
+                label = " & ".join([k[0] for k in combo])
 
                 if badness_type == "dirichlet":
                     b = temp_badness((t_mat, s), W_tenney_inv)
                 else:
                     b = height(t_mat, W_weil_inv)
 
-                by_rank[r_s].append((label, t_mat, b, label_type))
+                by_rank[r_s].append((label, t_mat, b))
                 total_count += 1
                 count += 1
-                if count >= 20:
+                if count >= 10:
                     break
             # print(count, math.comb(len(edo_list), r_s))
-
-    print(f"search took: {time.time() - t_start} to find {total_count} temps, r={rank} d={dim}")
 
     res["results"] = ["families", "badness", "complexity"]
     for r_s in sorted(list(by_rank.keys())):
         res[f"= rank-{r_s} ="] = "<hr>"
         res_list = sorted(by_rank[r_s], key=lambda v: v[2])
 
-        for k in res_list[0:20]:
+        for k in res_list[0:10]:
             t_mat = np.atleast_2d(k[1])
             r, d = t_mat.shape
             compl = (d) ** (r - 1) * height(t_mat, W_tenney_inv) / np.sqrt(d)
-            # compl = height(t_mat, W_tenney_inv) / np.sqrt(d)
             # compl = height(t_mat, W_tenney_inv) / np.sqrt(d)
 
             if s_non_prime:
@@ -190,24 +179,40 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
             families, families_weak = search_families(s_expanded, t_expanded)
             families_str = ""
             if len(families) > 0:
-                # names = [page_with_link([f"{s} family", s], s) for s in sorted(list(families))]
                 families_str += ", ".join(sorted(list(families)))
             if len(families_weak) > 0 and len(families) == 0:
                 if families_str != "":
                     families_str += ", "
-                # names = [page_with_link([f"{s} family", s], s) for s in sorted(list(families_weak))]
                 families_str += "(" + ", ".join(sorted(list(families_weak))) + ")"
 
+            label = str(k[0])
+            label_type = "edos"
+
+            if r_s > dim - r_s:
+                t_commas = kernel(t_mat)
+                t_commas = LLL(t_commas, W=W_wilson)
+                comma_rat = []
+                for c in t_commas.T:
+                    c = make_positive(c, s)
+                    comma_str = str(ratio(c, s))
+                    if len(comma_str) >= 11:
+                        comma_str = "[" + " ".join(map(str, c)) + "]"
+                    comma_rat.append(comma_str)
+                label = ", ".join(comma_rat)
+                label_type = "commas"
+
             url_args = {}
-            if k[3] == "edos":
-                url_args["edos"] = k[0]
+            if label_type == "edos":
+                url_args["edos"] = label
                 url_args["submit_edo"] = "submit"
-            elif k[3] == "commas":
-                url_args["commas"] = k[0]
+            elif label_type == "commas":
+                url_args["commas"] = label
                 url_args["submit_comma"] = "submit"
             url_args["subgroup"] = args["subgroup"]
-            url = Markup(f'<a href="{flask.url_for("result", **url_args)}">{str(k[0])}</a>')
+            url = Markup(f'<a href="{flask.url_for("result", **url_args)}">{label}</a>')
 
             res[url] = [families_str, f"{k[2]:.3f}", f"{compl:10.1f}"]
+
+    print(f"search took: {time.time() - t_start} to find {total_count} temps, r={rank} d={dim}")
 
     return res

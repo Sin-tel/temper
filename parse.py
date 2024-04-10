@@ -4,7 +4,7 @@ import numpy as np
 from markupsafe import Markup
 
 from lib_temper import *
-from lib_temper.util_types import IntMat
+from lib_temper.util_types import IntMat, SubgroupInt, SubgroupFrac
 from wiki.ratios import wiki_ratios
 from wiki.pages import wiki_pages
 
@@ -175,16 +175,17 @@ ratio_pattern = r"(\d+)[/:](\d+)"
 vector_pattern = r"[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]"
 
 
-def parse_intervals(c: str, s: SubgroupInt) -> list[IntVec]:
+def parse_intervals(c: str, basis: IntMat, s: SubgroupInt) -> list[IntVec]:
     commas = []
     for n, d in re.findall(ratio_pattern, c):
         commas.append(factors((int(n), int(d)), s))
     for v in re.findall(vector_pattern, c):
-        l = len(s)
+        l = basis.shape[1]
         res = np.zeros((l, 1), dtype=np.int64)
         v = np.array(list(map(int, v.replace(",", " ").split())))
         res[: v.shape[0], 0] = v[:l]
-        commas.append(res)
+
+        commas.append(basis @ res)
 
     return commas
 

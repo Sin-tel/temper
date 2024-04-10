@@ -1,9 +1,8 @@
-import flask as f
 import traceback
+import flask as f
 import git
 from timeout import time_limit, TimeoutException
 from info import *
-from markupsafe import Markup
 from search import temperament_search
 
 # from werkzeug.middleware.profiler import ProfilerMiddleware
