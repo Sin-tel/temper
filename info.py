@@ -314,7 +314,11 @@ def info(
     if showtarget:
         res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
 
-    badness = temp_badness((T_expanded, s_expanded))
+    W_tenney = basis.T @ np.linalg.inv(metric_tenney(s_expanded)) @ basis
+    W_tenney = W_tenney.astype(np.float64)
+    W_tenney_inv = np.linalg.inv(W_tenney)
+
+    badness = temp_badness((T, s), W=W_tenney_inv)
     res["badness"] = f"{badness:.3f}"
     # complexity = temp_complexity((T_expanded, s_expanded))
     # res["complexity"] = f"{complexity:.2f}"
