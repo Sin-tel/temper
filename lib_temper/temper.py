@@ -153,6 +153,10 @@ def solve_diophantine(A, B):
     H = hnf(aug)
     sol = H[0:d, d:]
 
+    K = H[0:d, 0:d]
+    S = np.linalg.inv(K)
+    sol = np.round(S @ sol).astype(np.int64)
+
     # Check that the solution actually works.
     # Probably the easiest way to guarantee this routine works correctly.
     assert np.all(A @ sol == B), "Could not solve system"
@@ -328,7 +332,7 @@ def height(M, W):
     return np.sqrt(np.linalg.det(M @ W @ M.T))
 
 
-# "logflat badness"
+# "logflat badness" aka Dirichlet coefficient
 # Combines complexity and error into a single measurement
 #
 # https://en.xen.wiki/w/Tenney-Euclidean_temperament_measures#TE_logflat_badness
