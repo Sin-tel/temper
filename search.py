@@ -53,8 +53,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
     log_s = np.log2(np.array(s).astype(np.float64))
 
-    f_init = 32 * rank * np.max(log_s)
-    f = 1.4 * (1.2 ** (dim - 1))
+    f_init = 32 * np.sqrt(rank) * np.max(log_s)
+    f = 1.4 * (1.1 ** (dim - 1))
     # f = 2.0
 
     print(f"f init = {f_init}")
@@ -90,8 +90,15 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
     f_prev = None
 
+    W_det = np.linalg.det(W_tenney_inv)
+    W_tenney_inv = W_tenney_inv / np.power(W_det, 1 / W_tenney_inv.shape[0])
+
+    # pick some arbitrary edo to calibrate the complexity calculation
+    compl_factor = 41.0 / height(patent_map(41.0, s), W_tenney_inv)
+    print(compl_factor)
+
     for i in range(8):
-        if total_count > 100:
+        if total_count > 150:
             break
         B = LLL(B, W=W_LLL, delta=0.9)
         # B = LLL(B, delta=0.9)
@@ -101,8 +108,12 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
         found = np.abs(B[0:dim].T)
 
-        if np.any(found[:, 0] > 1000):
+        if np.any(found[:, 0] > 2000):
             break
+
+        # commas_f = np.round(np.linalg.inv(found)).astype(np.int64)
+        # for k in commas_f.T:
+        #     print(ratio(k, s))
 
         assert np.allclose(found - np.round(found), 0)
         found = np.round(found).astype(np.int64)
@@ -114,7 +125,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
         edo_list = []
         for k in found:
-            if 2 < k[0] <= 1000:
+            if 2 <= k[0] <= 1000:
                 t_edo = k[None, :]
                 label = edo_map_notation(k, s)
                 if badness_type == "dirichlet":
@@ -168,8 +179,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         for k in res_list[0:10]:
             t_mat = np.atleast_2d(k[1])
             r, d = t_mat.shape
-            compl = (d) ** (r - 1) * height(t_mat, W_tenney_inv) / np.sqrt(d)
-            # compl = height(t_mat, W_tenney_inv) / np.sqrt(d)
+            # compl = (d) ** (r - 1) * height(t_mat, W_tenney_inv) / np.sqrt(d)
+            compl = (2) ** (r - 1) * height(t_mat, W_tenney_inv) * compl_factor
 
             if s_non_prime:
                 t_expanded = hnf(cokernel(basis @ kernel(t_mat)))
