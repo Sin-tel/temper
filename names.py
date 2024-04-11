@@ -27,6 +27,7 @@ names = [
     ("superpyth", "20480/19683"),
     ("supra", "8192/8019"),
     ("tridecimal", "1053/1024"),
+    ("mothra", "[-36 0 1 12]"), # 2.5.7
 
     # rank 3
     ("144/143", "144/143"),  # grossmic? needs better name!
@@ -64,6 +65,7 @@ names = [
     ("zeus", "176/175"),  # valinorismic
     ("zeus", "6144/6125"),  # porwell
     ("freya", "[-21 -13 6 0 8]"),
+    ("portent", "166375/165888"), # 2.3.5.11
 
     # rank 4
     ("animist", "105/104"),
