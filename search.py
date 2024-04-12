@@ -114,8 +114,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         assert np.allclose(found - np.round(found), 0)
         found = np.round(found).astype(np.int64)
 
-        if f_prev and f_prev == tuple(found[:, 0]):
-            break
+        # if f_prev and f_prev == tuple(found[:, 0]):
+        #     break
         f_prev = tuple(found[:, 0])
         print(f_prev)
 
