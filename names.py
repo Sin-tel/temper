@@ -166,7 +166,7 @@ names = [
     # ("slendrismic", "[36 -5 0 -10]",),  # 10/3. commented out bc confusing name!
     ("septiness", "67108864/66706983"),  # 3.5
     ("buzzard", "65536/64827"),  # 4
-    ("superpyth", "64/63"),  # infinity
+    ("archytas", "64/63"),  # infinity
     # period-based microtemps
     ("ennealimmal", "[-11 -9 0 9]"),  # 2\9 = 7/6
     ("enneadecal", "[-37 57 0 -19]"),  # 19 = 28/27
