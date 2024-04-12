@@ -55,7 +55,7 @@ T = TypeVar("T", bound=IntMat | FloatMat)
 # Operates on columns
 # M: Map
 # W: Weight matrix (metric)
-def LLL(M: T, W: Optional[FloatMat] = None, delta: float = 0.99) -> T:
+def LLL(M: T, W: Optional[FloatMat] = None, delta: float = 0.75) -> T:
     if W is None:
         W = np.eye(M.shape[0])
     res = olll.reduction(np.copy(M).T, delta=delta, W=W).T

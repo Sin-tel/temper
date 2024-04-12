@@ -122,7 +122,6 @@ def info(
         names = [page_with_link([f"{s} family", s], s) for s in sorted(list(families_weak))]
         families_str += "(" + ", ".join(names) + ")"
 
-    # TODO: link wiki
     if families_str != "":
         res["families"] = families_str
 
@@ -226,6 +225,7 @@ def info(
             fifth = log_interval(gens[:, 1], s)
             # reduce others
             cutoff = 0.04736875252  # Same cutoff as in modified FJS = log2(sqrt(2187/2048))
+            # cutoff = 0.02781874387  # Neutral FJS = log2(sqrt(134217728/129140163))
             for i in range(2, T.shape[0]):
                 interval_size = log_interval(gens[:, i], s)
 

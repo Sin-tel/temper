@@ -154,3 +154,4 @@ cython_debug/
 /test
 names.json
 illl_*
+lib_temper/hnf_np.py

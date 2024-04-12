@@ -53,28 +53,29 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
     log_s = np.log2(np.array(s).astype(np.float64))
 
-    f_init = 32 * np.sqrt(rank) * np.max(log_s)
+    f_init = 16 * np.sqrt(rank) * np.max(log_s)
     f = 1.4 * (1.1 ** (dim - 1))
     # f = 2.0
 
     print(f"f init = {f_init}")
     print(f"f = {f}")
 
-    eq = log_s[0]
-    log_s = log_s[1:]
-    log_s = np.atleast_2d(log_s)
+    # eq = log_s[0]
+    # log_s = log_s[1:]
+    # log_s = np.atleast_2d(log_s)
 
-    B = np.block([[np.eye(dim)], [f_init * log_s.T, -f_init * eq * np.eye(dim - 1)]])
+    # B = np.block([[np.eye(dim)], [f_init * log_s.T, -f_init * eq * np.eye(dim - 1)]])
     # B = np.block(
     #     [[np.eye(dim)], [f_init * np.ones((dim - 1, 1)), -f_init * eq * np.diagflat(1 / log_s)]]
     # )
+    B = np.eye(len(s))
     # print(B)
-    B = B @ t_map.astype(np.float64).T
+    B = t_map @ B
     # print(B)
 
-    W_LLL = np.block(
-        [[W_tenney_inv, np.zeros((dim, dim - 1))], [np.zeros((dim - 1, dim)), np.eye(dim - 1)]]
-    )
+    # W_LLL = np.block(
+    #     [[W_tenney_inv, np.zeros((dim, dim - 1))], [np.zeros((dim - 1, dim)), np.eye(dim - 1)]]
+    # )
 
     # print(B)
     # print(W_LLL)
@@ -97,23 +98,18 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     compl_factor = 41.0 / height(patent_map(41.0, s), W_tenney_inv)
     print(compl_factor)
 
+    edo_list = []
     for i in range(8):
-        if total_count > 150:
-            break
-        B = LLL(B, W=W_LLL, delta=0.9)
-        # B = LLL(B, delta=0.9)
-        # B = LLL(B, delta=0.9)
+        # if total_count > 1500:
+        #     break
+        W_LLL = metric_weil_k(s, f_init)
+        B = LLL(B.T, W=W_LLL, delta=0.9).T
+        f_init *= f
 
-        B[dim:] *= f
-
-        found = np.abs(B[0:dim].T)
+        found = np.abs(B)
 
         if np.any(found[:, 0] > 2000):
             break
-
-        # commas_f = np.round(np.linalg.inv(found)).astype(np.int64)
-        # for k in commas_f.T:
-        #     print(ratio(k, s))
 
         assert np.allclose(found - np.round(found), 0)
         found = np.round(found).astype(np.int64)
@@ -123,7 +119,6 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         f_prev = tuple(found[:, 0])
         print(f_prev)
 
-        edo_list = []
         for k in found:
             if 2 <= k[0] <= 1000:
                 t_edo = k[None, :]
@@ -138,38 +133,41 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
                 t_tup = tuple(t_edo.flatten())
                 if t_tup not in checked:
                     by_rank[1].append(r_edo)
+                    edo_list.append(r_edo)
                 checked.add(t_tup)
 
-                edo_list.append(r_edo)
-        edo_list = sorted(edo_list, key=lambda v: v[2])
+    edo_list = sorted(edo_list, key=lambda v: v[2])
+    # print(edo_list)
 
-        for r_s in range(2, rank):
-            count = 0
-            # for combo in itertools.combinations(edo_list, r_s):
-            for idx in comboBySum(r_s, 0, len(edo_list) - 1):
-                combo = [edo_list[i] for i in idx]
-                t_mat: IntMat = np.vstack([k[1] for k in combo])
-                t_mat = hnf(t_mat)
+    for r_s in range(2, rank):
+        count = 0
+        # for combo in itertools.combinations(edo_list, r_s):
+        for idx in comboBySum(r_s, 0, len(edo_list) - 1):
+            combo = [edo_list[i] for i in idx]
+            t_mat: IntMat = np.vstack([k[1] for k in combo])
+            t_mat = hnf(t_mat)
+            if np.any(np.all(t_mat[:] == 0, axis=1)):
+                continue
 
-                t_tup = tuple(t_mat.flatten())
-                if t_tup in checked:
-                    continue
+            t_tup = tuple(t_mat.flatten())
+            if t_tup in checked:
+                continue
 
-                checked.add(t_tup)
+            checked.add(t_tup)
 
-                label = " & ".join([k[0] for k in combo])
+            label = " & ".join([k[0] for k in combo])
 
-                if badness_type == "dirichlet":
-                    b = temp_badness((t_mat, s), W_tenney_inv)
-                else:
-                    b = height(t_mat, W_weil_inv)
+            if badness_type == "dirichlet":
+                b = temp_badness((t_mat, s), W_tenney_inv)
+            else:
+                b = height(t_mat, W_weil_inv)
 
-                by_rank[r_s].append((label, t_mat, b))
-                total_count += 1
-                count += 1
-                if count >= 10:
-                    break
-            # print(count, math.comb(len(edo_list), r_s))
+            by_rank[r_s].append((label, t_mat, b))
+            total_count += 1
+            count += 1
+            if count >= 42:
+                break
+        # print(count, math.comb(len(edo_list), r_s))
 
     res["results"] = ["families", "badness", "complexity"]
     for r_s in sorted(list(by_rank.keys())):
