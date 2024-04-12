@@ -136,6 +136,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
                     edo_list.append(r_edo)
                 checked.add(t_tup)
 
+    max_per_rank = max(10, 170 // max(1, rank - 2))
     edo_list = sorted(edo_list, key=lambda v: v[2])
     # print(edo_list)
 
@@ -165,7 +166,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
             by_rank[r_s].append((label, t_mat, b))
             total_count += 1
             count += 1
-            if count >= 42:
+            if count >= max_per_rank:
                 break
         # print(count, math.comb(len(edo_list), r_s))
 
