@@ -10,7 +10,9 @@
 <div class="normal">
 
 <h1>Search temperaments</h1>
-<p> Work in progress! Enter a subgroup and optionally a list of commas. </p>
+<p>
+Work in progress! Enter a subgroup and optionally a list of commas or edos (entering both ignores commas).
+</p>
 <hr>
 
 <form action = "{{ url_for('search') }}" method = "GET">
@@ -43,13 +45,17 @@
 			{% endif %}
 		required />
 	</p>
-	<!-- <p>
+	<p>
 		List of edos<br>
-		<input type = "text" name = "edos" />
-	</p> -->
+		<input type = "text"  name = "edos"
+			{% if args is defined and args.edos is defined %}
+				value = "{{args.edos}}"
+			{% endif %}
+		 />
+	</p>
 	<p>
 		List of commas<br>
-		<textarea name = "commas" rows="5"/>{% if args is defined %}{{args.commas}}{% endif %}</textarea>
+		<textarea name = "commas" rows="5"/>{% if args is defined and args.commas is defined %}{{args.commas}}{% endif %}</textarea>
 	</p>
 	<p>
 		<input type = "submit" value="Search" />
