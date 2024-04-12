@@ -177,6 +177,10 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
         for k in res_list[0:10]:
             t_mat = np.atleast_2d(k[1])
+
+            if factor_order(t_mat) > 1:
+                continue
+
             r, d = t_mat.shape
             # compl = (d) ** (r - 1) * height(t_mat, W_tenney_inv) / np.sqrt(d)
             compl = (2) ** (r - 1) * height(t_mat, W_tenney_inv) * compl_factor
