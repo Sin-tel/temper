@@ -1,49 +1,17 @@
-x always remove contorsion
-x enter comma vectors
-x reduce gens, always positive
-x get preimage gens
-x unweighted/weighted
-x rational subgroups
-x check if subgroup is valid (no 2.3.9 etc)
-x vector pattern FutureWarning
-x check solver for exact diophantine
-x adapt solver for multi-row solve
-x simplify subgroup
-x speed up findmaps
-x exact integer determinant
-x complexity, error, badness
-x check complexity invariant wrt basis
-x correct kernel
-x implement custom weights on dot product
-x check LLL reduction fp
-x sort commas by Wilson
-x reduce gens by commas
-x fix non-octave CTE
-x fix output for non-octave stuff
-x fix complexity calculation for subgroup temps
-x naming
-x radio selector for norm
-
-add type hints
+fix edo join search
 
 better errors
 
 cents precision should be adaptive
 
-find optimal maps for edo input
-
-search supported temps for an edo (irrespective of non-patent maps)
-temperament search in general
+somehow figure out best maps from edo input if no adjustments given
+  * search?
 
 switch for monospace formatting instead of latex
 
 find additional commas, sort by wilson height
 
-radio selector for basis [hnf, positive gen hnf, octave reduced, equave reduce, ...]
-
-fast rank test?
-
-make search better
+make edo search better
  - only patent edos first?
 
 add tests for solver
@@ -51,32 +19,23 @@ add tests for solver
 septimal meantone w just 5/4 and 7/4 is impossible because the intervals are collinear => deal w this properly
 
 help page
-enter intervals to optimize
-make results page look nicer
-list more commas, sort by tenney/wilson
-when subgroup empty, infer from commas
-make search
 
-parser for ~ notation
-  ie 9/8^2 ~ 5/4
+when subgroup empty, infer from commas
 
 custom weights
 
 input validation
+
 write tests
 
 different bases:
   pergen form, mingen form, [period, generator, commas]
 
-add xen-calc link to all ratios
-  https://www.yacavone.net/xen-calc/?q=60/49
-
-generate lattice
+generate lattice??
  - rank 2 -> easy
  - rank 3 -> ...
 
 add scale workshop links,
 need some way to figure out MOS and ?? for higher rank
 
-https://yahootuninggroupsultimatebackup.github.io/tuning-math/topicId_20249.html
 
