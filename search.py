@@ -111,7 +111,11 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
         comma_list = []
         for i in range(8):
-            W_LLL = subgroup_norm(metric_weil_k(s_expanded, f_init))
+            try:
+                W_LLL = subgroup_norm(metric_weil_k(s_expanded, f_init))
+            except np.linalg.LinAlgError:
+                break
+
             B = LLL(B, W=W_LLL, delta=0.9)
             f_init *= f
             for k in B.T:
@@ -180,7 +184,10 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
         edo_list = []
         for i in range(8):
-            W_LLL = np.linalg.inv(subgroup_norm(metric_weil_k(s_expanded, f_init)))
+            try:
+                W_LLL = np.linalg.inv(subgroup_norm(metric_weil_k(s_expanded, f_init)))
+            except np.linalg.LinAlgError:
+                break
             B = LLL(B.T, W=W_LLL, delta=0.9).T
             f_init *= f
 
