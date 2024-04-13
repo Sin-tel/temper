@@ -40,7 +40,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     dim = t_map.shape[1]
 
     if dim > 10:
-        res["error"] = "please use a smaller subgroup"
+        res["error"] = "search is limited to subgroups of dimensions < 10"
         return res
 
     log_s = np.log2(np.array(s).astype(np.float64))
