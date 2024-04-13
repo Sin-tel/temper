@@ -262,27 +262,6 @@ def find_edos(T, subgroup):
     return r_list[: (r + 12)]
 
 
-# Select <rank> edos that, when joined together, are equivalent to the temperament
-def find_join(T, subgroup, m_list):
-    assert T.ndim == 2
-    r = T.shape[0]
-
-    count = 0
-    for combo in comboBySum(r, 0, len(m_list) - 1):
-        m_new = np.vstack([m_list[i][0] for i in combo])
-        m_hnf = hnf(m_new)
-
-        count += 1
-
-        if np.all(m_hnf == T):
-            print("number of combos checked: " + str(count))
-            return list(m_new)
-
-        if count > 500:
-            break
-    print("Join search failed! Number of combos checked: " + str(count))
-
-
 # Iterator for general edo maps (GPVs)
 class Pmaps:
     def __init__(self, bounds, subgroup):
@@ -329,7 +308,11 @@ class Pmaps:
 # calculates the size of some exterior product, wrt weight matrix w
 # sqrt determinant of the gramian matrix
 def height(M, W):
-    return np.sqrt(np.linalg.det(M @ W @ M.T))
+    g = np.linalg.det(M @ W @ M.T)
+    if g <= 1e-8:
+        return 1e-4
+
+    return np.sqrt(g)
 
 
 # "logflat badness" aka Dirichlet coefficient
@@ -359,8 +342,6 @@ def temp_badness(temp, W=None):
     j = log_subgroup(S)[np.newaxis, :]
     if W is None:
         W = np.diagflat(1.0 / j) ** 2
-        # W = np.diagflat(1.0 / np.array(S).astype(np.double))
-        # W = np.eye(d)
 
     # normalize W so it has det(W) = 1
     W_det = np.linalg.det(W)
@@ -371,12 +352,10 @@ def temp_badness(temp, W=None):
     omega = r / (d - r)
 
     # || M ^ j ||
-    b = height(np.vstack([M, j]), W) + 1e-7
+    b = height(np.vstack([M, j]), W)
     # || M || ^ omega
     c = height(M, W)
     c = c**omega
 
     # (|| M ^ j || * || M || ^ omega ) / ||j||
     return b * c / height(j, W)
-    # return b
-    # return c

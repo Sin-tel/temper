@@ -155,14 +155,12 @@ def info(
 
     res["comma basis"] = "<br>".join(comma_str)
 
-    t_start = time.time()
-
-    edolist = find_edos(T, s)
-
-    print("find_edos() took: ", time.time() - t_start)
-
-    if edolist is not None and len(edolist) >= 1:
-        maps_join = find_join(T, s, edolist)
+    if T.shape[0] == 1:
+        res["edo"] = edo_map_notation(T[0], s)
+    else:
+        t_start = time.time()
+        edolist = find_edos(T, s)
+        print("find_edos() took: ", time.time() - t_start)
 
         show_list = []
         for m in edolist:
@@ -171,10 +169,16 @@ def info(
 
         res["edos"] = ", ".join(map(str, show_list))
 
-        if maps_join is not None:
-            res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
-    elif T.shape[0] == 1:
-        res["edo"] = edo_map_notation(T[0], s)
+        # Weil norm for displaying edos
+        W_edo = metric_weil_k(s_expanded, 1200.0)
+        W_edo = (basis.T @ np.linalg.inv(W_edo) @ basis).astype(np.float64)
+        W_edo = np.linalg.inv(W_edo)
+
+        maps_join = LLL(T.T, W_edo).T
+        for k, _ in enumerate(maps_join):
+            if maps_join[k, 0] < 0:
+                maps_join[k] *= -1
+        res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
 
     # find norm on quotient space
     # WL = metric_weil_k(s_expanded, 500.0)
