@@ -39,6 +39,10 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     rank = t_map.shape[0]
     dim = t_map.shape[1]
 
+    if dim > 10:
+        res["error"] = "please use a smaller subgroup"
+        return res
+
     log_s = np.log2(np.array(s).astype(np.float64))
 
     ## metrics
