@@ -114,7 +114,11 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
             try:
                 W_LLL = subgroup_norm(metric_weil_k(s_expanded, f_init))
                 B = LLL(B, W=W_LLL, delta=0.9)
-            except (np.linalg.LinAlgError, OverflowError):
+            except (np.linalg.LinAlgError, OverflowError) as e:
+                print(f"caught: {e}")
+                break
+
+            if np.any(np.abs(B) > 1000):
                 break
 
             f_init *= f
@@ -187,7 +191,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
             try:
                 W_LLL = np.linalg.inv(subgroup_norm(metric_weil_k(s_expanded, f_init)))
                 B = LLL(B.T, W=W_LLL, delta=0.9).T
-            except (np.linalg.LinAlgError, OverflowError):
+            except (np.linalg.LinAlgError, OverflowError) as e:
+                print(f"caught: {e}")
                 break
 
             f_init *= f

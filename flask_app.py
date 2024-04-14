@@ -32,7 +32,12 @@ def search():
             if args[k] == "" or args[k].isspace():
                 del args[k]
 
-        res = temperament_search(args)
+        try:
+            with time_limit(5):
+                res = temperament_search(args)
+        except TimeoutException as e:
+            raise TimeoutException("Calculation took too long!") from e
+
         return f.render_template("./search.jinja", args=args, res=res)
 
     raise ValueError("nothing submitted")

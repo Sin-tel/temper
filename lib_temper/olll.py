@@ -5,6 +5,8 @@ import numpy as np
 
 from .util_types import IntMat, FloatMat, IntVec
 
+MAX_LLL_ITERS = 200
+
 
 def innerprod(a: IntVec, b: IntVec, W: FloatMat) -> float:
     return np.dot(a, W @ b)
@@ -27,23 +29,18 @@ def reduction(basis: IntMat, delta: float, W: FloatMat) -> IntMat:
     n = basis.shape[0]
     ortho = gramschmidt(basis, W)
 
-    type_info = np.iinfo(np.int64)
-    i64_min = type_info.min
-    i64_max = type_info.max
-
     def mu(i: int, j: int) -> float:
         a, b = ortho[j], basis[i]
         return innerprod(a, b, W) / innerprod(a, a, W)
+
+    iter_count = 0
 
     k = 1
     while k < n:
         for j in range(k - 1, -1, -1):
             mu_kj = mu(k, j)
             if abs(mu_kj) > 0.5:
-                if mu_kj < i64_min or mu_kj > i64_max:
-                    raise OverflowError("your numbers are too big!")
-
-                basis[k] = basis[k] - basis[j] * np.round(mu_kj).astype(np.int64)
+                basis[k] = basis[k] - basis[j] * round(mu_kj)
                 ortho = gramschmidt(basis, W)
 
         l_condition = (delta - mu(k, k - 1) ** 2) * innerprod(ortho[k - 1], ortho[k - 1], W)
@@ -55,4 +52,8 @@ def reduction(basis: IntMat, delta: float, W: FloatMat) -> IntMat:
             ortho = gramschmidt(basis, W)
             k = max(k - 1, 1)
 
+        if iter_count > MAX_LLL_ITERS:
+            # we are likely stuck in an infinite loop due to precision issues
+            raise OverflowError("LLL reduction took too long")
+        iter_count += 1
     return basis
