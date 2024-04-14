@@ -10,7 +10,6 @@
 <div class="normal">
 
 <h1>Temperament calculator</h1>
-<p><b><i>New!</i></b> try <a href="{{url_for('search')}}">search</a></p>
 <hr>
 <form action = "{{ url_for('result') }}" method = "GET">
 	<p>Prime limit or subgroup<br>
@@ -54,6 +53,7 @@
 
 <hr>
 
+<p><a href="{{url_for('search')}}">go to search</a></p>
 
 <p>
 Most of the methods used here can be found at <a href="https://en.xen.wiki/">xen.wiki</a>. 
