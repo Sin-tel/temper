@@ -98,12 +98,13 @@ names = [
     ("19-comma", "[-30 19]"),  # 2; 19edo
     ("whitewood", "2187/2048"),  # infinity; 7edo
     # 2.5 subgroup:
-    ("bug", "27/25"),
     ("augmented", "128/125"),  # 1
     ("birds", "[72 0 -31]"),  # 10
     # 2.7 subgroup:
     ("cloudy", "[-14 0 0 5]"),  # 4
     ("birds", "[-87 0 0 31]"),  # 25
+    # 3.5
+    ("bug", "27/25"),
 
     # 2.3.5 subgroup:
     ("father", "16/15"),  # for chromatic-diatonic continuum's completeness
