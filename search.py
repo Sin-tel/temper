@@ -113,10 +113,10 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         for i in range(8):
             try:
                 W_LLL = subgroup_norm(metric_weil_k(s_expanded, f_init))
-            except np.linalg.LinAlgError:
+                B = LLL(B, W=W_LLL, delta=0.9)
+            except (np.linalg.LinAlgError, OverflowError):
                 break
 
-            B = LLL(B, W=W_LLL, delta=0.9)
             f_init *= f
             for k in B.T:
                 k = make_positive(k, s)  # TODO: speed up!
@@ -186,9 +186,10 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         for i in range(8):
             try:
                 W_LLL = np.linalg.inv(subgroup_norm(metric_weil_k(s_expanded, f_init)))
-            except np.linalg.LinAlgError:
+                B = LLL(B.T, W=W_LLL, delta=0.9).T
+            except (np.linalg.LinAlgError, OverflowError):
                 break
-            B = LLL(B.T, W=W_LLL, delta=0.9).T
+
             f_init *= f
 
             found = np.abs(B)

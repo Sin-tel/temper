@@ -47,15 +47,12 @@ def cokernel(M: IntMat) -> IntMat:
     return kernel(M.T).T
 
 
-T = TypeVar("T", bound=IntMat | FloatMat)
-
-
 # LLL reduction
 # Tries to find the smallest basis vectors in some lattice
 # Operates on columns
 # M: Map
 # W: Weight matrix (metric)
-def LLL(M: T, W: Optional[FloatMat] = None, delta: float = 0.75) -> T:
+def LLL(M: IntMat, W: Optional[FloatMat] = None, delta: float = 0.75) -> IntMat:
     if W is None:
         W = np.eye(M.shape[0])
     res = olll.reduction(np.copy(M).T, delta=delta, W=W).T
