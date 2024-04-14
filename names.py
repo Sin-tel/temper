@@ -5,7 +5,7 @@
 
 names = [
     # rank 2
-    ("512/507", "512/507"), # unnamed
+    # ("512/507", "512/507"), # unnamed
     ("diaschismic", "2147483648/2109289329"),
     ("flattone", "137781/131072"),
     ("flattone", "729/704"),
@@ -30,30 +30,34 @@ names = [
     ("mothra", "[-36 0 1 12]"), # 2.5.7
 
     # rank 3
-    ("144/143", "144/143"),  # grossmic? needs better name!
-    ("55/54", "55/54"),  # unnamed
-    ("729/728", "729/728"),  # squbemic, needs better name
+    # ("144/143", "144/143"),  # grossmic? needs better name!
+    # ("55/54", "55/54"),  # unnamed
+    # ("729/728", "729/728"),  # squbemic, needs better name
+    ("akea", "2200/2187"),  # small tetracot diesis
     ("apollo", "100/99"),  # ptolemismic
     ("arcturus", "15625/15309"),
     ("breed", "2401/2400"),  # breedsmic?
     ("buzurg", "169/168"),  # aka buzurg(ism)ic, dhanvantari
     ("counterpyth", "1216/1215"),
     ("demeter", "686/675"),  # sengic
+    ("freya", "[-21 -13 6 0 8]"),
     ("guanyin", "1728/1715"),  # orwellismic
     ("indra", "16875/16807"),  # mirkwai
     ("island", "676/675"),
     ("konbini", "56/55"),
     ("landscape", "250047/250000"),
-    ("parapyth", "352/351"),
     ("marvel", "225/224"),
     ("marveltwin", "325/324"),
+    ("metric", "703125/702464"),
     ("minerva", "5632/5625"),  # vishdel
+    ("mint", "36/35"),
     ("mothwellsmic", "99/98"),  # needs better name!
     ("odin", "[-17 24 -18 0 6]"),
+    ("parapyth", "352/351"),
     ("pele", "5120/5103"),  # hemifamity
-    ("akea", "2200/2187"),  # small tetracot diesis
     ("pentacircle", "896/891"),
     ("pine", "4000/3993"),
+    ("portent", "166375/165888"), # 2.3.5.11
     ("ragismic", "4375/4374"),
     ("starling", "126/125"),
     ("supermagic", "875/864"),
@@ -64,8 +68,6 @@ names = [
     ("zeus", "121/120"),  # biyatismic
     ("zeus", "176/175"),  # valinorismic
     ("zeus", "6144/6125"),  # porwell
-    ("freya", "[-21 -13 6 0 8]"),
-    ("portent", "166375/165888"), # 2.3.5.11
 
     # rank 4
     ("animist", "105/104"),
