@@ -261,7 +261,16 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         res[f"= rank-{r_s} ="] = "<hr>"
         res_list = sorted(by_rank[r_s], key=lambda v: v[2])
 
-        for k in res_list[0:10]:
+        # show less results for ranks nobody cares about
+        max_res = 5
+        if r_s <= 2:
+            max_res = 12
+        if r_s == 3:
+            max_res = 10
+        if r_s == dim - 1:
+            max_res = 12
+
+        for k in res_list[0:max_res]:
             t_mat = np.atleast_2d(k[1])
 
             if factor_order(t_mat) > 1:
