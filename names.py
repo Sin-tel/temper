@@ -42,7 +42,7 @@ names = [
     ("demeter", "686/675"),  # sengic
     ("freya", "[-21 -13 6 0 8]"),
     ("guanyin", "1728/1715"),  # orwellismic
-    ("indra", "16875/16807"),  # mirkwai
+    ("canopus", "16875/16807"),  # 3.5.7, mirkwai, indra
     ("island", "676/675"),
     ("konbini", "56/55"),
     ("landscape", "250047/250000"),
