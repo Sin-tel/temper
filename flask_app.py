@@ -105,7 +105,7 @@ def test():
 @app.errorhandler(500)
 def internal_error(exception):
     print("500 error caught")
-    return "<pre>" + traceback.format_exc() + "</pre>"
+    return "<pre>" + traceback.format_exc() + "</pre>", 500
 
 
 if __name__ == "__main__":
