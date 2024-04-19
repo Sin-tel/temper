@@ -105,7 +105,7 @@ def xen():
 
 @app.route("/test")
 def test():
-    return "hey2"
+    return "hey3"
 
 
 @app.errorhandler(500)
