@@ -82,8 +82,12 @@ def result():
 @app.route("/update", methods=["POST"])
 def update():
     if f.request.method == "POST":
-        # repo = git.Repo("./temper")
-        repo = git.Repo(".")
+        wd = os.getcwd()
+        if wd.endswith("temper"):
+            repo = git.Repo(".")
+        else:
+            repo = git.Repo("./temper")
+
         origin = repo.remotes.origin
         if not "main" in repo.heads:
             repo.create_head("main", origin.refs.main)
@@ -100,7 +104,7 @@ def xen():
 
 @app.route("/test")
 def test():
-    return "hey"
+    return "hey2"
 
 
 @app.errorhandler(500)
