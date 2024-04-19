@@ -82,7 +82,8 @@ def result():
 @app.route("/update", methods=["POST"])
 def update():
     if f.request.method == "POST":
-        repo = git.Repo("./temper")
+        # repo = git.Repo("./temper")
+        repo = git.Repo(".")
         origin = repo.remotes.origin
         if not "main" in repo.heads:
             repo.create_head("main", origin.refs.main)
@@ -103,7 +104,7 @@ def test():
 
 
 @app.errorhandler(500)
-def internal_error(exception):
+def internal_error(_):
     print("500 error caught")
     return "<pre>" + traceback.format_exc() + "</pre>", 500
 
