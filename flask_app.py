@@ -1,5 +1,9 @@
 import traceback
 import flask as f
+import os
+
+# workaround for git import errors
+os.environ["GIT_PYTHON_REFRESH"] = "quiet"
 import git
 from timeout import time_limit, TimeoutException
 from info import *
