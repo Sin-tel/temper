@@ -132,20 +132,27 @@ def info(
     # https://en.xen.wiki/w/Generalized_Tenney_norms_and_Tp_interval_space
     # b.T @ W^2 @ b
 
-    G_compl_exp = np.linalg.inv(metric_wilson(s_expanded))
-    G_compl = (basis.T @ G_compl_exp @ basis).astype(np.float64)
+    G_wilson_exp = np.linalg.inv(metric_wilson(s_expanded))
+    G_wilson = (basis.T @ G_wilson_exp @ basis).astype(np.float64)
 
-    commas = LLL(kernel(T), G_compl)
+    G_tenney_exp = np.linalg.inv(metric_tenney(s_expanded))
+    G_tenney = (basis.T @ G_tenney_exp @ basis).astype(np.float64)
+
+    commas = LLL(kernel(T), G_tenney, delta=0.99)
+    commas_show = LLL(kernel(T), G_wilson, delta=0.99)
 
     for i in range(len(commas.T)):
         commas[:, i] = make_positive(commas[:, i], s)
 
+    for i in range(len(commas_show.T)):
+        commas_show[:, i] = make_positive(commas_show[:, i], s)
+
     c_length = []
-    for c_column in commas:
+    for c_column in commas_show:
         c_length.append(max(len(str(x)) + 1 for x in list(c_column)))
 
     comma_str = []
-    for c in commas.T:
+    for c in commas_show.T:
         ## format spaces
         vec = "".join(["{1: {0}d}".format(c_length[i], c[i]) for i in range(len(c))])
         vec = vec.replace(" ", "&nbsp;")
@@ -188,7 +195,8 @@ def info(
     # T = solve_diophantine(gens2, T)
 
     gens = preimage(T)
-    gens = simplify(gens, commas, G_compl)
+    # gens = simplify(gens, commas, G_tenney)
+    gens = simplify(gens, commas)
 
     # make positive
     for i in range(T.shape[0]):
@@ -216,6 +224,8 @@ def info(
     elif red == "spine":
         # TODO: do the size calculations with tempered intervals instead
         o = T[0, 0]
+        k_mul = T[1, 1]
+
         genoct = np.zeros_like(gens[:, 0])
         genoct[0] = 1
         eq = log_interval(genoct, s)
@@ -234,17 +244,19 @@ def info(
                 interval_size = log_interval(gens[:, i], s)
 
                 for k in alternating_iter:
-                    try_next = interval_size + k * fifth
+                    try_next = interval_size + k_mul * k * fifth
                     eq_red = -int(np.round(try_next / eq))
                     try_next += eq * eq_red
+                    print(try_next, k)
                     # print(k, eq_red, try_next)
                     if np.abs(try_next) <= cutoff:
-                        gens[:, i] += k * gens[:, 1] + eq_red * gens[:, 0]
-                        T[1, :] -= k * T[i, :]
-                        T[0, :] -= eq_red * T[i, :]
+                        gens[:, i] += k_mul * k * gens[:, 1] + o * eq_red * gens[:, 0]
+                        T[1, :] -= k_mul * k * T[i, :]
+                        T[0, :] -= o * eq_red * T[i, :]
                         break
             # we have to do this again because the resulting intervals may be complicated
-            gens = simplify(gens, commas, G_compl)
+            # gens = simplify(gens, commas, G_tenney)
+            gens = simplify(gens, commas)
             # make positive
             for i in range(T.shape[0]):
                 if log_interval(gens[:, i], s) < 0:

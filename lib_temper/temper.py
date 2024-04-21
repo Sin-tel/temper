@@ -176,16 +176,15 @@ def preimage(M):
 
 # simplify list of intervals wrt a comma basis.
 # The comma basis should be in reduced LLL form for this to work properly.
-# TODO: figure out if the weight matrix here actually helps
+# TODO: need a better algorithm
+# passing W often doesn't improve solution
 def simplify(intervals, commas, W=None):
-    # system tries to find vectors approximately equal to zero
-    # approximate solution in floating point,
-    # then round to get integer solution
+    # solves a (weighted) least squares problem in the integers
+    # rounding solution is somewhat naive, since it assumes the basis is perfectly orthogonal
 
     if W is None:
         W = np.eye(commas.shape[0])
 
-    # c_inv = np.linalg.pinv(commas)
     c_inv = np.linalg.inv(commas.T @ W @ commas) @ commas.T
     s_vecs = np.round(c_inv @ W @ intervals).astype(np.int64)
     simpl = intervals - commas @ s_vecs

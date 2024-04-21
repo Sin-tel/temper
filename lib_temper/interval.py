@@ -2,7 +2,7 @@
 
 from fractions import Fraction
 import numpy as np
-from .util_types import IntArray, IntVec, FloatVec, Subgroup, SubgroupInt
+from .util_types import IntArray, IntVec, FloatVec, Subgroup, SubgroupInt, IntMat
 
 
 # prime vector to ratio. subgroup may be rational
@@ -21,7 +21,7 @@ def ratio(v: IntVec, subgroup: Subgroup) -> Fraction:
 
 # fraction to prime vector (aka prime factorization)
 # only works for integer subgroups (doesn't check for (co)primality in the basis)
-def factors(fr: int | Fraction | tuple[int, int], subgroup: SubgroupInt) -> IntVec:
+def factors(fr: int | Fraction | tuple[int, int], subgroup: SubgroupInt) -> IntMat:
     f_vector = np.zeros((len(subgroup), 1), dtype=np.int64)
 
     if isinstance(fr, tuple):
