@@ -28,6 +28,7 @@ names = [
     ("supra", "8192/8019"),
     ("tridecimal", "1053/1024"),
     ("mothra", "[-36 0 1 12]"), # 2.5.7
+    ("leapday", "[31 -21 1]"),
 
     # rank 3
     # ("144/143", "144/143"),  # grossmic? needs better name!
@@ -72,7 +73,7 @@ names = [
     # rank 4
     ("animist", "105/104"),
     ("biome", "91/90"),
-    ("gentle", "364/363"),  # minor minthmic
+    # ("gentle", "364/363"),  # minor minthmic (this doesn't actually give gentle)
     ("huntmic", "640/637"),  # ehh
     ("kalismic", "9801/9800"),
     ("keenanismic", "385/384"),  # keenan? (i can literally ask him) "undecimal kleismic" doesnt sound that nice
