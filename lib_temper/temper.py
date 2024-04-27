@@ -174,14 +174,24 @@ def preimage(M):
     return sol
 
 
-# simplify list of intervals wrt a comma basis.
+# Simplify a list of intervals with respect to some comma basis.
 # The comma basis should be in reduced LLL form for this to work properly.
-# TODO: need a better algorithm
-# passing W often doesn't improve solution
+# To find the solution, we solve approximate CVP in the lattice spanned by the commas.
 def simplify(intervals, commas, W=None):
-    # solves a (weighted) least squares problem in the integers
-    # rounding solution is somewhat naive, since it assumes the basis is perfectly orthogonal
+    if W is None:
+        W = np.eye(commas.shape[0])
 
+    simpl = intervals.copy()
+    for i in range(simpl.shape[1]):
+        simpl[:, i] -= olll.nearest_plane(simpl[:, i], commas.T, W)
+
+    return simpl
+
+
+# previous simplify algorithm
+# solves a (weighted) least squares problem in the integers
+# rounding solution is somewhat naive, since it assumes the basis is perfectly orthogonal
+def simplify2(intervals, commas, W=None):
     if W is None:
         W = np.eye(commas.shape[0])
 

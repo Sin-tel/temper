@@ -8,7 +8,7 @@ http://127.0.0.1:5000/result?subgroup=2.3.5.7.17&reduce=on&weights=tenney&target
 => should have 2, 85/64 as generators
 
 http://127.0.0.1:5000/result?subgroup=19&reduce=on&weights=unweighted&target=2%2F1%2C+17%2F13&edos=&commas=169%2F168%2C+221%2F220%2C+286%2F285%2C+289%2F288%2C+325%2F324%2C+400%2F399&submit_comma=submit
-=> should give 12/11 and 49/45
+=> should give 12/11 and 7/5
 
 http://127.0.0.1:5000/result?subgroup=2.3.7.11&reduce=on&tenney=on&edos=26%2C22&submit_edo=submit&commas=
 http://127.0.0.1:5000/result?subgroup=11&reduce=on&tenney=on&edos=31%2C19&submit_edo=submit&commas=
@@ -26,12 +26,11 @@ http://127.0.0.1:5000/result?subgroup=2.3.19%2F20&reduce=on&tenney=on&edos=12%2C
 spine reduce correctness:
 /result?subgroup=19&reduce=spine&weights=weil&target=2%2F1%2C+3%2F2&edos=5%5B-13%5D%2C+7%2C+41&commas=4095%2F4096%0D%0A65637%2F65536%0D%0A5103%2F5120%0D%0A34749%2F34816&submit_comma=submit
 
-http://127.0.0.1:5000//result?subgroup=2.3.5.17&reduce=off&weights=weil&target=&edos=&commas=%5B45+-2+-18%5D%2C+17825792%2F17578125&submit_comma=submit
+http://127.0.0.1:5000/result?subgroup=2.3.5.17&reduce=off&weights=weil&target=&edos=&commas=%5B45+-2+-18%5D%2C+17825792%2F17578125&submit_comma=submit
 => gens should be 17/12 and 17/15
 
 /result?subgroup=2.3.5.13.17.23&reduce=on&weights=weil&target=&edos=&commas=%7B%5B45+-2+-18%5D%2C+2197%2F2187%2C+1632%2F1625%2C+289%2F288%2C+4913%2F4875%2C+391%2F390&submit_comma=submit
 => gens should be 17/12 and 17/15
-=> currently gives 26/23!
 
 http://127.0.0.1:5000/result?subgroup=2.3.5.7.11.17.19.23&reduce=on&weights=tenney&target=&edos=&commas=1445%2F1444%2C+48013%2F48000%2C+2300%2F2299%2C+85184%2F85169&submit_comma=submit
 => gens: 2, 11/10, 19/17, 44/23

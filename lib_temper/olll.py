@@ -25,6 +25,7 @@ def gramschmidt(v: IntMat, W: FloatMat) -> FloatMat:
     return u
 
 
+# LLL reduction on the rows of `basis`
 def reduction(basis: IntMat, delta: float, W: FloatMat) -> IntMat:
     n = basis.shape[0]
     ortho = gramschmidt(basis, W)
@@ -57,3 +58,19 @@ def reduction(basis: IntMat, delta: float, W: FloatMat) -> IntMat:
             raise OverflowError("LLL reduction took too long")
         iter_count += 1
     return basis
+
+
+# Babai's nearest plane algorithm for solving approximate CVP
+# `basis` should be LLL reduced first
+# operates on rows
+def nearest_plane(v: IntVec, basis: IntMat, W: FloatMat) -> IntVec:
+    b = v.copy()
+    n = basis.shape[0]
+
+    ortho = gramschmidt(basis, W)
+
+    for j in range(n - 1, -1, -1):
+        a = ortho[j]
+        mu = innerprod(a, b, W) / innerprod(a, a, W)
+        b = b - round(mu) * basis[j]
+    return v - b

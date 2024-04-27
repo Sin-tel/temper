@@ -135,24 +135,17 @@ def info(
     G_wilson_exp = np.linalg.inv(metric_wilson(s_expanded))
     G_wilson = (basis.T @ G_wilson_exp @ basis).astype(np.float64)
 
-    G_tenney_exp = np.linalg.inv(metric_tenney(s_expanded))
-    G_tenney = (basis.T @ G_tenney_exp @ basis).astype(np.float64)
-
-    commas = LLL(kernel(T), G_tenney, delta=0.99)
-    commas_show = LLL(kernel(T), G_wilson, delta=0.99)
+    commas = LLL(kernel(T), G_wilson, delta=0.99)
 
     for i in range(len(commas.T)):
         commas[:, i] = make_positive(commas[:, i], s)
 
-    for i in range(len(commas_show.T)):
-        commas_show[:, i] = make_positive(commas_show[:, i], s)
-
     c_length = []
-    for c_column in commas_show:
+    for c_column in commas:
         c_length.append(max(len(str(x)) + 1 for x in list(c_column)))
 
     comma_str = []
-    for c in commas_show.T:
+    for c in commas.T:
         ## format spaces
         vec = "".join(["{1: {0}d}".format(c_length[i], c[i]) for i in range(len(c))])
         vec = vec.replace(" ", "&nbsp;")
@@ -195,8 +188,7 @@ def info(
     # T = solve_diophantine(gens2, T)
 
     gens = preimage(T)
-    # gens = simplify(gens, commas, G_tenney)
-    gens = simplify(gens, commas)
+    gens = simplify(gens, commas, G_wilson)
 
     # make positive
     for i in range(T.shape[0]):
@@ -255,8 +247,7 @@ def info(
                         T[0, :] -= o * eq_red * T[i, :]
                         break
             # we have to do this again because the resulting intervals may be complicated
-            # gens = simplify(gens, commas, G_tenney)
-            gens = simplify(gens, commas)
+            gens = simplify(gens, commas, G_wilson)
             # make positive
             for i in range(T.shape[0]):
                 if log_interval(gens[:, i], s) < 0:
