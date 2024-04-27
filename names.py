@@ -13,13 +13,16 @@ names = [
     ("garischismic", "[25 -14 0 -1]"),
     ("hedgehog", "118098/117649"),
     ("injera", "6561/6272"),
+    ("leapday", "[31 -21 1]"),
     ("liese", "[-9 11 0 -3]"),
     ("meantone", "59049/57344"), # 2.3.7 variant
     ("mohajira", "214358881/204800000"), # 2.5.11, contorted in 5-lim
+    ("mothra", "[-36 0 1 12]"), # 2.5.7
     ("nexus", "1771561/1769472"),
     ("octacot", "5764801/5668704"), # 2.3.7, contorted in 5-lim
     ("orwell", "839808/823543"), # 2.3.7 alternative
     ("pajara", "2197265625/1977326743"),  # 3.5.7 hack
+    ("passion", "[18 -4 -5]"),
     ("porcupine", "1331/1296"), # 2.3.11
     ("rastmic", "243/242"),
     ("sensamagic", "245/243"),
@@ -27,8 +30,6 @@ names = [
     ("superpyth", "20480/19683"),
     ("supra", "8192/8019"),
     ("tridecimal", "1053/1024"),
-    ("mothra", "[-36 0 1 12]"), # 2.5.7
-    ("leapday", "[31 -21 1]"),
 
     # rank 3
     # ("144/143", "144/143"),  # grossmic? needs better name!
