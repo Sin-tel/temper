@@ -5,7 +5,7 @@ import numpy as np
 
 from .util_types import IntMat, FloatMat, IntVec
 
-MAX_LLL_ITERS = 300
+MAX_LLL_ITERS = 800
 
 
 def innerprod(a: IntVec, b: IntVec, W: FloatMat) -> float:
