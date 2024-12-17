@@ -1,3 +1,4 @@
 flask
-numpy
+numpy<2.0
 GitPython
+rslattice

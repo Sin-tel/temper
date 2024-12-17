@@ -3,21 +3,19 @@
 from typing import Optional, TypeVar
 
 import numpy as np
-
-from . import olll
-from .hnf_bigint import hnf_bigint
+import rslattice
 
 from .util_types import IntMat, FloatMat
 from .subgroup import *
 from .optimize import *
-from .combo import comboBySum
 
 
 # Find the hermite normal form of M
 def hnf(M: IntMat, remove_zeros: bool = False) -> IntMat:
     assert M.ndim == 2
 
-    res = hnf_bigint(M)
+    # res = hnf_bigint(M)
+    res = rslattice.hnf(M)
 
     if remove_zeros:
         idx = np.argwhere(np.all(res[:] == 0, axis=1))
@@ -55,7 +53,9 @@ def cokernel(M: IntMat) -> IntMat:
 def LLL(M: IntMat, W: Optional[FloatMat] = None, delta: float = 0.75) -> IntMat:
     if W is None:
         W = np.eye(M.shape[0])
-    res = olll.reduction(np.copy(M).T, delta=delta, W=W).T
+
+    # res = olll.reduction(np.copy(M).T, delta=delta, W=W).T
+    res = rslattice.lll(M.T, delta, W).T
 
     # sort them by complexity
     # actually, this might be redundant.
@@ -85,7 +85,8 @@ def defactored_hnf(M: IntMat) -> IntMat:
     r, _ = M.shape
 
     K = hnf(M.T)[:r].T
-    if np.isclose(np.linalg.det(K), 1.0):
+    # if np.isclose(np.linalg.det(K), 1.0):
+    if rslattice.integer_det(K) == 1:
         return hnf(M)
 
     S = np.linalg.inv(K)
@@ -96,34 +97,11 @@ def defactored_hnf(M: IntMat) -> IntMat:
     return hnf(D.astype(np.int64))
 
 
-# exact integer determinant using Bareiss algorithm
-# modified slightly from:
-## https://stackoverflow.com/questions/66192894/precise-determinant-of-integer-nxn-matrix
-def integer_det(M: IntMat) -> int:
-    M = np.copy(M)  # make a copy to keep original M unmodified
-
-    N, sign, prev = len(M), 1, 1
-    for i in range(N - 1):
-        if M[i, i] == 0:  # swap with another row having nonzero i's elem
-            swapto = next((j for j in range(i + 1, N) if M[j, i] != 0), None)
-            if swapto is None:
-                return 0  # all M[*][i] are zero => zero determinant
-            ## swap rows
-            M[[i, swapto]] = M[[swapto, i]]
-            sign *= -1
-        for j in range(i + 1, N):
-            for k in range(i + 1, N):
-                assert (M[j, k] * M[i, i] - M[j, i] * M[i, k]) % prev == 0
-                M[j, k] = (M[j, k] * M[i, i] - M[j, i] * M[i, k]) // prev
-        prev = M[i, i]
-    return sign * M[-1, -1]
-
-
 # Order of factorization.
 # For a saturated basis this is 1.
 def factor_order(M: IntMat) -> int:
     r = M.shape[0]
-    return integer_det(hnf(M.T)[:r].T)
+    return rslattice.integer_det(hnf(M.T)[:r].T)
 
 
 # Canonical maps
@@ -161,7 +139,7 @@ def solve_diophantine(A, B):
     return sol
 
 
-# Solves MX = I in the integers (basically as above)
+# Solves XM = I in the integers (basically as above)
 def preimage(M):
     r, d = M.shape
 
@@ -183,21 +161,8 @@ def simplify(intervals, commas, W=None):
 
     simpl = intervals.copy()
     for i in range(simpl.shape[1]):
-        simpl[:, i] -= olll.nearest_plane(simpl[:, i], commas.T, W)
+        simpl[:, i] -= rslattice.nearest_plane(simpl[:, i], commas.T, W)
 
-    return simpl
-
-
-# previous simplify algorithm
-# solves a (weighted) least squares problem in the integers
-# rounding solution is somewhat naive, since it assumes the basis is perfectly orthogonal
-def simplify2(intervals, commas, W=None):
-    if W is None:
-        W = np.eye(commas.shape[0])
-
-    c_inv = np.linalg.inv(commas.T @ W @ commas) @ commas.T
-    s_vecs = np.round(c_inv @ W @ intervals).astype(np.int64)
-    simpl = intervals - commas @ s_vecs
     return simpl
 
 

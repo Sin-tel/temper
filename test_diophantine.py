@@ -1,7 +1,7 @@
 # test diophantine solver with random matrices
 
 import numpy as np
-from lib_temper import solve_diophantine, integer_det, hnf
+from lib_temper import solve_diophantine, hnf
 
 count = 0
 for i in range(1, 10000):
