@@ -155,3 +155,4 @@ cython_debug/
 names.json
 illl_*
 lib_temper/hnf_np.py
+*.sublime-workspace
