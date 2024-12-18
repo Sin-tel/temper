@@ -87,7 +87,7 @@ def defactored_hnf(M: IntMat) -> IntMat:
     K = hnf(M.T)[:r].T
     # if np.isclose(np.linalg.det(K), 1.0):
     if rslattice.integer_det(K) == 1:
-        return hnf(M)
+        return rslattice.hnf(M)
 
     S = np.linalg.inv(K)
 
@@ -125,7 +125,7 @@ def solve_diophantine(A, B):
     B = np.atleast_2d(B)
     aug = np.block([[A, B]])
 
-    H = hnf(aug)
+    H = rslattice.hnf(aug)
     sol = H[0:d, d:]
 
     K = H[0:d, 0:d]
@@ -144,7 +144,7 @@ def preimage(M):
     r, d = M.shape
 
     B = np.block([[M.T, np.eye(d, dtype=np.int64)]])
-    H = hnf(B)
+    H = rslattice.hnf(B)
     sol = H[0:r, r:].T
 
     assert np.all(M @ sol == np.eye(r, dtype=np.int64)), "Could not solve system"
