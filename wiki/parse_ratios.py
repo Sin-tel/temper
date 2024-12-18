@@ -1,4 +1,4 @@
-from all_pages import wiki_pages
+from pages import wiki_pages
 import re
 
 re_ratio = re.compile(r"^(\d+)/(\d+)$")
