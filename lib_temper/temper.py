@@ -8,6 +8,7 @@ import rslattice
 from .util_types import IntMat, FloatMat
 from .subgroup import *
 from .optimize import *
+from .combo import comboBySum
 
 
 # Find the hermite normal form of M
