@@ -9,7 +9,6 @@ from parse import *
 
 np.set_printoptions(suppress=True)
 
-
 def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     basis, s_expanded = parse_subgroup(args["subgroup"])
 
@@ -60,7 +59,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     W_tenney_inv = np.linalg.inv(W_tenney)
 
     # Weil norm for cangwu badness
-    W_weil = subgroup_norm(metric_weil_k(s_expanded, 800.0))
+    k_cangwu = 800.0  * np.sqrt(rank / 3)
+    W_weil = subgroup_norm(metric_weil_k(s_expanded, k_cangwu))
     W_weil_inv = np.linalg.inv(W_weil)
 
     # Wilson norm for displaying commas
@@ -85,6 +85,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     by_rank: dict[int, list[tuple[str, IntMat, float]]] = {}
 
     checked: set[tuple[int, ...]] = set()
+
+    delta = 0.75
 
     def badness(t_map: IntMat) -> float:
         if badness_type == "dirichlet":
@@ -113,7 +115,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         for i in range(8):
             try:
                 W_LLL = subgroup_norm(metric_weil_k(s_expanded, f_init))
-                B = LLL(B, W=W_LLL, delta=0.9)
+                B = LLL(B, W=W_LLL, delta=delta)
             except (np.linalg.LinAlgError, OverflowError) as e:
                 print(f"caught: {e}")
                 break
@@ -190,7 +192,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         for i in range(8):
             try:
                 W_LLL = np.linalg.inv(subgroup_norm(metric_weil_k(s_expanded, f_init)))
-                B = LLL(B.T, W=W_LLL, delta=0.9).T
+                B = LLL(B.T, W=W_LLL, delta=delta).T
             except (np.linalg.LinAlgError, OverflowError) as e:
                 print(f"caught: {e}")
                 break
