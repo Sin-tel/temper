@@ -41,11 +41,11 @@ names = [
     ("arcturus", "15625/15309"),
     ("breed", "2401/2400"),  # breedsmic?
     ("buzurg", "169/168"),  # aka buzurg(ism)ic, dhanvantari
+    ("canopus", "16875/16807"),  # 3.5.7, mirkwai, indra
     ("counterpyth", "1216/1215"),
     ("demeter", "686/675"),  # sengic
     ("freya", "[-21 -13 6 0 8]"),
     ("guanyin", "1728/1715"),  # orwellismic
-    ("canopus", "16875/16807"),  # 3.5.7, mirkwai, indra
     ("island", "676/675"),
     ("konbini", "56/55"),
     ("landscape", "250047/250000"),
@@ -63,6 +63,7 @@ names = [
     ("portent", "166375/165888"), # 2.3.5.11
     ("ragismic", "4375/4374"),
     ("starling", "126/125"),
+    ("superkleismic", "1953125/1889568"), # aka Shibboleth
     ("supermagic", "875/864"),
     ("symbiotic", "19712/19683"),
     ("thor", "1890625/1889568"),
