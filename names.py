@@ -56,6 +56,7 @@ names = [
     ("mint", "36/35"),
     ("mothwellsmic", "99/98"),  # needs better name!
     ("odin", "[-17 24 -18 0 6]"),
+    ("olympic", "131072/130977"), # 2.3.7.11
     ("parapyth", "352/351"),
     ("pele", "5120/5103"),  # hemifamity
     ("pentacircle", "896/891"),
