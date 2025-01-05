@@ -34,6 +34,7 @@ names = [
     ("superpyth", "20480/19683"),
     ("supra", "8192/8019"),
     ("tridecimal", "1053/1024"),
+    ("vulture", "[24 -21 4]"),
 
     # rank 3
     # ("144/143", "144/143"),  # grossmic? needs better name!
@@ -131,7 +132,7 @@ names = [
     ("python", "43046721/41943040"),  # 4
     # compton is 3
     ("gracecordial", "[-34 20 1]"),  # 2.5
-    ("schismatic", "32805/32768"),  # 2
+    ("schismatic", "32805/32768"),  # 2 (aka helmholtz)
     ("undim", "[41 -20 -4]"),  # 5/3
     ("misty", "67108864/66430125"),  # 1.5
     ("diaschismic", "2048/2025"),  # 1
