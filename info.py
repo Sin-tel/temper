@@ -155,8 +155,16 @@ def info(
 
     res["comma basis"] = "<br>".join(comma_str)
 
+    ed_name = "edo"
+
+    if s[0] != 2:
+        if s[0] == 3:
+            ed_name = "edt"
+        else:
+            ed_name = f"ed{s[0]}"
+
     if T.shape[0] == 1:
-        res["edo"] = edo_map_notation(T[0], s)
+        res[ed_name] = edo_map_notation(T[0], s)
     else:
         t_start = time.time()
         edolist = find_edos(T, s)
@@ -167,7 +175,7 @@ def info(
             mstr = edo_map_notation(m[0][0], s)
             show_list.append(mstr)
 
-        res["edos"] = ", ".join(map(str, show_list))
+        res[f"{ed_name}s"] = ", ".join(map(str, show_list))
 
         # Weil norm for displaying edos
         W_edo = metric_weil_k(s_expanded, 1200.0)
@@ -178,7 +186,7 @@ def info(
         for k, _ in enumerate(maps_join):
             if maps_join[k, 0] < 0:
                 maps_join[k] *= -1
-        res["edo join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
+        res[f"{ed_name} join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
 
     # find norm on quotient space
     # WL = metric_weil_k(s_expanded, 500.0)
@@ -200,6 +208,10 @@ def info(
         red = options["reduce"]
     else:
         red = "on"
+
+    # nothing to do for rank 1
+    if T.shape[0] == 1:
+        red = "off"
 
     if red == "on":
         o = T[0, 0]
