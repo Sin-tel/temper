@@ -21,7 +21,7 @@ def ratio(v: IntVec, subgroup: Subgroup) -> Fraction:
 
 # fraction to prime vector (aka prime factorization)
 # only works for integer subgroups (doesn't check for (co)primality in the basis)
-def factors(fr: int | Fraction | tuple[int, int], subgroup: SubgroupInt) -> IntMat:
+def factors(fr: int | Fraction | tuple[int, int], subgroup: SubgroupInt) -> IntVec:
     f_vector = np.zeros((len(subgroup), 1), dtype=np.int64)
 
     if isinstance(fr, tuple):

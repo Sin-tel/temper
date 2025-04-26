@@ -22,11 +22,10 @@ def from_commas(comma_str: str, basis: IntMat, s_expanded: SubgroupInt) -> tuple
 
     M_expanded = cokernel(commas)
 
-    assert M_expanded[0][0] != 0, "Can't temper out the octave."
-
     commas_2 = solve_diophantine(basis, commas)
 
     M = cokernel(commas_2)
+    assert M[0][0] != 0, "Can't temper out the octave."
 
     assert np.allclose(M_expanded @ basis @ commas_2, 0), "comma not in subgroup"
 
