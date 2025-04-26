@@ -42,7 +42,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         res["error"] = "search is limited to subgroups of dimensions < 20"
         return res
 
-    log_s = np.log2(np.array(s).astype(np.float64))
+    subgroup_size = np.max(np.log2(np.array(s_expanded).astype(np.float64)))
 
     ## metrics
 
@@ -59,7 +59,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     W_tenney_inv = np.linalg.inv(W_tenney)
 
     # Weil norm for cangwu badness
-    k_cangwu = 800.0  * np.sqrt(rank / 3)
+    k_cangwu = 800.0 * np.sqrt(rank / 4)
     W_weil = subgroup_norm(metric_weil_k(s_expanded, k_cangwu))
     W_weil_inv = np.linalg.inv(W_weil)
 
@@ -68,7 +68,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     W_wilson = W_wilson.astype(np.float64)
 
     # Weil norm for displaying edos
-    W_edo = subgroup_norm(metric_weil_k(s_expanded, 1200.0 * np.max(log_s)))
+    W_edo = subgroup_norm(metric_weil_k(s_expanded, 1200.0 * subgroup_size))
     W_edo = np.linalg.inv(W_edo)
 
     # normalize determinants
@@ -105,7 +105,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
         B = c_map
 
-        f_init = 8 * np.max(log_s)
+        f_init = 8 * subgroup_size
         f = 2 * (1.2 ** (dim - 1))
 
         # print(f"f init = {f_init}")
@@ -179,7 +179,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         for r_s in range(1, rank):
             by_rank[r_s] = []
 
-        f_init = 16 * np.sqrt(rank) * np.max(log_s)
+        f_init = 16 * np.sqrt(rank) * subgroup_size
         f = 1.4 * (1.1 ** (dim - 1))
 
         # print(f"f init = {f_init}")
