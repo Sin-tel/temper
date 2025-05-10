@@ -15,7 +15,6 @@ from .combo import comboBySum
 def hnf(M: IntMat, remove_zeros: bool = False) -> IntMat:
     assert M.ndim == 2
 
-    # res = hnf_bigint(M)
     res = rslattice.hnf(M)
 
     if remove_zeros:
@@ -55,7 +54,6 @@ def LLL(M: IntMat, W: Optional[FloatMat] = None, delta: float = 0.75) -> IntMat:
     if W is None:
         W = np.eye(M.shape[0])
 
-    # res = olll.reduction(np.copy(M).T, delta=delta, W=W).T
     res = rslattice.lll(M.T, delta, W).T
 
     # sort them by complexity
@@ -85,8 +83,7 @@ def antitranspose(M: IntMat) -> IntMat:
 def defactored_hnf(M: IntMat) -> IntMat:
     r, _ = M.shape
 
-    K = hnf(M.T)[:r].T
-    # if np.isclose(np.linalg.det(K), 1.0):
+    K = rslattice.hnf(M.T)[:r].T
     if rslattice.integer_det(K) == 1:
         return rslattice.hnf(M)
 
@@ -102,7 +99,7 @@ def defactored_hnf(M: IntMat) -> IntMat:
 # For a saturated basis this is 1.
 def factor_order(M: IntMat) -> int:
     r = M.shape[0]
-    return rslattice.integer_det(hnf(M.T)[:r].T)
+    return rslattice.integer_det(rslattice.hnf(M.T)[:r].T)
 
 
 # Canonical maps
@@ -315,19 +312,28 @@ def temp_badness(temp, W=None):
     if W is None:
         W = np.diagflat(1.0 / j) ** 2
 
+    # W = np.eye(d)
     # normalize W so it has det(W) = 1
     W_det = np.linalg.det(W)
     assert W_det > 0
-    W = W / np.power(W_det, 1 / W.shape[0])
+    W = W / np.power(W_det, 1 / d)
+
+    # W = W / np.power(W_det, 1 / r)
+    # W_det = np.linalg.det(W)
 
     # the exponent
     omega = r / (d - r)
 
     # || M ^ j ||
     b = height(np.vstack([M, j]), W)
+    # b = height(np.vstack([M, j]), W) / ((W_det) ** (1/2))
     # || M || ^ omega
     c = height(M, W)
+    # c = height(M, W) / ((W_det) ** (1/2))
     c = c**omega
+
 
     # (|| M ^ j || * || M || ^ omega ) / ||j||
     return b * c / height(j, W)
+    # return b * c
+    # return c

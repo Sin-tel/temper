@@ -187,12 +187,22 @@ def info(
                 maps_join[k] *= -1
         res[f"{ed_name} join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
 
-    # find norm on quotient space
-    # WL = metric_weil_k(s_expanded, 500.0)
-    # WL = T @ WL @ T.T
-    # WL = np.linalg.inv(WL)
-    # gens2 = LLL(np.eye(T.shape[0], dtype=np.int64), WL)
-    # T = solve_diophantine(gens2, T)
+    if "reduce" in options:
+        red = options["reduce"]
+    else:
+        red = "on"
+
+    # nothing to do for rank 1
+    if T.shape[0] == 1:
+        red = "off"
+
+    if red == "layout":
+        # find norm on quotient space
+        WL = metric_weil_k(s_expanded, 15.0)
+        WL = T @ WL @ T.T
+        WL = np.linalg.inv(WL)
+        gens_t = LLL(np.eye(T.shape[0], dtype=np.int64), WL)
+        T = solve_diophantine(gens_t, T)
 
     gens = preimage(T)
     gens = simplify(gens, commas, G_wilson)
@@ -203,14 +213,12 @@ def info(
             T[i, :] = -T[i, :]
             gens[:, i] = -gens[:, i]
 
-    if "reduce" in options:
-        red = options["reduce"]
-    else:
-        red = "on"
-
-    # nothing to do for rank 1
-    if T.shape[0] == 1:
-        red = "off"
+    if red == "layout":
+        # sort by size
+        log_s = log_subgroup(s)
+        indx = np.argsort(-log_s @ gens)
+        gens = gens[:, indx]
+        T = T[indx]
 
     if red == "on":
         o = T[0, 0]
