@@ -333,7 +333,11 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
             elif label_type == "commas":
                 url_args["commas"] = label
                 url_args["submit_comma"] = "submit"
-            url_args["subgroup"] = args["subgroup"]
+
+            copy_args = ["subgroup", "reduce", "weights"]
+            for key in copy_args:
+                if key in args:
+                    url_args[key] = args[key]
             url = Markup(f'<a href="{flask.url_for("result", **url_args)}">{label}</a>')
 
             res[url] = [families_str, f"{k[2]:.3f}", f"{compl:10.1f}"]

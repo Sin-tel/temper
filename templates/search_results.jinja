@@ -1,0 +1,18 @@
+<div class="search-results">
+    {% if res is defined %}
+<table>
+    {% for key, value in res.items() %}
+        <tr>
+            <th> {{ key }} </th>
+            {% if value is not string and value is iterable%}
+                <td> {{ value[0] }} </td>
+                <td style="text-align: right;"> {{ value[1] }} </td>
+                <td style="text-align: right;"> {{ value[2] }} </td>
+            {% else %}
+                <td colspan= 3> {{ value|safe  }} </td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+</table>
+{% endif %}
+</div>

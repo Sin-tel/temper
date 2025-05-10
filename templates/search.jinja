@@ -1,61 +1,180 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>temper search</title>
 	<link rel="stylesheet" href= "{{ url_for('static', filename = 'basic.css') }}">
+	<style>
+        body {
+        	/* Always show scrollbar to avoid jitter */
+        	overflow-y: scroll;
+        }
+    </style>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>temper</title>
 	<link rel="shortcut icon" type="image/jpg" href="{{ url_for('static', filename = 'icon.png') }}"/>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('searchForm');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            // Function to perform search
+            function performSearch(formData) {
+                const searchParams = new URLSearchParams(formData);
+                const url = '/search?' + searchParams.toString();
+
+                // Update browser URL for bookmarking without reloading page
+                const newUrl = window.location.pathname + '?' + searchParams.toString();
+                history.pushState({ searchParams: searchParams.toString() }, '', newUrl);
+
+                // Show loading indicator
+                // No good, makes page jump
+                // resultsContainer.innerHTML = 'Searching...';
+
+                // Use fetch for the AJAX request
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    resultsContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    resultsContainer.innerHTML = 'Error loading results: ' + error.message;
+                });
+            }
+
+            // Handle form submission
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent normal form submission
+                const formData = new FormData(searchForm);
+                performSearch(formData);
+            });
+
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', function(event) {
+                if (event.state && event.state.searchParams) {
+                    // Restore form state from URL parameters
+                    const searchParams = new URLSearchParams(event.state.searchParams);
+
+                    // Update form inputs to match URL parameters
+                    searchParams.forEach((value, key) => {
+                        const elements = searchForm.elements[key];
+                        if (elements) {
+                            if (elements instanceof RadioNodeList) {
+                                // Handle radio buttons
+                                Array.from(elements).forEach(el => {
+                                    el.checked = (el.value === value);
+                                });
+                            } else if (elements.type === 'radio' || elements.type === 'checkbox') {
+                                elements.checked = (elements.value === value);
+                            } else {
+                                elements.value = value;
+                            }
+                        }
+                    });
+
+                    // Perform search with the restored parameters
+                    performSearch(searchParams);
+                }
+            });
+
+            // Handle initial load with URL parameters
+            if (window.location.search) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const formData = new FormData();
+
+                // Update form to match URL parameters
+                urlParams.forEach((value, key) => {
+                    formData.append(key, value);
+                    const elements = searchForm.elements[key];
+                    if (elements) {
+                        if (elements instanceof RadioNodeList) {
+                            // Handle radio buttons
+                            Array.from(elements).forEach(el => {
+                                el.checked = (el.value === value);
+                            });
+                        } else if (elements.type === 'radio' || elements.type === 'checkbox') {
+                            elements.checked = (elements.value === value);
+                        } else {
+                            elements.value = value;
+                        }
+                    }
+                });
+
+                // Perform initial search if URL has parameters
+                performSearch(formData);
+
+                // Add to browser history to handle back button correctly
+                history.replaceState({ searchParams: urlParams.toString() }, '', window.location.href);
+            }
+        });
+    </script>
 </head>
 <body>
 <div class="normal">
-
 <h1>Search temperaments</h1>
 <p>
 Enter a subgroup and optionally a list of commas or edos (entering both ignores commas).
 </p>
 <hr>
-
-<form action = "{{ url_for('search') }}" method = "GET">
+<form id="searchForm">
 	Sort by:
 	<br>
-	<input type="radio" id="cangwu" name="badness" value="cangwu"
-		{% if args is defined %}
-			{% if args.badness == "cangwu" %}
-				checked="checked"
-			{% endif %}
-		{% else %}
-			checked="checked"
-		{% endif %}
-	>
+	<input type="radio" id="cangwu" name="badness" value="cangwu" checked="checked">
 	<label for="cangwu">Cangwu badness</label>
 
-	<input type="radio" id="dirichlet" name="badness" value="dirichlet"
-		{% if args is defined %}
-		{% if args.badness == "dirichlet" %}
-		checked="checked"
-		{% endif %}
-		{% endif %}
-	>
+	<input type="radio" id="dirichlet" name="badness" value="dirichlet">
 	<label for="dirichlet">Dirichlet badness</label>
+	<details>
+		<summary open>Other options</summary>
+		Reduce generators:
+		<br>
+		<input type="radio" id="off" name="reduce" value="off">
+		<label for="off">off</label>
+
+		<input type="radio" id="reduce" name="reduce" value="on" checked="checked">
+		<label for="reduce">oct. reduce</label>
+
+		<input type="radio" id="spine" name="reduce" value="spine">
+		<label for="spine">spine+commas</label>
+
+		<input type="radio" id="layout" name="reduce" value="layout">
+		<label for="layout">layout</label>
+
+		<br>
+		Weights:
+		<br>
+		<input type="radio" id="tenney" name="weights" value="tenney">
+		<label for="tenney">tenney</label>
+
+		<input type="radio" id="weil" name="weights" value="weil" checked="checked">
+		<label for="weil">weil</label>
+
+		<input type="radio" id="unweighted" name="weights" value="unweighted">
+		<label for="unweighted">unweighted</label>
+	</details>
 
 	<p>Prime limit or subgroup<br>
-		<input type = "text" name = "subgroup"
-			{% if args is defined %}
-				value= {{args.subgroup}}
-			{% endif %}
-		required />
+		<input type = "text" name = "subgroup" required/>
 	</p>
+
+
 	<p>
 		List of edos<br>
-		<input type = "text"  name = "edos"
-			{% if args is defined and args.edos is defined %}
-				value = "{{args.edos}}"
-			{% endif %}
-		 />
+		<input type = "text"  name = "edos"/>
 	</p>
 	<p>
 		List of commas<br>
-		<textarea name = "commas" rows="5"/>{% if args is defined and args.commas is defined %}{{args.commas}}{% endif %}</textarea>
+		<textarea name = "commas" rows="5"/></textarea>
 	</p>
 	<p>
 		<input type = "submit" value="Search" />
@@ -63,30 +182,12 @@ Enter a subgroup and optionally a list of commas or edos (entering both ignores 
 </form>
 <hr>
 
-{% if res is defined %}
-<table>
-	{% for key, value in res.items() %}
-		<tr>
-			<th> {{ key }} </th>
-			{% if value is not string and value is iterable%}
-				<td> {{ value[0] }} </td>
-				<td style="text-align: right;"> {{ value[1] }} </td>
-				<td style="text-align: right;"> {{ value[2] }} </td>
-				<!-- {% for i in value %}
-					{% if i is number %}
-						<td style="text-align: right;"> {{ i }} </td>
-					{% endif %}
-				{% endfor %} -->
-			{% else %}
-				<td colspan= 3> {{ value|safe  }} </td>
-			{% endif %}
-		</tr>
-	{% endfor %}
-</table>
-{% endif %}
-
+<div id="resultsContainer">
+    {% if res %}
+        {% include './search_results.jinja' %}
+    {% endif %}
 </div>
 
+</div>
 </body>
 </html>
-

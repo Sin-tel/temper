@@ -43,6 +43,10 @@ def search():
         except TimeoutException as e:
             raise TimeoutException("Calculation took too long!") from e
 
+        if f.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return f.render_template("./search_results.jinja", res=res)
+
+        # Otherwise return the full page
         return f.render_template("./search.jinja", args=args, res=res)
 
     raise ValueError("nothing submitted")
