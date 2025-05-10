@@ -199,6 +199,8 @@ def info(
     if red == "layout":
         # find norm on quotient space
         WL = metric_weil_k(s_expanded, 15.0)
+        WL = (basis.T @ np.linalg.inv(WL) @ basis).astype(np.float64)
+        WL = np.linalg.inv(WL)
         WL = T @ WL @ T.T
         WL = np.linalg.inv(WL)
         gens_t = LLL(np.eye(T.shape[0], dtype=np.int64), WL)
