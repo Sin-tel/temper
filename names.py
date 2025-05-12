@@ -43,7 +43,7 @@ names = [
     ("akea", "2200/2187"),  # small tetracot diesis
     ("apollo", "100/99"),  # ptolemismic
     ("arcturus", "15625/15309"),
-    ("breed", "2401/2400"),  # breedsmic?
+    ("jove", "2401/2400"),  # breedsmic?
     ("buzurg", "169/168"),  # aka buzurg(ism)ic, dhanvantari
     ("canopus", "16875/16807"),  # 3.5.7, mirkwai, indra
     ("counterpyth", "1216/1215"),
