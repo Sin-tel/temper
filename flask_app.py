@@ -43,7 +43,7 @@ def search():
         except TimeoutException as e:
             raise TimeoutException("Calculation took too long!") from e
 
-        if f.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        if f.request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return f.render_template("./search_results.jinja", res=res)
 
         # Otherwise return the full page
@@ -64,7 +64,21 @@ def result():
 
         args["tenney"] = "tenney" in args
 
-        basis, s_expanded = parse_subgroup(args["subgroup"])
+        if "subgroup" in args:
+            basis, s_expanded = parse_subgroup(args["subgroup"])
+        else:
+            # infer basis from commas
+            assert (
+                "submit_comma" in args and "commas" in args
+            ), "subgroup can only be inferred from commas"
+            s_expanded = p_limit(97)
+            basis = np.eye(len(s_expanded), dtype=np.int64)
+            commas = parse_intervals(args["commas"], basis, s_expanded)
+            commas = np.hstack(commas)
+            subset = [not np.all(k == 0) for k in commas]
+            s_expanded = [prime for (prime, s) in zip(s_expanded, subset) if s]
+            basis = np.eye(len(s_expanded), dtype=np.int64)
+
         if "submit_edo" in args:
             assert "edos" in args, "no edos entered"
             T, T_expanded = from_edos(args["edos"], basis, s_expanded)
