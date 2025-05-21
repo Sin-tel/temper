@@ -74,6 +74,8 @@ def result():
             s_expanded = p_limit(97)
             basis = np.eye(len(s_expanded), dtype=np.int64)
             commas = parse_intervals(args["commas"], basis, s_expanded)
+            assert len(commas) > 0, "need at least one comma"
+
             commas = np.hstack(commas)
             subset = [not np.all(k == 0) for k in commas]
             s_expanded = [prime for (prime, s) in zip(s_expanded, subset) if s]

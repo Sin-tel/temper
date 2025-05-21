@@ -174,12 +174,19 @@ def parse_edos(s: str, subgroup: Subgroup) -> list[IntVec]:
 
 ratio_pattern = r"(\d+)[/:](\d+)"
 vector_pattern = r"[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]"
+s_pattern = r"[Ss](\d+)"
 
 
 def parse_intervals(c: str, basis: IntMat, s: SubgroupInt) -> list[IntVec]:
     commas = []
     for n, d in re.findall(ratio_pattern, c):
         commas.append(factors((int(n), int(d)), s))
+    for k in re.findall(s_pattern, c):
+        # square superparticular
+        k = int(k)
+        n = k * k
+        d = n - 1
+        commas.append(factors((n, d), s))
     for v in re.findall(vector_pattern, c):
         l = basis.shape[1]
         res = np.zeros((l, 1), dtype=np.int64)
