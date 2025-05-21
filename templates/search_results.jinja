@@ -1,5 +1,8 @@
 <div class="search-results">
-    {% if res is defined %}
+{% if res is defined %}
+{% if "error" in res %}
+    {{ res["error"] }}
+{% else %}
 <table>
     {% for key, value in res.items() %}
         <tr>
@@ -14,5 +17,6 @@
         </tr>
     {% endfor %}
 </table>
+{% endif %}
 {% endif %}
 </div>

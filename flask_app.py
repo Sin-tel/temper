@@ -42,6 +42,9 @@ def search():
                 res = temperament_search(args)
         except TimeoutException as e:
             raise TimeoutException("Calculation took too long!") from e
+        except Exception:
+            res = {}
+            res["error"] = "<pre>" + traceback.format_exc() + "</pre>"
 
         if f.request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return f.render_template("./search_results.jinja", res=res)
