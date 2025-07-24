@@ -15,11 +15,11 @@
 :root{
 --sans: 400 16px/1.5 "Open Sans", sans-serif;
 --mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, 'Courier New', monospace;
---c1:#0059a6; /*button, link*/
---c2:#ddd;  /*text field*/
---c3:#F5F5F5;
---c4:#0A0A0A;
---c5:#fff;
+--c1:#0059a6;   /* link */
+--c2:#ddd;      /* text field */
+--c3:#F5F5F5;   /* background */
+--c4:#0A0A0A;   /* body text */
+--c5:#fff;      /* text in button */
 --m1: 8px;
 --rc: 8px;
 }
@@ -28,11 +28,11 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-    --c1:#0071ce;
-    --c2:#333;
-    --c3:#1E2328;
-    --c4:#eee;
-    --c5:#fff;
+    --c1:#4780C7; /* link */
+    --c2:#333;    /* text field */
+    --c3:#1A1A1E; /* background */
+    --c4:#eee;    /* body text */
+    --c5:#fff;    /* text in button */
 	}
 }
 
