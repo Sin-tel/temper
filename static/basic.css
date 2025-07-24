@@ -15,7 +15,7 @@
 :root{
 --sans: 400 16px/1.5 "Open Sans", sans-serif;
 --mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, 'Courier New', monospace;
---c1:#0059a6 ; /*button, link*/
+--c1:#0059a6; /*button, link*/
 --c2:#ddd;  /*text field*/
 --c3:#F5F5F5;
 --c4:#0A0A0A;
@@ -25,15 +25,17 @@
 }
 
 
-/*
+
 @media (prefers-color-scheme: dark) {
 	:root {
+    --c1:#0071ce;
     --c2:#333;
-    --c3:#1e1f20;
-    --c4:#fff;
+    --c3:#1E2328;
+    --c4:#eee;
+    --c5:#fff;
 	}
 }
-*/
+
 
 /* fix table */
 
