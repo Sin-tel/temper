@@ -347,7 +347,10 @@ def info(
     W_tenney_inv = np.linalg.inv(W_tenney)
 
     badness = temp_badness((T, s), W=W_tenney_inv)
-    res["badness"] = f"{badness:.3f}"
+    if badness is None:
+        res["badness"] = "NA"
+    else:
+        res["badness"] = f"{badness:.3f}"
     # complexity = temp_complexity((T_expanded, s_expanded))
     # res["complexity"] = f"{complexity:.2f}"
 

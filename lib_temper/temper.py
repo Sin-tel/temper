@@ -1,6 +1,6 @@
 # collection of functions for dealing with regular temperaments
 
-from typing import Optional, TypeVar
+from typing import Optional
 
 import numpy as np
 import rslattice
@@ -8,7 +8,6 @@ import rslattice
 from .util_types import IntMat, FloatMat
 from .subgroup import *
 from .optimize import *
-from .combo import comboBySum
 
 
 # Find the hermite normal form of M
@@ -276,10 +275,12 @@ class Pmaps:
 
 # calculates the size of some exterior product, wrt weight matrix w
 # sqrt determinant of the gramian matrix
-def height(M, W):
+def height(M: FloatMat, W: FloatMat) -> Optional[float]:
     g = np.linalg.det(M @ W @ M.T)
     if g <= 1e-8:
-        return 1e-4
+        # If we have precision issues, return None
+        # TODO: Figure out if we can do a higher precision calculation here.
+        return None
 
     return np.sqrt(g)
 
@@ -304,7 +305,7 @@ def height(M, W):
 #
 # | X | ~ complexity
 # | y ∧ X | ~ error * complexity
-def temp_badness(temp, W=None):
+def temp_badness(temp, W=None) -> Optional[float]:
     M, S = temp
     r, d = M.shape
 
@@ -326,12 +327,13 @@ def temp_badness(temp, W=None):
 
     # || M ^ j ||
     b = height(np.vstack([M, j]), W)
+    if b is None:
+        return None
     # b = height(np.vstack([M, j]), W) / ((W_det) ** (1/2))
     # || M || ^ omega
     c = height(M, W)
     # c = height(M, W) / ((W_det) ** (1/2))
     c = c**omega
-
 
     # (|| M ^ j || * || M || ^ omega ) / ||j||
     return b * c / height(j, W)
