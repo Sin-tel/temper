@@ -5,9 +5,11 @@ import flask
 
 from info import from_commas, from_edos, search_families
 from lib_temper import *
+from lib_temper.combo import comboBySum
 from parse import *
 
 np.set_printoptions(suppress=True)
+
 
 def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     basis, s_expanded = parse_subgroup(args["subgroup"])
@@ -90,7 +92,11 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
     def badness(t_map: IntMat) -> float:
         if badness_type == "dirichlet":
-            return temp_badness((t_map, s), W_tenney_inv)
+            b = temp_badness((t_map, s), W_tenney_inv)
+            if b is None:
+                # TODO: we should still get some estimate here...
+                return 0.0
+            return b
         return height(t_map, W_weil_inv)
 
     if search_up:
@@ -340,7 +346,11 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
                     url_args[key] = args[key]
             url = Markup(f'<a href="{flask.url_for("result", **url_args)}">{label}</a>')
 
-            res[url] = [families_str, f"{k[2]:.3f}", f"{compl:10.1f}"]
+            b_format = f"{k[2]:.3f}"
+            if k[2] == 0.0:
+                b_format = "NA"
+
+            res[url] = [families_str, b_format, f"{compl:10.1f}"]
 
     s_str = ".".join([str(x) for x in s])
     print(f"search took: {time.time() - t_start} to find {total_count} temps, s={s_str}")
