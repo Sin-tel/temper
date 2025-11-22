@@ -112,7 +112,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
         B = c_map
 
         f_init = 8 * subgroup_size
-        f = 2 * (1.2 ** (dim - 1))
+        f = 1.4 * (1.1 ** (dim - 1))
+        f = min(f, 2.0)
 
         # print(f"f init = {f_init}")
         # print(f"f = {f}")
