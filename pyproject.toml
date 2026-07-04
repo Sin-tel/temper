@@ -1,5 +1,16 @@
-[build-system]
-requires = ["setuptools"]
+[project]
+name = "temper"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.1.3",
+    "gitpython>=3.1.50",
+    "numpy<2",
+    "rslattice>=0.1.1",
+]
+
 
 [tool.mypy]
 ignore_missing_imports = true
@@ -15,31 +26,35 @@ warn_redundant_casts = true
 
 [tool.pylint.'MESSAGES CONTROL']
 disable=[
-	"missing-module-docstring",
-	"missing-class-docstring",
-	"missing-function-docstring",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
 
-	"import-error",
-	"no-name-in-module",
-	"line-too-long",
-	"invalid-name",
-	"redefined-outer-name",
+    "import-error",
+    "no-name-in-module",
+    "line-too-long",
+    "invalid-name",
+    "redefined-outer-name",
 
-	"too-many-locals",
-	"too-many-branches",
-	"too-many-arguments",
-	"too-many-locals",
-	"too-many-instance-attributes",
-	"too-many-public-methods",
-	"too-many-nested-blocks",
-	"too-many-statements",
-	"too-many-function-args",
-	"too-few-public-methods",
-	"too-many-lines",
-	"too-many-return-statements",
+    "too-many-locals",
+    "too-many-branches",
+    "too-many-arguments",
+    "too-many-locals",
+    "too-many-instance-attributes",
+    "too-many-public-methods",
+    "too-many-nested-blocks",
+    "too-many-statements",
+    "too-many-function-args",
+    "too-few-public-methods",
+    "too-many-lines",
+    "too-many-return-statements",
 
-	"fixme",
-	"wildcard-import",
-	"unused-wildcard-import",
-	"consider-using-f-string",
+    "fixme",
+    "wildcard-import",
+    "unused-wildcard-import",
+    "consider-using-f-string",
 ]
+
+[tool.ruff.lint]
+ignore = ["F403", "F405", "F741"]
+
