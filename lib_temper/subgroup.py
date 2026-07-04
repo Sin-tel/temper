@@ -3,7 +3,7 @@
 from fractions import Fraction
 import numpy as np
 
-from .util_types import Subgroup, SubgroupInt, SubgroupFrac, IntMat
+from .util_types import Subgroup, SubgroupInt, SubgroupFrac, IntArray
 from .primes import primes
 from .interval import *
 
@@ -17,7 +17,7 @@ def p_limit(limit: int) -> SubgroupInt:
 
 
 # get basis for rational subgroup in term of prime expansion
-def get_subgroup_basis(subgroup: SubgroupFrac) -> tuple[IntMat, SubgroupInt]:
+def get_subgroup_basis(subgroup: SubgroupFrac) -> tuple[IntArray, SubgroupInt]:
     expanded = prime_expansion(subgroup)
     s_basis = []
     for k in subgroup:
@@ -60,7 +60,7 @@ def prime_factors(frac: Fraction) -> set[int]:
 
 
 # get the rational subgroup from the prime expansion + basis
-def get_subgroup(s_basis: IntMat, expanded: SubgroupInt) -> SubgroupFrac:
+def get_subgroup(s_basis: IntArray, expanded: SubgroupInt) -> SubgroupFrac:
     s = []
     for b in s_basis.T:
         s.append(ratio(b, expanded))

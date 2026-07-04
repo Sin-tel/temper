@@ -14,7 +14,9 @@ write_names()
 temperament_names = load_names()
 
 
-def from_commas(comma_str: str, basis: IntMat, s_expanded: SubgroupInt) -> tuple[IntMat, IntMat]:
+def from_commas(
+    comma_str: str, basis: IntArray, s_expanded: SubgroupInt
+) -> tuple[IntArray, IntArray]:
     commas = parse_intervals(comma_str, basis, s_expanded)
     assert len(commas) > 0, "need at least one comma"
     commas = np.hstack(commas)
@@ -32,7 +34,9 @@ def from_commas(comma_str: str, basis: IntMat, s_expanded: SubgroupInt) -> tuple
     return (M, M_expanded)
 
 
-def from_edos(edo_str: str, basis: IntMat, s_expanded: SubgroupInt) -> tuple[IntMat, IntMat]:
+def from_edos(
+    edo_str: str, basis: IntArray, s_expanded: SubgroupInt
+) -> tuple[IntArray, IntArray]:
     edos = parse_edos(edo_str, get_subgroup(basis, s_expanded))
 
     M = hnf(np.vstack(edos), remove_zeros=True)
@@ -97,7 +101,11 @@ alternating_iter = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9
 
 
 def info(
-    T: IntMat, basis: IntMat, T_expanded: IntMat, s_expanded: SubgroupInt, options: dict[str, Any]
+    T: IntArray,
+    basis: IntArray,
+    T_expanded: IntArray,
+    s_expanded: SubgroupInt,
+    options: dict[str, Any],
 ) -> dict[str, Any]:
     s = get_subgroup(basis, s_expanded)
 
@@ -118,7 +126,9 @@ def info(
     if len(families_weak) > 0:
         if families_str != "":
             families_str += ", "
-        names = [page_with_link([f"{s} family", s], s) for s in sorted(list(families_weak))]
+        names = [
+            page_with_link([f"{s} family", s], s) for s in sorted(list(families_weak))
+        ]
         families_str += "(" + ", ".join(names) + ")"
 
     if families_str != "":
@@ -185,7 +195,9 @@ def info(
         for k, _ in enumerate(maps_join):
             if maps_join[k, 0] < 0:
                 maps_join[k] *= -1
-        res[f"{ed_name} join"] = " & ".join(map(lambda x: edo_map_notation(x, s), maps_join))
+        res[f"{ed_name} join"] = " & ".join(
+            map(lambda x: edo_map_notation(x, s), maps_join)
+        )
 
     if "reduce" in options:
         red = options["reduce"]
@@ -251,7 +263,9 @@ def info(
             # generally not a fifth, just the second generator
             fifth = log_interval(gens[:, 1], s)
             # reduce others
-            cutoff = 0.04736875252  # Same cutoff as in modified FJS = log2(sqrt(2187/2048))
+            cutoff = (
+                0.04736875252  # Same cutoff as in modified FJS = log2(sqrt(2187/2048))
+            )
             # cutoff = 0.02781874387  # Neutral FJS = log2(sqrt(134217728/129140163))
             for i in range(2, T.shape[0]):
                 interval_size = log_interval(gens[:, i], s)
@@ -310,7 +324,9 @@ def info(
         # use least squares if theres more targets than degrees of freedom
         # if equal, this just solves the system
         if n_targets >= T_expanded.shape[0]:
-            target_tun, _ = lstsq((T_expanded, s_expanded), weight="unweighted", V=targets)
+            target_tun, _ = lstsq(
+                (T_expanded, s_expanded), weight="unweighted", V=targets
+            )
 
         # otherwise, use constraints with regular weights
         else:

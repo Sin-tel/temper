@@ -19,7 +19,7 @@ print("Temperament matrix:")
 print(mapping)
 
 # constrainted optimization will use octaves by default
-solution, _ = cte((mapping, subgroup), weight='tenney')
+solution, _ = cte((mapping, subgroup), weight="tenney")
 
 # solution is in octaves, multiply by 1200 to get cents
 print("Generators:")

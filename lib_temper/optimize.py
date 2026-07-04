@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from .util_types import FloatMat, Subgroup, SubgroupInt
+from .util_types import FloatArray, Subgroup, SubgroupInt
 from .interval import *
 from .farey import farey
 
@@ -76,7 +76,9 @@ def cte(temp, weight="tenney", V=None):
 
     Z = np.zeros((C.shape[0], C.shape[0]))
 
-    sol = np.linalg.solve(np.block([[A.T @ G @ A, C.T], [C, Z]]), np.vstack([A.T @ G @ b, d]))
+    sol = np.linalg.solve(
+        np.block([[A.T @ G @ A, C.T], [C, Z]]), np.vstack([A.T @ G @ b, d])
+    )
 
     sol = sol[:r]
 
@@ -91,7 +93,7 @@ def cte(temp, weight="tenney", V=None):
 
 
 # diagonal inverse log primes
-def metric_tenney(s: Subgroup) -> FloatMat:
+def metric_tenney(s: Subgroup) -> FloatArray:
     j = log_subgroup(s)
     W = np.diag(1.0 / j)
     G = W @ W.T
@@ -100,7 +102,7 @@ def metric_tenney(s: Subgroup) -> FloatMat:
 
 
 # diagonal inverse primes
-def metric_wilson(s: Subgroup) -> FloatMat:
+def metric_wilson(s: Subgroup) -> FloatArray:
     j = np.array(s).astype(np.double)
     W = np.diag(1.0 / j)
     G = W @ W.T
@@ -109,7 +111,7 @@ def metric_wilson(s: Subgroup) -> FloatMat:
 
 
 # weil norm
-def metric_weil(s: Subgroup) -> FloatMat:
+def metric_weil(s: Subgroup) -> FloatArray:
     n = len(s)
     j = log_subgroup(s)
     Bw = np.block([[np.eye(n)], [np.ones((1, n))]])
@@ -122,7 +124,7 @@ def metric_weil(s: Subgroup) -> FloatMat:
 
 
 # k-weil norm
-def metric_weil_k(s: Subgroup, k: float) -> FloatMat:
+def metric_weil_k(s: Subgroup, k: float) -> FloatArray:
     n = len(s)
     j = log_subgroup(s)
     Bw = np.block([[np.eye(n)], [k * np.ones((1, n))]])
@@ -135,7 +137,7 @@ def metric_weil_k(s: Subgroup, k: float) -> FloatMat:
 
 
 # farey series (integer limit) norm
-def metric_farey(s: SubgroupInt, n: int) -> FloatMat:
+def metric_farey(s: SubgroupInt, n: int) -> FloatArray:
     l = farey(n)  # integer limit
     lv = []
     for i in l:

@@ -5,13 +5,13 @@ from typing import Optional
 import numpy as np
 import rslattice
 
-from .util_types import IntMat, FloatMat
+from .util_types import IntArray, FloatArray
 from .subgroup import *
 from .optimize import *
 
 
 # Find the hermite normal form of M
-def hnf(M: IntMat, remove_zeros: bool = False) -> IntMat:
+def hnf(M: IntArray, remove_zeros: bool = False) -> IntArray:
     assert M.ndim == 2
 
     res = rslattice.hnf(M)
@@ -27,7 +27,7 @@ def hnf(M: IntMat, remove_zeros: bool = False) -> IntMat:
 # Adjoin an identity block matrix and solve for HNF.
 # This is equivalent to the highschool maths method,
 # but using HNF instead of Gaussian elimination.
-def kernel(M: IntMat) -> IntMat:
+def kernel(M: IntArray) -> IntArray:
     assert M.ndim == 2
     r, d = M.shape
 
@@ -39,7 +39,7 @@ def kernel(M: IntMat) -> IntMat:
 
 
 # Find the right kernel (nullspace) of M
-def cokernel(M: IntMat) -> IntMat:
+def cokernel(M: IntArray) -> IntArray:
     assert M.ndim == 2
     return kernel(M.T).T
 
@@ -49,7 +49,7 @@ def cokernel(M: IntMat) -> IntMat:
 # Operates on columns
 # M: Map
 # W: Weight matrix (metric)
-def LLL(M: IntMat, W: Optional[FloatMat] = None, delta: float = 0.75) -> IntMat:
+def LLL(M: IntArray, W: Optional[FloatArray] = None, delta: float = 0.75) -> IntArray:
     if W is None:
         W = np.eye(M.shape[0])
 
@@ -65,7 +65,7 @@ def LLL(M: IntMat, W: Optional[FloatMat] = None, delta: float = 0.75) -> IntMat:
 
 
 # Flips M along diagonal
-def antitranspose(M: IntMat) -> IntMat:
+def antitranspose(M: IntArray) -> IntArray:
     return np.flipud(np.fliplr((M.T)))
 
 
@@ -79,7 +79,7 @@ def antitranspose(M: IntMat) -> IntMat:
 # Journal of Number Theory.
 # https://doi.org/10.1016/j.jnt.2010.01.017
 # See section 8.
-def defactored_hnf(M: IntMat) -> IntMat:
+def defactored_hnf(M: IntArray) -> IntArray:
     r, _ = M.shape
 
     K = rslattice.hnf(M.T)[:r].T
@@ -96,7 +96,7 @@ def defactored_hnf(M: IntMat) -> IntMat:
 
 # Order of factorization.
 # For a saturated basis this is 1.
-def factor_order(M: IntMat) -> int:
+def factor_order(M: IntArray) -> int:
     r = M.shape[0]
     return rslattice.integer_det(rslattice.hnf(M.T)[:r].T)
 
@@ -275,7 +275,7 @@ class Pmaps:
 
 # calculates the size of some exterior product, wrt weight matrix w
 # sqrt determinant of the gramian matrix
-def height(M: FloatMat, W: FloatMat) -> Optional[float]:
+def height(M: FloatArray, W: FloatArray) -> Optional[float]:
     g = np.linalg.det(M @ W @ M.T)
     if g <= 1e-8:
         # If we have precision issues, return None

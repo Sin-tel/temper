@@ -48,10 +48,10 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
     ## metrics
 
-    def subgroup_norm(n_mat: FloatMat) -> FloatMat:
+    def subgroup_norm(n_mat: FloatArray) -> FloatArray:
         return (basis.T @ np.linalg.inv(n_mat) @ basis).astype(np.float64)
 
-    def norm_det(n_mat: FloatMat) -> FloatMat:
+    def norm_det(n_mat: FloatArray) -> FloatArray:
         W_det = np.linalg.det(n_mat)
         assert W_det > 0
         return n_mat / np.power(W_det, 1 / n_mat.shape[0])
@@ -84,13 +84,13 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
     total_count = 0
 
     # list of tuples (label, mapping, badness) ordered by rank
-    by_rank: dict[int, list[tuple[str, IntMat, float]]] = {}
+    by_rank: dict[int, list[tuple[str, IntArray, float]]] = {}
 
     checked: set[tuple[int, ...]] = set()
 
     delta = 0.75
 
-    def badness(t_map: IntMat) -> float:
+    def badness(t_map: IntArray) -> float:
         if badness_type == "dirichlet":
             b = temp_badness((t_map, s), W_tenney_inv)
             if b is None:
@@ -157,7 +157,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
             count = 0
             for idx in comboBySum(r_s, 0, len(comma_list) - 1):
                 combo = [comma_list[i] for i in idx]
-                t_mat: IntMat = np.vstack([k[1] for k in combo]).T
+                t_mat: IntArray = np.vstack([k[1] for k in combo]).T
                 t_mat = cokernel(t_mat)
                 if np.any(np.all(t_mat == 0, axis=0)):
                     continue
@@ -243,7 +243,7 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
             # for combo in itertools.combinations(edo_list, r_s):
             for idx in comboBySum(r_s, 0, len(edo_list) - 1):
                 combo = [edo_list[i] for i in idx]
-                t_mat: IntMat = np.vstack([k[1] for k in combo])
+                t_mat: IntArray = np.vstack([k[1] for k in combo])
                 t_mat = hnf(t_mat)
                 if np.any(np.all(t_mat[:] == 0, axis=1)):
                     continue
@@ -354,6 +354,8 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
             res[url] = [families_str, b_format, f"{compl:10.1f}"]
 
     s_str = ".".join([str(x) for x in s])
-    print(f"search took: {time.time() - t_start} to find {total_count} temps, s={s_str}")
+    print(
+        f"search took: {time.time() - t_start} to find {total_count} temps, s={s_str}"
+    )
 
     return res

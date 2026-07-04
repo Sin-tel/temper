@@ -4,7 +4,7 @@ import numpy as np
 from markupsafe import Markup
 
 from lib_temper import *
-from lib_temper.util_types import IntMat, SubgroupInt, SubgroupFrac
+from lib_temper.util_types import IntArray, SubgroupInt, SubgroupFrac
 from wiki.ratios import wiki_ratios
 from wiki.pages import wiki_pages
 
@@ -28,7 +28,7 @@ def page_with_link(titles: list[str], display: str) -> str:
     return display
 
 
-def parse_subgroup(s: str) -> tuple[IntMat, SubgroupInt]:
+def parse_subgroup(s: str) -> tuple[IntArray, SubgroupInt]:
     s = s.strip()
     s = [Fraction(i) for i in re.split(r"[\\.,; ]+", s)]
 
@@ -68,13 +68,13 @@ wart_map = {
 }
 
 
-def parse_edos(s: str, subgroup: Subgroup) -> list[IntVec]:
+def parse_edos(s: str, subgroup: Subgroup) -> list[IntArray]:
     # split string by separators (,.;& ) but ignore when in square brackets
     # "12, 17[+5, 8], 22"
     # => ["12", "17[+5, 8]", "22"]
     s = re.split(r"[\\.,; &]+(?!(?:[^,\[\]]+,)*[^,\[\]]+])", s.lower().strip())
 
-    edos: list[IntVec] = []
+    edos: list[IntArray] = []
 
     log_s = log_subgroup(subgroup)
     log_s = log_s / log_s[0]  # fix equave
@@ -146,7 +146,9 @@ def parse_edos(s: str, subgroup: Subgroup) -> list[IntVec]:
 
                         index = None
                         for k, v in enumerate(subgroup):
-                            assert v.denominator == 1, "Warts can't be used in rational subgroups"
+                            assert (
+                                v.denominator == 1
+                            ), "Warts can't be used in rational subgroups"
                             if w_prime == v.numerator:
                                 index = k
                                 break
@@ -177,7 +179,7 @@ vector_pattern = r"[\[(<]\s*(-?\d+(?:[,\s]+-?\d+)*)\s*[\])>]"
 s_pattern = r"[Ss](\d+)"
 
 
-def parse_intervals(c: str, basis: IntMat, s: SubgroupInt) -> list[IntVec]:
+def parse_intervals(c: str, basis: IntArray, s: SubgroupInt) -> list[IntArray]:
     commas = []
     for n, d in re.findall(ratio_pattern, c):
         commas.append(factors((int(n), int(d)), s))
@@ -198,7 +200,7 @@ def parse_intervals(c: str, basis: IntMat, s: SubgroupInt) -> list[IntVec]:
     return commas
 
 
-def format_matrix(matrix: IntMat) -> str:
+def format_matrix(matrix: IntArray) -> str:
     """Format a matrix using LaTeX syntax"""
     body_lines = [" & ".join(map(str, row)) for row in matrix]
     body = "\\\\\n".join(body_lines)
@@ -208,7 +210,7 @@ def format_matrix(matrix: IntMat) -> str:
 
 # given a map for some edo, return the string representation in the new format
 # (to replace warts notation)
-def edo_map_notation(this_map: IntVec, subgroup: Subgroup) -> str:
+def edo_map_notation(this_map: IntArray, subgroup: Subgroup) -> str:
     this_edo = this_map[0]
 
     # divide by equave to fix non-octave temps
