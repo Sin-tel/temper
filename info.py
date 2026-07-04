@@ -358,6 +358,11 @@ def info(
     if showtarget:
         res["target errors"] = ", ".join(map(cents, target_err2.flatten()))
 
+    res[f"{weight_name} primes"] = ", ".join(map(cents, (te_tun2 @ T).flatten()))
+    res[f"C{weight_name} primes"] = ", ".join(map(cents, (cte_tun2 @ T).flatten()))
+    if showtarget:
+        res["target primes"] = ", ".join(map(cents, (target_tun2 @ T).flatten()))
+
     W_tenney = basis.T @ np.linalg.inv(metric_tenney(s_expanded)) @ basis
     W_tenney = W_tenney.astype(np.float64)
     W_tenney_inv = np.linalg.inv(W_tenney)
