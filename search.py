@@ -254,6 +254,9 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
 
                 checked.add(t_tup)
 
+                # Sort by size
+                combo = sorted(combo, key=lambda x: x[1][0])
+
                 label = " & ".join([k[0] for k in combo])
 
                 b = badness(t_mat)
@@ -313,6 +316,9 @@ def temperament_search(args: dict[str, Any]) -> dict[str, Any]:
                     for edo_k in new_basis:
                         if edo_k[0] < 0:
                             edo_k *= -1
+                    # Sort by size
+                    new_basis = new_basis[new_basis[:, 0].argsort()]
+                    for edo_k in new_basis:
                         labels.append(edo_map_notation(edo_k, s))
                     label = " & ".join(labels)
                     label_type = "edos"

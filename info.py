@@ -195,6 +195,10 @@ def info(
         for k, _ in enumerate(maps_join):
             if maps_join[k, 0] < 0:
                 maps_join[k] *= -1
+
+        # Sort by size
+        maps_join = maps_join[maps_join[:, 0].argsort()]
+
         res[f"{ed_name} join"] = " & ".join(
             map(lambda x: edo_map_notation(x, s), maps_join)
         )
@@ -263,9 +267,9 @@ def info(
             # generally not a fifth, just the second generator
             fifth = log_interval(gens[:, 1], s)
             # reduce others
-            cutoff = (
-                0.04736875252  # Same cutoff as in modified FJS = log2(sqrt(2187/2048))
-            )
+
+            # Same cutoff as in modified FJS = log2(sqrt(2187/2048))
+            cutoff = 0.04736875252
             # cutoff = 0.02781874387  # Neutral FJS = log2(sqrt(134217728/129140163))
             for i in range(2, T.shape[0]):
                 interval_size = log_interval(gens[:, i], s)
